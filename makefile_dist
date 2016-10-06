@@ -1,0 +1,71 @@
+#
+# POM makefile
+#
+
+#-----------------------------------------------------------------------
+# Settings that depend on the system and the compiler
+#-----------------------------------------------------------------------
+# Set macros
+CPP = cpp -P
+FC = mpif90
+LD = mpif90
+CLEAN = rm
+MKDIR = mkdir
+# Set libraries and include files
+NETCDFINC = -I/path/to/pnetcdf/include
+NETCDFLIB = -L/path/to/pnetcdf/lib
+FFLAGS = -O0 -Wconversion -ffpe-trap=zero,overflow,underflow -fcheck=all -g -fbacktrace $(NETCDFINC) -I/path/to/project/sbPOM
+LIBS = $(NETCDFLIB) -lpnetcdf
+
+#-----------------------------------------------------------------------
+# Set the executable
+#-----------------------------------------------------------------------
+BIN = sbpom
+
+# Object Directory
+OBJECTDIR=./
+
+#-----------------------------------------------------------------------
+# Define source directory
+#-----------------------------------------------------------------------
+SRCDIR = pom
+
+#-----------------------------------------------------------------------
+# Define objects
+#-----------------------------------------------------------------------
+OBJS = parallel_mpi.o   \
+       io_pnetcdf.o     \
+       solver.o         \
+       bounds_forcing.o \
+       advance.o        \
+       initialize.o     \
+       pom.o
+VPATH = $(SRCDIR)
+
+#-----------------------------------------------------------------------
+# Set implicit rules for compilation
+#-----------------------------------------------------------------------
+%.o: %.f
+	@echo
+	$(FC) -c $(FFLAGS) $<
+
+#-----------------------------------------------------------------------
+# Set implicit rules for dependencies
+#-----------------------------------------------------------------------
+%.f: %.F
+	@echo
+	$(CPP) $(FFLAGS) $< > $*.f
+
+#-----------------------------------------------------------------------
+# Create the executable
+#-----------------------------------------------------------------------
+${OBJECTDIR}/$(BIN): $(OBJS)
+	${MKDIR} -p ${OBJECTDIR}
+	@echo
+	$(LD) $(FFLAGS) -o ${OBJECTDIR}/$(BIN) $(OBJS) $(LIBS)
+
+#-----------------------------------------------------------------------
+# Cleaning target
+#-----------------------------------------------------------------------
+clean:
+	@rm -f *.o *.mod

@@ -1,0 +1,15 @@
+The original POM serial code is reconfigured into
+
+pom.f : main dirver
+
+initialize.f : set up the problem
+
+advance.f : advance the code in time
+
+bounds_forcing.f : conditions, atmospheric forcing, restoring...
+
+solver.f : subroutines for basic dynamics
+
+parallel_mpi.f : parallel tasks (communications between processors)
+
+io_pnetcdf.F : parallel I/O

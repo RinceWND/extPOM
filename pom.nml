@@ -1,0 +1,80 @@
+&pom_nml
+  title = 'sbPOM test case: US east coast'
+  wrk_pth = '/home/rincewnd/POM/src/sbPOM/'
+  netcdf_file = 'jes'
+  mode = 3
+  nadv = 2
+  nitera = 1
+  sw = 0.5
+  npg = 1
+  dte = 2.
+  isplit = 30
+  time_start = '2000-01-01 00:00:00 +00:00'
+  nread_rst = 0
+  read_rst_file = 'restart.0001.nc'
+  write_rst = 1.0
+  write_rst_file = 'restart'
+  days = 1
+  prtd1 = 0.1
+  prtd2 = 1.0
+  swtch = 9999.
+/
+
+
+! title: run's title
+
+! netcdf_file: netCDF output file (rund ID)
+
+! mode: calculation mode
+! mode     description
+!  2       2-D calculation (bottom stress calculated in advave)
+!  3       3-D calculation (bottom stress calculated in profu,v)
+!  4       3-D calculation with t and s held fixed
+
+! nadv: advection scheme
+! nadv     advection scheme
+!  1       Centred scheme, as originally provide in POM
+!  2       Smolarkiewicz iterative upstream scheme, based on
+!          subroutines provided by Gianmaia Sannino and Vincenzo
+!          Artale
+
+! Constants for Smolarkiewicz iterative upstream scheme
+! nitera: number of iterations. This should be in the range 1 - 4. 1 is
+!         standard upstream differencing; 3 adds 50% CPU time to POM
+! sw: smoothing parameter. This should preferably be 1, but 0 < sw < 1
+!     gives smoother solutions with less overshoot when nitera > 1
+
+! npg: pressure gradient scheme
+! npg      pressure gradient scheme
+!  1       Second order scheme, as originally provide in POM
+!  2       Fourth order scheme using the McCalpin method (Berntsen and
+           Oey, Ocean Dynamics, 2010)
+
+! dte: external (2-D) time step (secs.) according to CFL
+
+! isplit: <Internal (3-D) time step>/<External (2-D) time step>
+!         (dti/dte; dimensionless)
+
+! time_start: date and time of start of initial run of model in format
+!             (i.e. UDUNITS convention)
+!             YYYY-MM-DD HH:MM:SS <+/->HH:MM
+!             where "<+/->HH:MM" is the time zone (positive eastwards
+!             from Coordinated Universal Time). NOTE that the
+!             climatological time axis (i.e. beginning of year zero,
+!             which does not exist in the real-world calendar) is used
+
+! Restart
+! nread_rst: index to indicate whether run to start from restart file
+!            (nread_rst=0: no restart input file; nread_rst=1: restart
+!            input file)
+! read_rst_file: restart input file name
+! write_rst: interval (days) to write a restart file
+! write_rst_file: restart output file name
+
+! days: run duration (days)
+
+! prtd1: initial print interval (days)
+
+! prtd2: final print interval (days)
+
+! swtch: time to switch from prtd1 to prtd2
