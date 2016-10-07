@@ -34,12 +34,13 @@
      $  im_global=180  ,
      $  jm_global=313  ,
      $  kb=33          ,
-     $  im_local=47    ,
+!     $  im_local=47    ,
 !     $  im_local=91    ,
-!     $  im_local=180   ,
-     $  jm_local=313   ,
-     $  n_proc=4       )
-!     $  n_proc=2       )
+     $  im_local=180   ,
+!     $  jm_local=313   ,
+     $  jm_local=158   ,
+!     $  n_proc=4       )
+     $  n_proc=2       )
 !     $  n_proc=1       )
 
 !_______________________________________________________________________

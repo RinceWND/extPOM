@@ -21,10 +21,6 @@
 
       do j=2,jm
         do i=2,imm1
-!          if (abs(d(i,j)) > 1.d10) write(*,'("D"i4.0,:i4.0,::,e16.7)')
-!     $                                  i,j,d(i,j)
-!          if (abs(ua(i,j)) > 1.d10) write(*,'("U"i4.0,:i4.0,::,e16.7)')
-!     $                                  i,j,ua(i,j)
           fluxua(i,j)=.125d0*((d(i+1,j)+d(i,j))*ua(i+1,j)
      $                       +(d(i,j)+d(i-1,j))*ua(i,j))
      $                      *(ua(i+1,j)+ua(i,j))
@@ -90,9 +86,6 @@
 
       do j=2,jmm1
         do i=2,im
-!          if (abs(va(i,j))>1.d1) then
-!            write(50+my_task,*) iint,i,j,d(i,j),va(i,j)
-!          end if
           fluxva(i,j)=.125d0*((d(i,j+1)+d(i,j))*va(i,j+1)
      $                       +(d(i,j)+d(i,j-1))*va(i,j))
      $                      *(va(i,j+1)+va(i,j))
@@ -935,13 +928,6 @@
         end do
       end do
       
-      if (maxval(abs(rho))>1.d10) then
-        write(*,*) "rho:",maxval(abs(rho)), maxloc(abs(rho))
-        write(*,*) "rmn:",maxval(abs(rmean)), maxloc(abs(rmean))
-        call finalize_mpi
-        stop "solver:baropg:941"
-      end if
-
 ! calculate x-component of baroclinic pressure gradient
       do j=2,jmm1
         do i=2,imm1
@@ -1000,13 +986,6 @@
         end do
       end do
 
-      if (maxval(abs(drhoy))>1.d10) then
-          write(*,*) maxval(abs(drhoy)), maxloc(abs(drhoy))
-          write(*,*) maxval(abs(rho)), maxloc(abs(rho))
-          call finalize_mpi
-          stop "solver:baropg:1000"
-        end if
- 
       do k=1,kbm1
         do j=2,jmm1
           do i=2,imm1
@@ -1241,12 +1220,6 @@
         end do
       end do
       
-      if (maxval(abs(drhoy))>1.d10.and.my_task==0) then
-        write(*,*) maxval(abs(drhoy)), maxloc(abs(drhoy))
-        call finalize_mpi
-        stop "solver:1233"
-      end if
-
       do k=2,kbm1
         do j=2,jmm1
           do i=2,imm1

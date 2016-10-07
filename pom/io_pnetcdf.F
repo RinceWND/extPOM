@@ -1646,6 +1646,9 @@
 ! close file
       status=nfmpi_close(ncid)
       call handle_error_pnetcdf('nf_close',status,nf_noerr)
+! convert heat fluxes
+      shf = -shf/rhoref/3986. ! J/kg
+      swr = -swr/rhoref/3986.
 
       return
       end

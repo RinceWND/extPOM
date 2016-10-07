@@ -11,13 +11,6 @@
 ! get time
       call get_time
       
-      if (maxval(abs(rho))>1.d5) then
-        write(*,*) "iint=",iint
-        write(*,*) "rho:",maxval(abs(rho)), maxloc(abs(rho))
-        call finalize_mpi
-        stop "advance:advance:18"
-      end if
-      
 ! set time dependent surface boundary conditions
       call surface_forcing
       
@@ -113,12 +106,6 @@
           write(6,'(/''Error: invalid value for npg'')')
         end if
         
-        if (maxval(abs(drhoy))>1.d10) then
-          write(*,*) maxval(abs(drhoy)), maxloc(abs(drhoy))
-          call finalize_mpi
-          stop "advance:112"
-        end if
-
         do k=1,kbm1
           do j=2,jmm1
             do i=2,imm1
@@ -162,12 +149,6 @@
               ady2d(i,j)=ady2d(i,j)+advy(i,j,k)*dz(k)
               drx2d(i,j)=drx2d(i,j)+drhox(i,j,k)*dz(k)
               dry2d(i,j)=dry2d(i,j)+drhoy(i,j,k)*dz(k)
-          if (abs(dry2d(i,j))>1.d10.and.my_task==0) then
-                write(*,*) "!!!",my_task,":",iint,i,j
-                write(*,*) drhoy(i,j,k), dz(k)
-                call finalize_mpi
-                stop "advance:162"
-              end if
               aam2d(i,j)=aam2d(i,j)+aam(i,j,k)*dz(k)
             end do
           end do
@@ -237,8 +218,6 @@
       
       if(mod(iext,ispadv).eq.0) call advave
       
-      write(*,*) "1]",my_task,"-",iint,"::",va(44,31)
-      
       do j=2,jmm1
         do i=2,im
           uaf(i,j)=adx2d(i,j)+advua(i,j)
@@ -279,38 +258,8 @@
      $                         +elf(i,j)-elf(i,j-1))
      $                  +e_atmos(i,j)-e_atmos(i,j-1))
      $              +dry2d(i,j)+arv(i,j)*(wvsurf(i,j)-wvbot(i,j))
-          if (my_task==0 .and. i==44 .and. j==31) then
-            write(*,*) "[ady2d]",ady2d(i,j)
-            write(*,*) "[advva]",advva(i,j)
-            write(*,*) "[ arv ]",arv(i,j)
-            write(*,*) "[ cor ]",cor(i,j)
-            write(*,*) "[cor-1]",cor(i,j-1)
-            write(*,*) "[  d  ]",d(i,j)
-            write(*,*) "[ d-1 ]",d(i,j-1)
-            write(*,*) "[ ua+ ]",ua(i+1,j)
-            write(*,*) "[ ua  ]",ua(i,j)
-            write(*,*) "[ua+-1]",ua(i+1,j-1)
-            write(*,*) "[ ua-1]",ua(i,j-1)
-            write(*,*) "[ grav]",grav
-            write(*,*) "[ dx  ]",dx(i,j)
-            write(*,*) "[ dx-1]",dx(i,j-1)
-            write(*,*) "[alpha]",alpha
-            write(*,*) "[ el  ]",el(i,j)
-            write(*,*) "[ el-1]",el(i,j-1)
-            write(*,*) "[elb  ]",elb(i,j)
-            write(*,*) "[elb-1]",elb(i,j-1)
-            write(*,*) "[elf  ]",elf(i,j)
-            write(*,*) "[elf-1]",elf(i,j-1)
-            write(*,*) "[atmos]",e_atmos(i,j)
-            write(*,*) "[atm-1]",e_atmos(i,j-1)
-            write(*,*) "[dry2d]",dry2d(i,j)
-            write(*,*) "[wvsrf]",wvsurf(i,j)
-            write(*,*) "[wvbot]",wvbot(i,j)
-          end if
         end do
       end do
-      
-      write(*,*) "2]",my_task,"-",iint,"::",vaf(44,31)
       
       do j=2,jm
         do i=2,imm1
@@ -321,8 +270,6 @@
      $                 *arv(i,j))
         end do
       end do
-      
-      write(*,*) "3]",my_task,"-",iint,"::",vaf(44,31)
       
       call bcond(2)
       
@@ -370,8 +317,6 @@
         end do
       end do
       
-      write(*,*) "4]",my_task,"-",iint,"::",va(44,31)
-
       if(iext.ne.isplit) then
         do j=1,jm
           do i=1,im
@@ -533,13 +478,6 @@
 
           ! restore temperature and salinity
           !call restore_interior ! TODO: Do not restore t and s yet
-          if (maxval(abs(s))>1.d5 .or. maxval(abs(t))>1.d5) then
-            write(*,*) "iint=",iint
-            write(*,*) "s:",maxval(abs(s)), maxloc(abs(s))
-            write(*,*) "t:",maxval(abs(t)), maxloc(abs(t))
-            call finalize_mpi
-            stop "advance:mode_internal:542"
-          end if
           
           call dens(s,t,rho)
 
