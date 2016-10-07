@@ -21,10 +21,10 @@
 
       do j=2,jm
         do i=2,imm1
-          if (abs(d(i,j)) > 1.d10) write(*,'("D"i4.0,:i4.0,::,e16.7)')
-     $                                  i,j,d(i,j)
-          if (abs(ua(i,j)) > 1.d10) write(*,'("U"i4.0,:i4.0,::,e16.7)')
-     $                                  i,j,ua(i,j)
+!          if (abs(d(i,j)) > 1.d10) write(*,'("D"i4.0,:i4.0,::,e16.7)')
+!     $                                  i,j,d(i,j)
+!          if (abs(ua(i,j)) > 1.d10) write(*,'("U"i4.0,:i4.0,::,e16.7)')
+!     $                                  i,j,ua(i,j)
           fluxua(i,j)=.125d0*((d(i+1,j)+d(i,j))*ua(i+1,j)
      $                       +(d(i,j)+d(i-1,j))*ua(i,j))
      $                      *(ua(i+1,j)+ua(i,j))
@@ -63,7 +63,7 @@
         end do
       end do
 
-      call exchange2d_mpi(fluxua,im,jm)
+      call exchange2d_mpi(fluxua(1:im,1:jm),im,jm)
 
       do j=2,jmm1
         do i=2,imm1
@@ -90,6 +90,9 @@
 
       do j=2,jmm1
         do i=2,im
+!          if (abs(va(i,j))>1.d1) then
+!            write(50+my_task,*) iint,i,j,d(i,j),va(i,j)
+!          end if
           fluxva(i,j)=.125d0*((d(i,j+1)+d(i,j))*va(i,j+1)
      $                       +(d(i,j)+d(i,j-1))*va(i,j))
      $                      *(va(i,j+1)+va(i,j))
@@ -113,7 +116,7 @@
         end do
       end do
 
-      call exchange2d_mpi(fluxva,im,jm)
+      call exchange2d_mpi(fluxva(1:im,1:jm),im,jm)
 
       do j=2,jmm1
         do i=2,imm1
@@ -721,7 +724,7 @@
           end do
         end do
         ! next line added on 22-Jul-2009 by Raffaele Bernardello
-        call exchange3d_mpi(ff(:,:,1:kbm1),im,jm,kbm1)
+        call exchange3d_mpi(ff(1:im,1:jm,1:kbm1),im,jm,kbm1)
 
 ! calculate antidiffusion velocity
         call smol_adif(xmassflux,ymassflux,zwflux,ff)
@@ -931,6 +934,13 @@
           end do
         end do
       end do
+      
+      if (maxval(abs(rho))>1.d10) then
+        write(*,*) "rho:",maxval(abs(rho)), maxloc(abs(rho))
+        write(*,*) "rmn:",maxval(abs(rmean)), maxloc(abs(rmean))
+        call finalize_mpi
+        stop "solver:baropg:941"
+      end if
 
 ! calculate x-component of baroclinic pressure gradient
       do j=2,jmm1
@@ -990,6 +1000,13 @@
         end do
       end do
 
+      if (maxval(abs(drhoy))>1.d10) then
+          write(*,*) maxval(abs(drhoy)), maxloc(abs(drhoy))
+          write(*,*) maxval(abs(rho)), maxloc(abs(rho))
+          call finalize_mpi
+          stop "solver:baropg:1000"
+        end if
+ 
       do k=1,kbm1
         do j=2,jmm1
           do i=2,imm1
@@ -999,7 +1016,7 @@
           end do
         end do
       end do
-
+      
       do k=1,kb
         do j=2,jmm1
           do i=2,imm1
@@ -1223,6 +1240,12 @@
           drhoy(i,j,1)=grav*(-zz(1))*d4(i,j)*drho(i,j,1)
         end do
       end do
+      
+      if (maxval(abs(drhoy))>1.d10.and.my_task==0) then
+        write(*,*) maxval(abs(drhoy)), maxloc(abs(drhoy))
+        call finalize_mpi
+        stop "solver:1233"
+      end if
 
       do k=2,kbm1
         do j=2,jmm1
@@ -1343,7 +1366,7 @@
       double precision l0(im,jm)
       double precision cbcnst,surfl,shiw
       double precision utau2(im,jm)
-      double precision df0,df1,df2,   tmp !!!!!!! TODO: remove tmp var
+!      double precision df0,df1,df2
       integer i,j,k,ki
 
       data a1,b1,a2,b2,c1/0.92d0,16.6d0,0.74d0,10.1d0,0.08d0/
@@ -1404,10 +1427,6 @@
 
       do j=1,jmm1
         do i=1,imm1
-          if (abs(wusurf(i,j))>1.d5 .or. abs(wusurf(i+1,j))>1.d5
-     $   .or. abs(wvsurf(i,j))>1.d5 .or. abs(wvsurf(i,j+1))>1.d5)
-     $       write(50,'(4(e16.7,x))')
-     $          wusurf(i,j),wusurf(i+1,j),wvsurf(i,j),wvsurf(i,j+1)
           utau2(i,j)=sqrt((.5d0*(wusurf(i,j)+wusurf(i+1,j)))**2
      $                   +(.5d0*(wvsurf(i,j)+wvsurf(i,j+1)))**2)
           uf(i,j,kb)=sqrt((.5d0*(wubot(i,j)+wubot(i+1,j)))**2
@@ -1415,7 +1434,7 @@
         end do
       end do
       call exchange2d_mpi(utau2,im,jm)
-      call exchange2d_mpi(uf(:,:,kb),im,jm)
+      call exchange2d_mpi(uf(1:im,1:jm,kb),im,jm)
 
       do j=1,jm
         do i=1,im
@@ -1936,7 +1955,7 @@
           wubot(i,j)=-tps(i,j)*uf(i,j,kbm1)
         end do
       end do
-      call exchange2d_mpi(wubot,im,jm)
+      call exchange2d_mpi(wubot(1:im,1:jm),im,jm)
 
       return
       end
@@ -2043,7 +2062,7 @@
           wvbot(i,j)=-tps(i,j)*vf(i,j,kbm1)
         end do
       end do
-      call exchange2d_mpi(wvbot,im,jm)
+      call exchange2d_mpi(wvbot(1:im,1:jm),im,jm)
 
       return
       end
@@ -2207,7 +2226,7 @@
 ! calculates real vertical velocity (wr)
       implicit none
       include 'pom.h'
-      integer i,j,k
+      integer i,j,k,li !TODO: remove li
       double precision dxr,dxl,dyt,dyb
       do k=1,kb
         do j=1,jm
@@ -2239,7 +2258,7 @@
         end do
       end do
 
-      call exchange3d_mpi(wr(:,:,1:kbm1),im,jm,kbm1)
+      call exchange3d_mpi(wr(1:im,1:jm,1:kbm1),im,jm,kbm1)
 
       do k=1,kb
         do i=1,im

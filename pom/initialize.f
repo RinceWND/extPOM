@@ -8,7 +8,7 @@
 ! initialize POM
       implicit none
       include 'pom.h'
-      integer i,j,k
+!      integer i,j,k
 
 ! initialize the MPI execution environment and create communicator for
 !internal POM communications
@@ -237,69 +237,56 @@
 ! initialize arrays for safety
       implicit none
       include 'pom.h'
-      integer i,j,k
+!      integer i,j,k
 
 ! boundary arrays
-      do i=1,im
-        vabn(i)=0.d0
-        vabs(i)=0.d0
-        eln(i)=0.d0
-        els(i)=0.d0
-        do k=1,kb
-          vbn(i,k)=0.d0
-          vbs(i,k)=0.d0
-          tbn(i,k)=0.d0
-          tbs(i,k)=0.d0
-          sbn(i,k)=0.d0
-          sbs(i,k)=0.d0
-        end do
-      end do
+      vabn = 0.d0
+      vabs = 0.d0
+      uabe = 0.d0
+      uabw = 0.d0
+      
+      eln  = 0.d0
+      els  = 0.d0
+      ele  = 0.d0
+      elw  = 0.d0
+      
+      vbn  = 0.d0
+      vbs  = 0.d0
+      tbn  = 0.d0
+      tbs  = 0.d0
+      sbn  = 0.d0
+      sbs  = 0.d0
 
-      do j=1,jm
-        uabe(j)=0.d0
-        uabw(j)=0.d0
-        ele(j)=0.d0
-        elw(j)=0.d0
-        do k=1,kb
-          ube(j,k)=0.d0
-          ubw(j,k)=0.d0
-          tbe(j,k)=0.d0
-          tbw(j,k)=0.d0
-          sbe(j,k)=0.d0
-          sbw(j,k)=0.d0
-        end do
-      end do
+      ube  = 0.d0
+      ubw  = 0.d0
+      tbe  = 0.d0
+      tbw  = 0.d0
+      sbe  = 0.d0
+      sbw  = 0.d0
 
       fluxua = 0.d0
       fluxva = 0.d0
-! 2-D and 3-D arrays
-      do j=1,jm
-        do i=1,im
-          uab(i,j)=0.d0
-          vab(i,j)=0.d0
-          elb(i,j)=0.d0
-          etb(i,j)=0.d0
-          e_atmos(i,j)=0.d0
-          vfluxb(i,j)=0.d0
-          vfluxf(i,j)=0.d0
-          wusurf(i,j)=0.d0
-          wvsurf(i,j)=0.d0
-          wtsurf(i,j)=0.d0
-          wssurf(i,j)=0.d0
-          swrad(i,j)=0.d0
-          drx2d(i,j)=0.d0
-          dry2d(i,j)=0.d0
-        end do
-      end do
-
-      do k=1,kbm1
-        do j=1,jm
-          do i=1,im
-            ub(i,j,k)=0.d0
-            vb(i,j,k)=0.d0
-          end do
-        end do
-      end do
+! 2-D arrays
+      uab     = 0.d0
+      vab     = 0.d0
+      elb     = 0.d0
+      etb     = 0.d0
+      e_atmos = 0.d0
+      vfluxb  = 0.d0
+      vfluxf  = 0.d0
+      wusurf  = 0.d0
+      wvsurf  = 0.d0
+      wtsurf  = 0.d0
+      wssurf  = 0.d0
+      swrad   = 0.d0
+      drx2d   = 0.d0
+      dry2d   = 0.d0
+! 3-D arrays
+      ub = 0.d0
+      vb = 0.d0
+      
+!      drhox = 0.d0
+!      drhoy = 0.d0
 
       return
       end
@@ -349,11 +336,7 @@
       end if
 
 ! calculate areas of "t" and "s" cells
-      do j=1,jm
-        do i=1,im
-          art(i,j)=dx(i,j)*dy(i,j)
-        end do
-      end do
+      art = dx*dy
 
 ! calculate areas of "u" and "v" cells
       do j=2,jm
@@ -362,28 +345,24 @@
           arv(i,j)=.25d0*(dx(i,j)+dx(i,j-1))*(dy(i,j)+dy(i,j-1))
         end do
       end do
-      call exchange2d_mpi(aru,im,jm)
-      call exchange2d_mpi(arv,im,jm)
+      call exchange2d_mpi(aru(1:im,1:jm),im,jm)
+      call exchange2d_mpi(arv(1:im,1:jm),im,jm)
 
       if (n_west.eq.-1) then
-        do j=1,jm
-          aru(1,j)=aru(2,j)
-          arv(1,j)=arv(2,j)
-        end do
+        aru(1,:)=aru(2,:)
+        arv(1,:)=arv(2,:)
       end if
 
       if (n_south.eq.-1) then
-        do i=1,im
-          aru(i,1)=aru(i,2)
-          arv(i,1)=arv(i,2)
-        end do
+        aru(:,1)=aru(:,2)
+        arv(:,1)=arv(:,2)
       end if
 
       do i=1,im
         do j=1,jm
           d(i,j)=h(i,j)+el(i,j)
           dt(i,j)=h(i,j)+et(i,j)
-          end do
+        end do
       end do
 
       return
@@ -396,16 +375,17 @@
       include 'pom.h'
       integer nz
       parameter(nz=40)
-      integer i,j,k,nn
-      double precision sum1,sum2
-      double precision tb0(im,jm,nz),sb0(im,jm,nz)
-      double precision tb2(im,jm,nz),sb2(im,jm,nz)
-      double precision p1(im,jm,kb),p2(im,jm,kb)
-      double precision z2(nz)
+      integer i,j,k
+!      double precision sum1,sum2
+!      double precision tb0(im,jm,nz),sb0(im,jm,nz)
+!      double precision tb2(im,jm,nz),sb2(im,jm,nz)
+!      double precision p1(im,jm,kb),p2(im,jm,kb)
+!      double precision z2(nz)
 
 ! read initial temperature and salinity from ic file
-      call read_initial_ts_pnetcdf(kb,tb,sb)
-      call read_clim_ts_pnetcdf(kb,10,tclim,sclim)
+      call read_initial_ts_pnetcdf(kb,tb(1:im,1:jm,:),sb(1:im,1:jm,:))
+      call read_clim_ts_pnetcdf(kb,10
+     $                         ,tclim(1:im,1:jm,:),sclim(1:im,1:jm,:))
 
 ! map onto sigma coordinate
 !      call ztosig(z2,tb0,zz,h,tclim,im,jm,nz,kb,
@@ -514,7 +494,14 @@
         end do
       end do
 
-      call baropg
+      if (npg.eq.1) then
+        call baropg
+      else if (npg.eq.2) then
+        call baropg_mcc
+      else
+        error_status=1
+        write(6,'(/''Error: invalid value for npg'')')
+      end if
 
       do k=1,kbm1
         do j=1,jm
@@ -534,17 +521,13 @@
       implicit none
       include 'pom.h'
       integer i,j
-      double precision TCB(im,jm)
-      real tmp
+!      double precision TCB(im,jm)
       
 ! calculate bottom friction
       !TCB(1:im,1:jm) = h(1:im,1:jm)
       
       do i=1,im
         do j=1,jm
-          tmp = minval(h)
-          write(50+my_task,*) minloc(h), tmp
-          !write(50+my_task,*) log(tmp)
           cbc(i,j)=(kappa/log((1.+zz(kbm1))*h(i,j)/z0b))**2
           cbc(i,j)=max(cbcmin,cbc(i,j))
 ! if the following is invoked, then it is probable that the wrong

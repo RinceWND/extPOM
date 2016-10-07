@@ -159,7 +159,7 @@
       include 'pom.h'
       integer nx,ny
       double precision work(nx,ny)
-      integer i,j,k
+      integer i,j
       integer ierr
       integer istatus(mpi_status_size)
       double precision send_east(ny),recv_west(ny)
@@ -357,7 +357,7 @@
       include 'pom.h'
       integer nx,ny
       double precision work2(nx,ny),work4(0:nx,0:ny)
-      integer i,j,k
+      integer i,j
       integer ierr
       integer istatus(mpi_status_size)
       double precision send_east(ny),recv_west(ny)

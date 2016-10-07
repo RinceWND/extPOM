@@ -339,7 +339,7 @@
       include 'pom.h'
       integer idx
       double precision cl,denom
-      double precision ar,eps
+!      double precision ar,eps
       integer i,j,k
 
       if(idx.eq.1) then
@@ -607,11 +607,11 @@
       parameter(nz=40)
       integer i,j,k,ntime,ibc
       double precision tbc,fold,fnew
-      double precision z0(nz),hs(im,jm)
-      double precision t_w(jm,nz),s_w(jm,nz),t_e(jm,nz),s_e(jm,nz),q,
-     $       t_n(im,nz),s_n(im,nz),t_s(im,nz),s_s(im,nz)
-      double precision ts1(im,jm,nz),ss1(im,jm,nz)
-      double precision ts2(im,jm,kb),ss2(im,jm,kb)
+!      double precision z0(nz),hs(im,jm)
+!      double precision t_w(jm,nz),s_w(jm,nz),t_e(jm,nz),s_e(jm,nz),q,
+!     $       t_n(im,nz),s_n(im,nz),t_s(im,nz),s_s(im,nz)
+!      double precision ts1(im,jm,nz),ss1(im,jm,nz)
+!      double precision ts2(im,jm,kb),ss2(im,jm,kb)
 
       tbc=30. ! time between bc files (days)
       ibc=int(tbc*86400.d0/dti)
@@ -619,8 +619,11 @@
 ! read bc data
       ! read initial bc file
       if (iint.eq.1) then
-        call read_boundary_conditions_pnetcdf(iint/ibc,kb,
-     $  tbwf,sbwf,ubwf,tbef,sbef,ubef,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
+        call read_boundary_conditions_pnetcdf(iint/ibc,kb
+     $                         ,tbwf(1:jm,:),sbwf(1:jm,:),ubwf(1:jm,:)
+     $                         ,tbef(1:jm,:),sbef(1:jm,:),ubef(1:jm,:)
+     $                         ,tbnf(1:im,:),sbnf(1:im,:),vbnf(1:im,:)
+     $                         ,tbsf(1:im,:),sbsf(1:im,:),vbsf(1:im,:))
 ! integrate by depth
         uabwf = sum(ubwf, 2)
         uabef = sum(ubef, 2)
@@ -727,7 +730,7 @@
         end do
         do i=1,im
           do k=1,kb
-            write(51,'(2(i4),e16.7)') i,k,sbnf(i,k)
+!            write(51,'(2(i4),e16.7)') i,k,sbnf(i,k)
             tbnb(i,k)=tbnf(i,k)
             sbnb(i,k)=sbnf(i,k)
             tbsb(i,k)=tbsf(i,k)
@@ -876,7 +879,8 @@
 
 ! read wind stress data
       ! read initial wind file
-      if (iint.eq.1) call read_wind_pnetcdf(iint/iwind,wusurff,wvsurff)
+      if (iint.eq.1) call read_wind_pnetcdf(iint/iwind
+     $                           ,wusurff(1:im,1:jm),wvsurff(1:im,1:jm))
       ! read wind file corresponding to next time
       if (iint.eq.1 .or. mod(iint,iwind).eq.0.) then
         do i=1,im
@@ -886,7 +890,8 @@
           end do
         end do
         if (iint.ne.iend) then
-          call read_wind_pnetcdf((iint+iwind)/iwind,wusurff,wvsurff)
+          call read_wind_pnetcdf((iint+iwind)/iwind
+     $                           ,wusurff(1:im,1:jm),wvsurff(1:im,1:jm))
         end if
       end if
 
@@ -917,7 +922,8 @@
 
 ! read wind stress data
       ! read initial heat file
-      if (iint.eq.1) call read_heat_pnetcdf(iint/iheat,wtsurff,swradf)
+      if (iint.eq.1) call read_heat_pnetcdf(iint/iheat
+     $                            ,wtsurff(1:im,1:jm),swradf(1:im,1:jm))
       ! read heat forcing corresponding to next twind
       if (iint.eq.1 .or. mod(iint,iheat).eq.0.) then
         do i=1,im
@@ -926,7 +932,8 @@
             swradb(i,j)=swradf(i,j)
           end do
         end do
-        call read_heat_pnetcdf((iint+iheat)/iheat,wtsurff,swradf)
+        call read_heat_pnetcdf((iint+iheat)/iheat
+     $                            ,wtsurff(1:im,1:jm),swradf(1:im,1:jm))
       end if
 
 ! linear interpolation in time
