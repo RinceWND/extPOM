@@ -15,22 +15,26 @@
       integer(mpi_offset_kind) length
 ! define variable
       status=nfmpi_def_var(ncid,name,nf_double,nvdims,vdims,varid)
-      call handle_error_pnetcdf('nf_put_att_text',status,nf_noerr)
+      call handle_error_pnetcdf('nf_def_var `'//trim(name)//'`'
+     $                                                 ,status,nf_noerr)
 ! define attributes
       length=len(trim(long_name))
       status=nfmpi_put_att_text(ncid,varid,'long_name',
      $                                           length,trim(long_name))
-      call handle_error_pnetcdf('nf_put_att_text',status,nf_noerr)
+      call handle_error_pnetcdf('nf_put_att_text: long_name'
+     $                                                 ,status,nf_noerr)
 
       length=len(trim(units))
       status=nfmpi_put_att_text(ncid,varid,'units',length,trim(units))
-      call handle_error_pnetcdf('nf_put_att_text',status,nf_noerr)
+      call handle_error_pnetcdf('nf_put_att_text: units'
+     $                                                 ,status,nf_noerr)
 ! add coordinates attribute, if necessary
       if(lcoords) then
         length=len(trim(coords))
         status=nfmpi_put_att_text(ncid,varid,'coordinates',
      $                                              length,trim(coords))
-        call handle_error_pnetcdf('nf_put_att_text',status,nf_noerr)
+        call handle_error_pnetcdf('nf_put_att_text: coordinates'
+     $                                                 ,status,nf_noerr)
       end if
       return
       end
@@ -86,13 +90,15 @@
       length=len(trim(title))
       status=nfmpi_put_att_text(ncid,nf_global,'title',length,
      $                                                      trim(title))
-      call handle_error_pnetcdf('nf_put_att_text',status,nf_noerr)
+      call handle_error_pnetcdf('nf_put_att_text: title'
+     $                                                 ,status,nf_noerr)
 
       str_tmp='output file'
       length=len(trim(str_tmp))
       status=nfmpi_put_att_text(ncid,nf_global,'description',length,
      $                                                    trim(str_tmp))
-      call handle_error_pnetcdf('nf_put_att_text',status,nf_noerr)
+      call handle_error_pnetcdf('nf_put_att_text: description'
+     $                                                 ,status,nf_noerr)
 
 ! define dimensions
       length=1
@@ -342,10 +348,9 @@
       character*120 netcdf_out_file,str_tmp
       integer nprint
       integer time_dimid,x_dimid,y_dimid,z_dimid
-      integer z_varid,zz_varid,dx_varid,dy_varid,east_c_varid,
+      integer z_varid,zz_varid,east_c_varid,
      $        east_e_varid,east_u_varid,east_v_varid,north_c_varid,
-     $        north_e_varid,north_u_varid,north_v_varid,rot_varid,
-     $        h_varid,fsm_varid,dum_varid,dvm_varid
+     $        north_e_varid,north_u_varid,north_v_varid,rot_varid
       integer art_varid,aru_varid,arv_varid
       integer aam2d_varid,advua_varid,advva_varid,adx2d_varid
      $       ,ady2d_varid,cbc_varid,cor_varid,d_varid,drx2d_varid
@@ -366,8 +371,7 @@
      $       ,tb_varid,tclim_varid,trstr_varid,trstrb_varid
      $       ,trstrf_varid,taurstr_varid,taurstrb_varid,taurstrf_varid
      $       ,ub_varid,uf_varid,vb_varid,vf_varid,wr_varid,zflux_varid
-      integer time_varid,uab_varid,vab_varid,elb_varid,u_varid,v_varid,
-     $        w_varid,t_varid,s_varid,rho_varid
+      integer time_varid,elb_varid
       integer ncid,status
       integer vdims(4)
       integer(mpi_offset_kind) length
@@ -390,13 +394,15 @@
       length=len(trim(title))
       status=nfmpi_put_att_text(ncid,nf_global,'title',length,
      $                                                      trim(title))
-      call handle_error_pnetcdf('nf_put_att_text',status,nf_noerr)
+      call handle_error_pnetcdf('nf_put_att_text: title'
+     $                                                 ,status,nf_noerr)
 
-      str_tmp='auxilary file'
+      str_tmp='debug file'
       length=len(trim(str_tmp))
       status=nfmpi_put_att_text(ncid,nf_global,'description',length,
      $                                                    trim(str_tmp))
-      call handle_error_pnetcdf('nf_put_att_text',status,nf_noerr)
+      call handle_error_pnetcdf('nf_put_att_text: description'
+     $                                                 ,status,nf_noerr)
 
 ! define dimensions
       length=1
@@ -561,9 +567,6 @@
       call def_var_pnetcdf(ncid,'vfluxf',3,vdims,vfluxf_varid,
      $         'volume flux through water column surface at time n+1'
      $        ,'metre^3/sec?','east_e north_e',.true.)
-      call def_var_pnetcdf(ncid,'tsurf',3,vdims,tsurf_varid,
-     $         'na'
-     $        ,'tba','east_e north_e',.true.)
       call def_var_pnetcdf(ncid,'tsurf',3,vdims,tsurf_varid,
      $         'na'
      $        ,'tba','east_e north_e',.true.)
@@ -1265,13 +1268,15 @@
       length=len(trim(title))
       status=nfmpi_put_att_text(ncid,nf_global,'title',length,
      $                                                      trim(title))
-      call handle_error_pnetcdf('nf_put_att_text',status,nf_noerr)
+      call handle_error_pnetcdf('nf_put_att_text: title'
+     $                                                 ,status,nf_noerr)
 
       str_tmp='restart file'
       length=len(trim(str_tmp))
       status=nfmpi_put_att_text(ncid,nf_global,'description',length,
      $                                                    trim(str_tmp))
-      call handle_error_pnetcdf('nf_put_att_text',status,nf_noerr)
+      call handle_error_pnetcdf('nf_put_att_text: description'
+     $                                                 ,status,nf_noerr)
 ! define dimensions
       length=1
       status=nfmpi_def_dim(ncid,'time',length,time_dimid)

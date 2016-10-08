@@ -38,8 +38,8 @@
       if(netcdf_file.ne.'nonetcdf' .and. mod(iint,iprint).eq.0)
      $                                         call write_output_pnetcdf
 
-!! write auxillary debug
-!      call write_aux_pnetcdf
+! write auxillary debug
+      call write_aux_pnetcdf
 !
 ! write restart
       if(mod(iint,irestart).eq.0) call write_restart_pnetcdf
