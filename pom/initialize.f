@@ -275,9 +275,17 @@
       vfluxb  = 0.d0
       vfluxf  = 0.d0
       wusurf  = 0.d0
+      wusurff = 0.d0
+      wusurfb = 0.d0
       wvsurf  = 0.d0
+      wvsurff = 0.d0
+      wvsurfb = 0.d0
       wtsurf  = 0.d0
+      wtsurff = 0.d0
+      wtsurfb = 0.d0
       wssurf  = 0.d0
+      wssurff = 0.d0
+      wssurfb = 0.d0
       swrad   = 0.d0
       drx2d   = 0.d0
       dry2d   = 0.d0
@@ -345,8 +353,8 @@
           arv(i,j)=.25d0*(dx(i,j)+dx(i,j-1))*(dy(i,j)+dy(i,j-1))
         end do
       end do
-      call exchange2d_mpi(aru(1:im,1:jm),im,jm)
-      call exchange2d_mpi(arv(1:im,1:jm),im,jm)
+      call exchange2d_mpi(aru,im,jm)
+      call exchange2d_mpi(arv,im,jm)
 
       if (n_west.eq.-1) then
         aru(1,:)=aru(2,:)
@@ -383,9 +391,8 @@
 !      double precision z2(nz)
 
 ! read initial temperature and salinity from ic file
-      call read_initial_ts_pnetcdf(kb,tb(1:im,1:jm,:),sb(1:im,1:jm,:))
-      call read_clim_ts_pnetcdf(kb,10
-     $                         ,tclim(1:im,1:jm,:),sclim(1:im,1:jm,:))
+      call read_initial_ts_pnetcdf(kb,tb,sb)
+      call read_clim_ts_pnetcdf(kb,10,tclim,sclim)
 
 ! map onto sigma coordinate
 !      call ztosig(z2,tb0,zz,h,tclim,im,jm,nz,kb,

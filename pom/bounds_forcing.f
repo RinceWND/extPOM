@@ -620,15 +620,19 @@
       ! read initial bc file
       if (iint.eq.1) then
         call read_boundary_conditions_pnetcdf(iint/ibc,kb
-     $                         ,tbwf(1:jm,:),sbwf(1:jm,:),ubwf(1:jm,:)
-     $                         ,tbef(1:jm,:),sbef(1:jm,:),ubef(1:jm,:)
-     $                         ,tbnf(1:im,:),sbnf(1:im,:),vbnf(1:im,:)
-     $                         ,tbsf(1:im,:),sbsf(1:im,:),vbsf(1:im,:))
+     $                         ,tbwf,sbwf,ubwf,tbef,sbef,ubef
+     $                         ,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
 ! integrate by depth
-        uabwf = sum(ubwf, 2)
-        uabef = sum(ubef, 2)
-        vabnf = sum(vbnf, 2)
-        vabsf = sum(vbsf, 2)
+      uabwf = 0.d0
+      uabef = 0.d0
+      vabnf = 0.d0
+      vabsf = 0.d0
+      do k = 1,kb
+        uabwf(:) = uabwf(:) + ubwf(:,k)*dz(k)
+        uabef(:) = uabef(:) + ubef(:,k)*dz(k)
+        vabnf(:) = vabnf(:) + vbnf(:,k)*dz(k)
+        vabsf(:) = vabsf(:) + vbsf(:,k)*dz(k)
+      end do
 !  south
 !        do i=1,im
 !          do j=1,jm
@@ -743,10 +747,16 @@
           call read_boundary_conditions_pnetcdf((iint+ibc)/ibc,kb,
      $    tbwf,sbwf,ubwf,tbef,sbef,ubef,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
 ! integrate by depth
-          uabwf = sum(ubwf, 2)
-          uabef = sum(ubef, 2)
-          vabnf = sum(vbnf, 2)
-          vabsf = sum(vbsf, 2)
+          uabwf = 0.d0
+          uabef = 0.d0
+          vabnf = 0.d0
+          vabsf = 0.d0
+          do k=1,kb
+            uabwf(:) = uabwf(:) + ubwf(:,k)*dz(k)
+            uabef(:) = uabef(:) + ubef(:,k)*dz(k)
+            vabnf(:) = vabnf(:) + vbnf(:,k)*dz(k)
+            vabsf(:) = vabsf(:) + vbsf(:,k)*dz(k)
+          end do
 ! south
 !        do i=1,im
 !          do j=1,jm

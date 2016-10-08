@@ -59,7 +59,7 @@
         end do
       end do
 
-      call exchange2d_mpi(fluxua(1:im,1:jm),im,jm)
+      call exchange2d_mpi(fluxua,im,jm)
 
       do j=2,jmm1
         do i=2,imm1
@@ -109,7 +109,7 @@
         end do
       end do
 
-      call exchange2d_mpi(fluxva(1:im,1:jm),im,jm)
+      call exchange2d_mpi(fluxva,im,jm)
 
       do j=2,jmm1
         do i=2,imm1
@@ -717,7 +717,7 @@
           end do
         end do
         ! next line added on 22-Jul-2009 by Raffaele Bernardello
-        call exchange3d_mpi(ff(1:im,1:jm,1:kbm1),im,jm,kbm1)
+        call exchange3d_mpi(ff(:,:,1:kbm1),im,jm,kbm1)
 
 ! calculate antidiffusion velocity
         call smol_adif(xmassflux,ymassflux,zwflux,ff)
@@ -962,6 +962,8 @@
         end do
       end do
 
+      call exchange3d_mpi(drhox,im,jm,kb)
+
 ! calculate y-component of baroclinic pressure gradient
       do j=2,jmm1
         do i=2,imm1
@@ -995,7 +997,9 @@
           end do
         end do
       end do
-      
+
+      call exchange3d_mpi(drhoy,im,jm,kb)
+
       do k=1,kb
         do j=2,jmm1
           do i=2,imm1
@@ -1141,6 +1145,8 @@
         end do
       end do
 
+      call exchange3d_mpi(drhox,im,jm,kb)
+
 ! compute terms correct to 4th order
       do i=1,im
         do j=1,jm
@@ -1241,6 +1247,8 @@
           end do
         end do
       end do
+
+      call exchange3d_mpi(drhoy,im,jm,kb)
 
       do k=1,kb
         do j=2,jmm1
@@ -1407,7 +1415,7 @@
         end do
       end do
       call exchange2d_mpi(utau2,im,jm)
-      call exchange2d_mpi(uf(1:im,1:jm,kb),im,jm)
+      call exchange2d_mpi(uf(:,:,kb),im,jm)
 
       do j=1,jm
         do i=1,im
@@ -1928,7 +1936,7 @@
           wubot(i,j)=-tps(i,j)*uf(i,j,kbm1)
         end do
       end do
-      call exchange2d_mpi(wubot(1:im,1:jm),im,jm)
+      call exchange2d_mpi(wubot,im,jm)
 
       return
       end
@@ -2035,7 +2043,7 @@
           wvbot(i,j)=-tps(i,j)*vf(i,j,kbm1)
         end do
       end do
-      call exchange2d_mpi(wvbot(1:im,1:jm),im,jm)
+      call exchange2d_mpi(wvbot,im,jm)
 
       return
       end
@@ -2199,7 +2207,7 @@
 ! calculates real vertical velocity (wr)
       implicit none
       include 'pom.h'
-      integer i,j,k,li !TODO: remove li
+      integer i,j,k
       double precision dxr,dxl,dyt,dyb
       do k=1,kb
         do j=1,jm
@@ -2231,7 +2239,7 @@
         end do
       end do
 
-      call exchange3d_mpi(wr(1:im,1:jm,1:kbm1),im,jm,kbm1)
+      call exchange3d_mpi(wr(:,:,1:kbm1),im,jm,kbm1)
 
       do k=1,kb
         do i=1,im
