@@ -373,6 +373,8 @@
         end do
       end do
 
+      call check_cflmin_mpi
+
       return
       end
 

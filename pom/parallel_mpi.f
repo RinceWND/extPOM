@@ -479,3 +479,37 @@
       return
       end
 
+!_______________________________________________________________________
+      subroutine check_cflmin_mpi
+! calculate the min cfl for domain
+      implicit none
+      include 'mpif.h'
+      include 'pom.h'
+
+      double precision, dimension(im_local,jm_local) :: cfl
+      double precision, dimension(n_proc) :: cflmin
+      integer ierr
+
+      cfl = 0.d0
+      cflmin = 1.d10
+
+      cfl(:,:) = .5d0/sqrt(1.d0/dx(:,:)**2+1.d0/dy(:,:)**2)
+     $               /sqrt(grav*(h(:,:)+small))*fsm(:,:)
+
+      cflmin(my_task+1) = minval(cfl, cfl>0.)
+
+      call mpi_gather(cflmin(my_task+1),1,mpi_double
+     $               ,cflmin,           1,mpi_double
+     $               ,0,pom_comm,ierr)
+
+      if (my_task == 0) then
+        if (minval(cflmin) < dte) then
+          write(*,'(/a,f5.2,a)')
+     $                "[!] Specified timestep (", dte, ") is too large."
+          write(*,'(a,f5.2,a/)')
+     $         "    You are strongly advised to make dte smaller than "
+     $                                               ,minval(cflmin),"."
+        end if
+      end if
+
+      end subroutine check_cflmin_mpi
