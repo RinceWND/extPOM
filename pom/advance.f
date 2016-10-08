@@ -39,7 +39,7 @@
      $                                         call write_output_pnetcdf
 
 ! write auxillary debug
-      call write_aux_pnetcdf
+!      call write_aux_pnetcdf
 !
 ! write restart
       if(mod(iint,irestart).eq.0) call write_restart_pnetcdf

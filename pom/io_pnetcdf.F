@@ -2375,7 +2375,6 @@
       start(1)=i_global(1)
       start(2)=j_global(1)
       start(3)=n
-      if (start(3)==0) start(3)=1
       edge(1)=im
       edge(2)=jm
       edge(3)=1
@@ -2545,7 +2544,6 @@
       start(1)=i_global(1)
       start(2)=j_global(1)
       start(3)=n
-      if (start(3)==0) start(3)=1
       edge(1)=im
       edge(2)=jm
       edge(3)=1

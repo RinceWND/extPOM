@@ -889,7 +889,7 @@
 
 ! read wind stress data
       ! read initial wind file
-      if (iint.eq.1) call read_wind_pnetcdf(iint/iwind
+      if (iint.eq.1) call read_wind_pnetcdf(iint/iwind+1
      $                           ,wusurff(1:im,1:jm),wvsurff(1:im,1:jm))
       ! read wind file corresponding to next time
       if (iint.eq.1 .or. mod(iint,iwind).eq.0.) then
@@ -900,7 +900,7 @@
           end do
         end do
         if (iint.ne.iend) then
-          call read_wind_pnetcdf((iint+iwind)/iwind
+          call read_wind_pnetcdf((iint+iwind)/iwind+1
      $                           ,wusurff(1:im,1:jm),wvsurff(1:im,1:jm))
         end if
       end if
@@ -932,7 +932,7 @@
 
 ! read wind stress data
       ! read initial heat file
-      if (iint.eq.1) call read_heat_pnetcdf(iint/iheat
+      if (iint.eq.1) call read_heat_pnetcdf(iint/iheat+1
      $                            ,wtsurff(1:im,1:jm),swradf(1:im,1:jm))
       ! read heat forcing corresponding to next twind
       if (iint.eq.1 .or. mod(iint,iheat).eq.0.) then
@@ -942,7 +942,7 @@
             swradb(i,j)=swradf(i,j)
           end do
         end do
-        call read_heat_pnetcdf((iint+iheat)/iheat
+        call read_heat_pnetcdf((iint+iheat)/iheat+1
      $                            ,wtsurff(1:im,1:jm),swradf(1:im,1:jm))
       end if
 
