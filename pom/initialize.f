@@ -62,8 +62,8 @@
       include 'pom.h'
       namelist/pom_nml/ title,wrk_pth,netcdf_file,mode,nadv,nitera,
      $                  sw,npg,dte,isplit,time_start,nread_rst,
-     $                  read_rst_file,write_rst,write_rst_file,days,
-     $                  prtd1,prtd2,swtch
+     $                  read_rst_file,cont_bry,write_rst,write_rst_file,
+     $                  days,prtd1,prtd2,swtch
 
 ! read input namelist
       open(73,file='pom.nml',status='old')
@@ -185,6 +185,9 @@
 ! initialise time
       time0=0.d0
       time=0.d0
+
+! check cont_bry
+      if (nread_rst == 0) cont_bry = 0
 
 ! print initial summary
       if(my_task.eq.master_task) then

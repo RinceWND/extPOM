@@ -1471,6 +1471,9 @@
           do i=1,im
             l(i,j,k)=abs(q2lb(i,j,k)/q2b(i,j,k))
             if(z(k).gt.-0.5) l(i,j,k)=max(l(i,j,k),kappa*l0(i,j))
+!            if (my_task == 0) then
+!              write(*,*) i,j,k,":",l(i,j,k), boygr(i,j,k), q2b(i,j,k)
+!            end if
             gh(i,j,k)=(l(i,j,k)**2)*boygr(i,j,k)/q2b(i,j,k)
             gh(i,j,k)=min(gh(i,j,k),.028d0)
           end do
@@ -1870,6 +1873,8 @@
           end do
         end do
       end do
+
+      write(*,*) iint,my_task,"]",maxval(abs(km)),maxloc(abs(km))
 
       do k=1,kb
         do j=2,jm
