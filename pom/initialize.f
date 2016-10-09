@@ -63,12 +63,7 @@
       namelist/pom_nml/ title,wrk_pth,netcdf_file,mode,nadv,nitera,
      $                  sw,npg,dte,isplit,time_start,nread_rst,
      $                  read_rst_file,cont_bry,write_rst,write_rst_file,
-     $                  days,prtd1,prtd2,swtch
-
-! read input namelist
-      open(73,file='pom.nml',status='old')
-      read(73,nml=pom_nml)
-      close(73)
+     $                  days,prtd1,prtd2,swtch,ntp,nbct,nbcs
 
 ! Input of filenames and constants
 
@@ -165,6 +160,11 @@
       aam_init=0.d0
 
 ! End of input of constants
+
+! read input namelist (overwrites vars)
+      open(73,file='pom.nml',status='old')
+      read(73,nml=pom_nml)
+      close(73)
 
 ! calculate some constants
       small=1.d-9           ! Small value

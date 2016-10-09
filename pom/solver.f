@@ -1761,9 +1761,10 @@
         do k=1,kbm1
           do j=1,jm
             do i=1,im
-              rad(i,j,k)=swrad(i,j)
-     $                    *(r(ntp)*exp(z(k)*dh(i,j)/ad1(ntp))
-     $                      +(1.d0-r(ntp))*exp(z(k)*dh(i,j)/ad2(ntp)))
+              rad(i,j,k)=real(swrad(i,j)
+     $                    *(r(ntp)*exp(real(z(k)*dh(i,j)/ad1(ntp),16))
+     $              +(1.d0-r(ntp))*exp(real(z(k)*dh(i,j)/ad2(ntp),16)))
+     $                        ,8)
             end do
           end do
         end do
