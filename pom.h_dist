@@ -111,6 +111,7 @@
      $  nitera         ,! number of iterations for Smolarkiewicz scheme
      $  npg            ,! pressure gradient scheme
      $  nread_rst      ,! index to start from restart file
+     $  cont_bry       ,! flag to continue boundary reading (0 starts reading from beginning)
      $  irestart       ,
      $  error_status
 
@@ -208,6 +209,7 @@
      $  nitera         ,
      $  npg            ,
      $  nread_rst      ,
+     $  cont_bry       ,
      $  irestart       ,
      $  error_status
 
