@@ -1249,7 +1249,7 @@
      $        w_varid,v_varid,vb_varid,t_varid,tb_varid,s_varid,
      $        sb_varid,rho_varid,adx2d_varid,ady2d_varid,advua_varid,
      $        advva_varid,km_varid,kh_varid,kq_varid,l_varid,q2_varid,
-     $        q2b_varid,aam_varid,q2l_varid,q2lb_varid
+     $        q2b_varid,aam_varid,q2l_varid,q2lb_varid,iint_varid
       integer vdims(3)
       integer(mpi_offset_kind) length
       integer(mpi_offset_kind) start(3),edge(3)
@@ -1299,8 +1299,8 @@
 ! define variables and their attributes
       vdims(1)=time_dimid
       str_tmp = 'model internal step number'
-      call def_var_pnetcdf(ncid, 'iint', 0, vdims, time_varid,
-     $                           'dimensionless', str_tmp, ' ', .false.)
+      call def_var_pnetcdf(ncid, 'iint', 0, vdims, iint_varid,
+     $                              'i_internal', str_tmp, ' ', .false.)
       str_tmp='days since '//time_start
       call def_var_pnetcdf(ncid,'time',1,vdims,time_varid,
      $                                       'time',str_tmp,' ',.false.)
@@ -1467,6 +1467,9 @@
 ! write data
       start(1)=1
       edge(1)=1
+      status=nfmpi_put_vara_double_all(ncid,iint_varid,start,edge,iint)
+      call handle_error_pnetcdf('nf_put_vara_double: iint'
+     $                                                 ,status,nf_noerr)
       status=nfmpi_put_vara_double_all(ncid,time_varid,start,edge,time)
       call handle_error_pnetcdf('nf_put_vara_double: time'
      $                                                 ,status,nf_noerr)
