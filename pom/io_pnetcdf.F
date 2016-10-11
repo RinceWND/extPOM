@@ -1214,7 +1214,7 @@
       call handle_error_pnetcdf('nf_put_vara_double: vf',
      $                                                  status,nf_noerr)
       dat3d = wr(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,wr_varid,start,edge,wr)
+      status=nfmpi_put_vara_double_all(ncid,wr_varid,start,edge,dat3d)
       call handle_error_pnetcdf('nf_put_vara_double: wr',
      $                                                  status,nf_noerr)
       dat3d = zflux(1:im,1:jm,1:kb)
