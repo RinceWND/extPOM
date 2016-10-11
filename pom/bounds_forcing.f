@@ -644,9 +644,9 @@
 !          end do
 !        end do
 !        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        do i=1,im
 !          do k=1,kb
 !            !write(52,'(2(i4),e16.7)') i,k,ss2(i,jm/2,k)
@@ -665,9 +665,9 @@
 !          end do
 !        end do
 !        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        do i=1,im
 !          do k=1,kb
 !            tbnf(i,k)=ts2(i,jm/2,k)
@@ -685,9 +685,9 @@
 !          end do
 !        end do
 !        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        do j=1,jm
 !          do k=1,kb
 !            tbef(j,k)=ts2(im/2,j,k)
@@ -705,9 +705,9 @@
 !          end do
 !        end do
 !        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        do j=1,jm
 !          do k=1,kb
 !            tbwf(j,k)=ts2(im/2,j,k)
@@ -768,9 +768,9 @@
 !          end do
 !        end do
 !        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        do i=1,im
 !          do k=1,kb
 !            tbsf(i,k)=ts2(i,jm/2,k)
@@ -788,9 +788,9 @@
 !          end do
 !        end do
 !        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        do i=1,im
 !          do k=1,kb
 !            tbnf(i,k)=ts2(i,jm/2,k)
@@ -808,9 +808,9 @@
 !          end do
 !        end do
 !        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        do j=1,jm
 !          do k=1,kb
 !            tbef(j,k)=ts2(im/2,j,k)
@@ -828,9 +828,9 @@
 !          end do
 !        end do
 !        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        do j=1,jm
 !          do k=1,kb
 !            tbwf(j,k)=ts2(im/2,j,k)
@@ -1017,13 +1017,13 @@
       if (iint.eq.2) then
         call read_restore_t_interior_pnetcdf(iint/irst,nz,z0,f0)
         call ztosig(z0,f0,zz,h,trstrf,im,jm,nz,kb,
-     $                                    n_west,n_east,n_south,n_north)
+     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
         call read_restore_s_interior_pnetcdf(iint/irst,nz,z0,f0)
         call ztosig(z0,f0,zz,h,srstrf,im,jm,nz,kb,
-     $                                    n_west,n_east,n_south,n_north)
+     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
         call read_restore_tau_interior_pnetcdf(iint/irst,nz,z0,f0)
         call ztosig(z0,f0,zz,h,taurstrf,im,jm,nz,kb,
-     $                                    n_west,n_east,n_south,n_north)
+     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
       end if
       ! read restore file corresponding to next time
       if (iint.eq.2 .or. mod(iint,irst).eq.0.) then
@@ -1040,15 +1040,15 @@
           call read_restore_t_interior_pnetcdf((iint+irst)/irst,nz,z0,
      $                                                               f0)
           call ztosig(z0,f0,zz,h,trstrf,im,jm,nz,kb,
-     $                                    n_west,n_east,n_south,n_north)
+     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
           call read_restore_s_interior_pnetcdf((iint+irst)/irst,nz,z0,
      $                                                               f0)
           call ztosig(z0,f0,zz,h,srstrf,im,jm,nz,kb,
-     $                                    n_west,n_east,n_south,n_north)
+     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
           call read_restore_tau_interior_pnetcdf((iint+irst)/irst,nz,
      $                                                            z0,f0)
           call ztosig(z0,f0,zz,h,taurstrf,im,jm,nz,kb,
-     $                                    n_west,n_east,n_south,n_north)
+     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
         end if
       end if
 

@@ -552,10 +552,10 @@
 
 !_______________________________________________________________________
       subroutine ztosig(zs,tb,zz,h,t,im,jm,ks,kb,
-     $                                    n_west,n_east,n_south,n_north)
+     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 ! interpolate vertically
       implicit none
-      integer im,jm,ks,kb
+      integer im,jm,ks,kb,im_local,jm_local
       double precision zs(ks),tb(im,jm,ks),zz(kb),h(im,jm),t(im,jm,kb),
      $                                          tin(ks),tout(kb),zzh(kb)
       integer n_west,n_east,n_south,n_north
