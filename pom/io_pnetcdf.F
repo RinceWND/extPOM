@@ -2410,7 +2410,7 @@
 !      double precision zlev(k)
       double precision, dimension(im_local,jm_local,k), intent(out) ::
      $                                                        temp, salt
-      double precision, dimension(im,jm,k) :: ttmp, stmp
+      double precision, dimension(im,jm,k) :: dat
       character*120 netcdf_ic_file
       integer ncid,status
 !      integer z_varid
@@ -2450,19 +2450,18 @@
       edge(2)=jm
       edge(3)=k
       edge(4)=1
-      status=nfmpi_get_vara_double_all(ncid,t_varid,start,edge,ttmp)
+      status=nfmpi_get_vara_double_all(ncid,t_varid,start,edge,dat)
       call handle_error_pnetcdf('nfmpi_get_vara_double_all',
      $                                                  status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,s_varid,start,edge,stmp)
+      temp(1:im,1:jm,:) = dat
+      status=nfmpi_get_vara_double_all(ncid,s_varid,start,edge,dat)
       call handle_error_pnetcdf('nfmpi_get_vara_double_all',
      $                                                  status,nf_noerr)
+      salt(1:im,1:jm,:) = dat
 
 ! close file
       status=nfmpi_close(ncid)
       call handle_error_pnetcdf('nf_close',status,nf_noerr)
-
-      temp(1:im,1:jm,:) = ttmp
-      salt(1:im,1:jm,:) = stmp
 
       return
       end

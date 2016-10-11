@@ -1029,7 +1029,8 @@
       integer i,j,k
       double precision d4(im,jm),ddx(im,jm),drho(im,jm,kb),
      $                 rhou(im,jm,kb)
-      double precision rho4th(0:im,0:jm,kb),d4th(0:im,0:jm)
+      double precision rho4th(0:im_local,0:jm_local,kb)
+     $                ,d4th(0:im_local,0:jm_local)
 
       do k=1,kb
         do j=1,jm
