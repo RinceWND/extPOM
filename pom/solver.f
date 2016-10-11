@@ -59,7 +59,7 @@
         end do
       end do
 
-      call exchange2d_mpi(fluxua,im,jm)
+      call exchange2d_mpi(fluxua,im_local,jm_local)
 
       do j=2,jmm1
         do i=2,imm1
@@ -109,7 +109,7 @@
         end do
       end do
 
-      call exchange2d_mpi(fluxva,im,jm)
+      call exchange2d_mpi(fluxva,im_local,jm_local)
 
       do j=2,jmm1
         do i=2,imm1
@@ -717,7 +717,7 @@
           end do
         end do
         ! next line added on 22-Jul-2009 by Raffaele Bernardello
-        call exchange3d_mpi(ff(:,:,1:kbm1),im,jm,kbm1)
+        call exchange3d_mpi(ff(:,:,1:kbm1),im_local,jm_local,kbm1)
 
 ! calculate antidiffusion velocity
         call smol_adif(xmassflux,ymassflux,zwflux,ff)
@@ -962,7 +962,7 @@
         end do
       end do
 
-      call exchange3d_mpi(drhox,im,jm,kb)
+      call exchange3d_mpi(drhox,im_local,jm_local,kb)
 
 ! calculate y-component of baroclinic pressure gradient
       do j=2,jmm1
@@ -998,7 +998,7 @@
         end do
       end do
 
-      call exchange3d_mpi(drhoy,im,jm,kb)
+      call exchange3d_mpi(drhoy,im_local,jm_local,kb)
 
       do k=1,kb
         do j=2,jmm1
@@ -1041,8 +1041,8 @@
 
 ! convert a 2nd order matrices to special 4th order
 ! special 4th order case
-      call order2d_mpi(d,d4th,im,jm)
-      call order3d_mpi(rho,rho4th,im,jm,kb)
+      call order2d_mpi(d,d4th,im_local,jm_local)
+      call order3d_mpi(rho,rho4th,im_local,jm_local,kb)
 
 ! compute terms correct to 4th order
       do i=1,im
@@ -1145,7 +1145,7 @@
         end do
       end do
 
-      call exchange3d_mpi(drhox,im,jm,kb)
+      call exchange3d_mpi(drhox,im_local,jm_local,kb)
 
 ! compute terms correct to 4th order
       do i=1,im
@@ -1248,7 +1248,7 @@
         end do
       end do
 
-      call exchange3d_mpi(drhoy,im,jm,kb)
+      call exchange3d_mpi(drhoy,im_local,jm_local,kb)
 
       do k=1,kb
         do j=2,jmm1
@@ -1415,7 +1415,7 @@
         end do
       end do
       call exchange2d_mpi(utau2,im,jm)
-      call exchange2d_mpi(uf(:,:,kb),im,jm)
+      call exchange2d_mpi(uf(:,:,kb),im_local,jm_local)
 
       do j=1,jm
         do i=1,im
@@ -1942,7 +1942,7 @@
           wubot(i,j)=-tps(i,j)*uf(i,j,kbm1)
         end do
       end do
-      call exchange2d_mpi(wubot,im,jm)
+      call exchange2d_mpi(wubot,im_local,jm_local)
 
       return
       end
@@ -2049,7 +2049,7 @@
           wvbot(i,j)=-tps(i,j)*vf(i,j,kbm1)
         end do
       end do
-      call exchange2d_mpi(wvbot,im,jm)
+      call exchange2d_mpi(wvbot,im_local,jm_local)
 
       return
       end
@@ -2245,7 +2245,7 @@
         end do
       end do
 
-      call exchange3d_mpi(wr(:,:,1:kbm1),im,jm,kbm1)
+      call exchange3d_mpi(wr(:,:,1:kbm1),im_local,jm_local,kbm1)
 
       do k=1,kb
         do i=1,im

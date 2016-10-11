@@ -158,7 +158,7 @@
       include 'mpif.h'
       include 'pom.h'
       integer nx,ny
-      double precision work(im_local,jm_local)
+      double precision work(nx,ny)
       integer i,j
       integer ierr
       integer istatus(mpi_status_size)
@@ -246,7 +246,7 @@
       include 'mpif.h'
       include 'pom.h'
       integer nx,ny,nz
-      double precision work(im_local,jm_local,nz)
+      double precision work(nx,ny,nz)
       integer i,j,k
       integer ierr
       integer istatus(mpi_status_size)
@@ -356,7 +356,7 @@
       include 'mpif.h'
       include 'pom.h'
       integer nx,ny
-      double precision work2(im_local,jm_local),work4(0:nx,0:ny)
+      double precision work2(nx,ny),work4(0:nx,0:ny)
       integer i,j
       integer ierr
       integer istatus(mpi_status_size)
@@ -414,7 +414,7 @@
       include 'mpif.h'
       include 'pom.h'
       integer nx,ny,nz
-      double precision work2(im_local,jm_local,nz),work4(0:nx,0:ny,nz)
+      double precision work2(nx,ny,nz),work4(0:nx,0:ny,nz)
       integer i,j,k
       integer ierr
       integer istatus(mpi_status_size)

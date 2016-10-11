@@ -356,8 +356,8 @@
           arv(i,j)=.25d0*(dx(i,j)+dx(i,j-1))*(dy(i,j)+dy(i,j-1))
         end do
       end do
-      call exchange2d_mpi(aru,im,jm)
-      call exchange2d_mpi(arv,im,jm)
+      call exchange2d_mpi(aru,im_local,jm_local)
+      call exchange2d_mpi(arv,im_local,jm_local)
 
       if (n_west.eq.-1) then
         aru(1,:)=aru(2,:)
@@ -592,7 +592,7 @@
         end if
       end do
       end do
-      call exchange3d_mpi(t,im,jm,kb)
+      call exchange3d_mpi(t,im_local,jm_local,kb)
 
 ! boundaries
       do k=1,kb

@@ -22,10 +22,17 @@
       
 ! form vertical averages of 3-D fields for use in external (2-D) mode
       call mode_interaction
-      
+
 ! external (2-D) mode calculation
       do iext=1,isplit
         call mode_external
+        if (iext==2) then
+! write auxillary debug
+        call write_aux_pnetcdf
+! debug stop
+        call finalize_mpi
+        stop 'advance:31[user]'
+        end if
       end do
       
 ! internal (3-D) mode calculation
@@ -39,17 +46,17 @@
      $                                         call write_output_pnetcdf
 
 ! write auxillary debug
-!      call write_aux_pnetcdf
-!
+      call write_aux_pnetcdf
+
 ! write restart
       if(mod(iint,irestart).eq.0) call write_restart_pnetcdf
 
 ! check CFL condition
       call check_velocity
 
-!      ! debug stop
-!      call finalize_mpi
-!      stop 'advance:52[user]'
+! debug stop
+      call finalize_mpi
+      stop 'advance:52[user]'
 !
       return
       end
@@ -128,7 +135,7 @@
             end do
           end do
         end do
-        call exchange3d_mpi(aam(:,:,1:kbm1),im,jm,kbm1)
+        call exchange3d_mpi(aam(:,:,1:kbm1),im_local,jm_local,kbm1)
       end if
 
       return
@@ -221,7 +228,7 @@
       
       call bcond(1)
       
-      call exchange2d_mpi(elf,im,jm)
+      call exchange2d_mpi(elf,im_local,jm_local)
       
       if(mod(iext,ispadv).eq.0) call advave
       
@@ -280,8 +287,8 @@
       
       call bcond(2)
       
-      call exchange2d_mpi(uaf,im,jm)
-      call exchange2d_mpi(vaf,im,jm)
+      call exchange2d_mpi(uaf,im_local,jm_local)
+      call exchange2d_mpi(vaf,im_local,jm_local)
       
       if(iext.eq.(isplit-2))then
         do j=1,jm
@@ -406,7 +413,7 @@
 
         call bcondorl(5)
 
-        call exchange3d_mpi(w,im,jm,kb)
+        call exchange3d_mpi(w,im_local,jm_local,kb)
 
 ! set uf and vf to zero
         do k=1,kb
@@ -425,8 +432,8 @@
 
         call bcond(6)
 
-        call exchange3d_mpi(uf(:,:,2:kbm1),im,jm,kbm2)
-        call exchange3d_mpi(vf(:,:,2:kbm1),im,jm,kbm2)
+        call exchange3d_mpi(uf(:,:,2:kbm1),im_local,jm_local,kbm2)
+        call exchange3d_mpi(vf(:,:,2:kbm1),im_local,jm_local,kbm2)
 
         do k=1,kb
           do j=1,jm
@@ -458,8 +465,8 @@
             write(6,'(/''Error: invalid value for nadv'')')
           end if
 
-          call exchange3d_mpi(uf(:,:,1:kbm1),im,jm,kbm1)
-          call exchange3d_mpi(vf(:,:,1:kbm1),im,jm,kbm1)
+          call exchange3d_mpi(uf(:,:,1:kbm1),im_local,jm_local,kbm1)
+          call exchange3d_mpi(vf(:,:,1:kbm1),im_local,jm_local,kbm1)
 
           call proft(uf,wtsurf,tsurf,nbct)
           call proft(vf,wssurf,ssurf,nbcs)
@@ -498,8 +505,8 @@
 
         call bcondorl(3)
 
-        call exchange3d_mpi(uf(:,:,1:kbm1),im,jm,kbm1)
-        call exchange3d_mpi(vf(:,:,1:kbm1),im,jm,kbm1)
+        call exchange3d_mpi(uf(:,:,1:kbm1),im_local,jm_local,kbm1)
+        call exchange3d_mpi(vf(:,:,1:kbm1),im_local,jm_local,kbm1)
 
         do j=1,jm
           do i=1,im
