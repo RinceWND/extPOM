@@ -498,9 +498,15 @@
 
       cflmin(my_task+1) = minval(cfl, cfl>0.)
 
-      call mpi_gather(cflmin(my_task+1),1,mpi_double
-     $               ,cflmin,           1,mpi_double
-     $               ,0,pom_comm,ierr)
+      if (my_task == 0) then
+        call mpi_gather(MPI_IN_PLACE,1,mpi_double
+     $                 ,cflmin      ,1,mpi_double
+     $                 ,0,pom_comm,ierr)
+      else
+        call mpi_gather(cflmin(my_task+1),1,mpi_double
+     $                 ,%val(0)          ,1,mpi_double
+     $                 ,0,pom_comm,ierr)
+      end if
 
       if (my_task == 0) then
         if (minval(cflmin) < dte) then
