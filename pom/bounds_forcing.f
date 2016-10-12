@@ -883,14 +883,18 @@
       include 'pom.h'
       integer i,j,ntime,iwind
       double precision twind,fold,fnew
+      double precision, dimension(im,jm) :: wu, wv
 
       twind= .125!30. ! time between wind files (days)
       iwind=int(twind*86400.d0/dti)
 
 ! read wind stress data
       ! read initial wind file
-      if (iint.eq.1) call read_wind_pnetcdf((iint+cont_bry)/iwind+1
-     $                           ,wusurff(1:im,1:jm),wvsurff(1:im,1:jm))
+      if (iint.eq.1) then
+        call read_wind_pnetcdf((iint+cont_bry)/iwind+1,wu,wv)
+        wusurff(1:im,1:jm) = wu
+        wvsurff(1:im,1:jm) = wu
+      end if
       ! read wind file corresponding to next time
       if (iint.eq.1 .or. mod(iint,iwind).eq.0.) then
         do i=1,im
@@ -900,8 +904,9 @@
           end do
         end do
         if (iint.ne.iend) then
-        call read_wind_pnetcdf((iint+cont_bry+iwind)/iwind+1
-     $                           ,wusurff(1:im,1:jm),wvsurff(1:im,1:jm))
+          call read_wind_pnetcdf((iint+cont_bry+iwind)/iwind+1,wu,wv)
+          wusurff(1:im,1:jm) = wu
+          wvsurff(1:im,1:jm) = wu
         end if
       end if
 
@@ -926,14 +931,18 @@
       include 'pom.h'
       integer i,j,ntime,iheat
       double precision theat,fold,fnew
+      double precision, dimension(im,jm) :: shf, swr
 
       theat=.125 ! time between wind forcing (days)
       iheat=int(theat*86400.d0/dti)
 
 ! read wind stress data
       ! read initial heat file
-      if (iint.eq.1) call read_heat_pnetcdf((iint+cont_bry)/iheat+1
-     $                            ,wtsurff(1:im,1:jm),swradf(1:im,1:jm))
+      if (iint.eq.1) then
+        call read_heat_pnetcdf((iint+cont_bry)/iheat+1,shf,swr)
+        wtsurff(1:im,1:jm) = shf
+        swradf(1:im,1:jm) = swr
+      end if
       ! read heat forcing corresponding to next twind
       if (iint.eq.1 .or. mod(iint,iheat).eq.0.) then
         do i=1,im
@@ -942,8 +951,9 @@
             swradb(i,j)=swradf(i,j)
           end do
         end do
-        call read_heat_pnetcdf((iint+cont_bry+iheat)/iheat+1
-     $                            ,wtsurff(1:im,1:jm),swradf(1:im,1:jm))
+        call read_heat_pnetcdf((iint+cont_bry+iheat)/iheat+1,shf,swr)
+        wtsurff(1:im,1:jm) = shf
+        swradf(1:im,1:jm) = swr
       end if
 
 ! linear interpolation in time

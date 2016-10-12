@@ -26,13 +26,6 @@
 ! external (2-D) mode calculation
       do iext=1,isplit
         call mode_external
-        if (iext==2) then
-! write auxillary debug
-        call write_aux_pnetcdf
-! debug stop
-        call finalize_mpi
-        stop 'advance:31[user]'
-        end if
       end do
       
 ! internal (3-D) mode calculation
@@ -42,11 +35,13 @@
       call print_section
 
 ! write output
-      if(netcdf_file.ne.'nonetcdf' .and. mod(iint,iprint).eq.0)
-     $                                         call write_output_pnetcdf
+      if(netcdf_file.ne.'nonetcdf' .and. mod(iint,iprint).eq.0) then
+        call write_output_pnetcdf
+        call write_aux_pnetcdf
+      end if
 
 ! write auxillary debug
-      call write_aux_pnetcdf
+!      call write_aux_pnetcdf
 
 ! write restart
       if(mod(iint,irestart).eq.0) call write_restart_pnetcdf
@@ -55,8 +50,8 @@
       call check_velocity
 
 ! debug stop
-      call finalize_mpi
-      stop 'advance:52[user]'
+!      call finalize_mpi
+!      stop 'advance:52[user]'
 !
       return
       end
