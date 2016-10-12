@@ -1881,7 +1881,7 @@
       do k=1,kb
         do j=2,jm
           do i=2,im
-            c(i,j,k)=real(real(km(i,j,k),16)+real(km(i-1,j,k),16),8)*.5 ! TODO: remove real(,16) and FPE signalling when other FPEs are gone
+            c(i,j,k)=(km(i,j,k)+km(i-1,j,k))*.5d0
           end do
         end do
       end do
@@ -1989,7 +1989,7 @@
       do k=1,kb
         do j=2,jm
           do i=2,im
-            c(i,j,k)=real(real(km(i,j,k),16)+real(km(i,j-1,k),16),8)*.5
+            c(i,j,k)=(km(i,j,k)+km(i,j-1,k))*.5d0
           end do
         end do
       end do

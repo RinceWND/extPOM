@@ -2148,7 +2148,7 @@
       start(1)=1
       edge(1)=1
       if (cont_bry /= 0) then
-        status=nfmpi_get_vara_double_all(ncid,time_varid,start,edge
+        status=nfmpi_get_vara_double_all(ncid,iint_varid,start,edge
      $                                                           ,time0)
         call handle_error_pnetcdf('nfmpi_get_vara_double_all: cont_bry',
      $                                                  status,nf_noerr)
