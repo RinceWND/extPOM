@@ -13,11 +13,9 @@
 ! u-advection and diffusion
 
 ! advective fluxes
-      do j=1,jm
-        do i=1,im
-          advua(i,j)=0.d0
-        end do
-      end do
+      advua = 0.d0
+      fluxua = 0.d0
+      fluxva = 0.d0
 
       do j=2,jm
         do i=2,imm1
@@ -60,6 +58,7 @@
       end do
 
       call exchange2d_mpi(fluxua,im_local,jm_local)
+      call exchange2d_mpi(fluxva,im_local,jm_local)
 
       do j=2,jmm1
         do i=2,imm1
@@ -68,12 +67,12 @@
         end do
       end do
 
+      call exchange2d_mpi(advua,im_local,jm_local)
+
 ! v-advection and diffusion
-      do j=1,jm
-        do i=1,im
-          advva(i,j)=0.d0
-        end do
-      end do
+      advva  = 0.d0
+      fluxua = 0.d0
+      fluxva = 0.d0
 
 ! advective fluxes
       do j=2,jm
@@ -109,6 +108,7 @@
         end do
       end do
 
+      call exchange2d_mpi(fluxua,im_local,jm_local)
       call exchange2d_mpi(fluxva,im_local,jm_local)
 
       do j=2,jmm1
@@ -117,6 +117,8 @@
      $                +fluxva(i,j)-fluxva(i,j-1)
         end do
       end do
+
+      call exchange2d_mpi(advva,im_local,jm_local)
 
       if(mode.eq.2) then
 
@@ -316,6 +318,8 @@
         end do
       end do
 
+      call exchange3d_mpi(advx,im_local,jm_local,kb)
+
 ! calculate y-component of velocity advection
 
       do k=1,kb
@@ -409,6 +413,8 @@
           end if
         end do
       end do
+
+      call exchange3d_mpi(advy,im_local,jm_local,kb)
 
       return
       end
@@ -1875,8 +1881,6 @@
           end do
         end do
       end do
-
-      write(*,*) iint,my_task,"]",minval(abs(km),abs(km)>0.)
 
       do k=1,kb
         do j=2,jm

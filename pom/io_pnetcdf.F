@@ -376,12 +376,12 @@
      $       ,el_varid,elf_varid,et_varid,etb_varid,etf_varid
      $       ,fluxua_varid,fluxva_varid,psi_varid,ssurf_varid
      $       ,swrad_varid,swradb_varid,swradf_varid,vfluxb_varid
-     $       ,tsurf_varid,ua_varid,vfluxf_varid,uaf_varid,utb_varid
-     $       ,utf_varid,va_varid,vaf_varid,vtb_varid,vtf_varid
-     $       ,wssurf_varid,wssurfb_varid,wssurff_varid,wtsurf_varid
-     $       ,wtsurfb_varid,wtsurff_varid,wubot_varid,wusurf_varid
-     $       ,wusurfb_varid,wusurff_varid,wvbot_varid,wvsurf_varid
-     $       ,wvsurfb_varid,wvsurff_varid
+     $       ,tsurf_varid,ua_varid,vfluxf_varid,uab_varid,uaf_varid
+     $       ,utb_varid,utf_varid,va_varid,vab_varid,vaf_varid,vtb_varid
+     $       ,vtf_varid,wssurf_varid,wssurfb_varid,wssurff_varid
+     $       ,wtsurf_varid,wtsurfb_varid,wtsurff_varid,wubot_varid
+     $       ,wusurf_varid,wusurfb_varid,wusurff_varid,wvbot_varid
+     $       ,wvsurf_varid,wvsurfb_varid,wvsurff_varid
       integer aam_varid,advx_varid,advy_varid,drhox_varid,drhoy_varid
      $       ,dtef_varid,kh_varid,km_varid,kq_varid,l_varid,q2b_varid
      $       ,q2_varid,q2lb_varid,q2l_varid,rmean_varid,sb_varid
@@ -591,7 +591,10 @@
       call def_var_pnetcdf(ncid,'ua',3,vdims,ua_varid,
      $         'vertical mean of u at time n'
      $        ,'metre/sec','east_u north_u',.true.)
-      call def_var_pnetcdf(ncid,'uaf',3,vdims,uaf_varid,
+      call def_var_pnetcdf(ncid,'uab',3,vdims,uaf_varid,
+     $         'vertical mean of u at time n-1'
+     $        ,'metre/sec','east_u north_u',.true.)
+      call def_var_pnetcdf(ncid,'uaf',3,vdims,uab_varid,
      $         'vertical mean of u at time n+1'
      $        ,'metre/sec','east_u north_u',.true.)
       call def_var_pnetcdf(ncid,'utb',3,vdims,utb_varid,
@@ -602,6 +605,9 @@
      $        ,'metre/sec','east_u north_u',.true.)
       call def_var_pnetcdf(ncid,'va',3,vdims,va_varid,
      $         'vertical mean of v at time n'
+     $        ,'metre/sec','east_v north_v',.true.)
+      call def_var_pnetcdf(ncid,'vab',3,vdims,vab_varid,
+     $         'vertical mean of v at time n-1'
      $        ,'metre/sec','east_v north_v',.true.)
       call def_var_pnetcdf(ncid,'vaf',3,vdims,vaf_varid,
      $         'vertical mean of v at time n+1'
@@ -982,6 +988,10 @@
      $                                                           ,dat2d)
       call handle_error_pnetcdf('nf_put_vara_double: vfluxf',
      $                                                  status,nf_noerr)
+      dat2d = uab(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,uab_varid,start,edge,dat2d)
+      call handle_error_pnetcdf('nf_put_vara_double: uab',
+     $                                                  status,nf_noerr)
       dat2d = uaf(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,uaf_varid,start,edge,dat2d)
       call handle_error_pnetcdf('nf_put_vara_double: uaf',
@@ -1001,6 +1011,10 @@
       dat2d = vaf(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,vaf_varid,start,edge,dat2d)
       call handle_error_pnetcdf('nf_put_vara_double: vaf',
+     $                                                  status,nf_noerr)
+      dat2d = vab(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,vab_varid,start,edge,dat2d)
+      call handle_error_pnetcdf('nf_put_vara_double: vab',
      $                                                  status,nf_noerr)
       dat2d = vtb(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,vtb_varid,start,edge,dat2d)

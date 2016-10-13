@@ -623,16 +623,16 @@
      $                         ,tbwf,sbwf,ubwf,tbef,sbef,ubef
      $                         ,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
 ! integrate by depth
-      uabwf = 0.d0
-      uabef = 0.d0
-      vabnf = 0.d0
-      vabsf = 0.d0
-      do k = 1,kb
-        uabwf(:) = uabwf(:) + ubwf(:,k)*dz(k)
-        uabef(:) = uabef(:) + ubef(:,k)*dz(k)
-        vabnf(:) = vabnf(:) + vbnf(:,k)*dz(k)
-        vabsf(:) = vabsf(:) + vbsf(:,k)*dz(k)
-      end do
+        uabwf = 0.d0
+        uabef = 0.d0
+        vabnf = 0.d0
+        vabsf = 0.d0
+        do k = 1,kb
+          uabwf(:) = uabwf(:) + ubwf(:,k)*dz(k)
+          uabef(:) = uabef(:) + ubef(:,k)*dz(k)
+          vabnf(:) = vabnf(:) + vbnf(:,k)*dz(k)
+          vabsf(:) = vabsf(:) + vbsf(:,k)*dz(k)
+        end do
 !  south
 !        do i=1,im
 !          do j=1,jm
@@ -844,33 +844,27 @@
 ! linear interpolation in time
       fnew=time/tbc-real(ntime, 8)
       fold=1.-fnew
-      do j=1,jm
-        uabe(j) = 0.
-        uabw(j) = 0.
-        do k=1,kb
-          tbw(j,k)=fold*tbwb(j,k)+fnew*tbwf(j,k)
-          sbw(j,k)=fold*sbwb(j,k)+fnew*sbwf(j,k)
-          tbe(j,k)=fold*tbeb(j,k)+fnew*tbef(j,k)
-          sbe(j,k)=fold*sbeb(j,k)+fnew*sbef(j,k)
-          ube(j,k)=fold*ubeb(j,k)+fnew*ubef(j,k)
-          ubw(j,k)=fold*ubwb(j,k)+fnew*ubwf(j,k)
-          uabe(j) = uabe(j) + ube(j,k)
-          uabw(j) = uabw(j) + ubw(j,k)
-        end do
-      end do
-      do i=1,im
-        vabn(i) = 0.
-        vabs(i) = 0.
-        do k=1,kb
-          tbn(i,k)=fold*tbnb(i,k)+fnew*tbnf(i,k)
-          sbn(i,k)=fold*sbnb(i,k)+fnew*sbnf(i,k)
-          tbs(i,k)=fold*tbsb(i,k)+fnew*tbsf(i,k)
-          sbs(i,k)=fold*sbsb(i,k)+fnew*sbsf(i,k)
-          vbn(i,k)=fold*vbnb(i,k)+fnew*vbnf(i,k)
-          vbs(i,k)=fold*vbsb(i,k)+fnew*vbsf(i,k)
-          vabn(i) = vabn(i) + vbn(i,k)
-          vabs(i) = vabs(i) + vbs(i,k)
-        end do
+      tbw(1:jm,1:kb) = fold*tbwb(1:jm,1:kb)+fnew*tbwf(1:jm,1:kb)
+      sbw(1:jm,1:kb) = fold*sbwb(1:jm,1:kb)+fnew*sbwf(1:jm,1:kb)
+      ubw(1:jm,1:kb) = fold*ubwb(1:jm,1:kb)+fnew*ubwf(1:jm,1:kb)
+      tbe(1:jm,1:kb) = fold*tbeb(1:jm,1:kb)+fnew*tbef(1:jm,1:kb)
+      sbe(1:jm,1:kb) = fold*sbeb(1:jm,1:kb)+fnew*sbef(1:jm,1:kb)
+      ube(1:jm,1:kb) = fold*ubeb(1:jm,1:kb)+fnew*ubef(1:jm,1:kb)
+      tbn(1:im,1:kb) = fold*tbnb(1:im,1:kb)+fnew*tbnf(1:im,1:kb)
+      sbn(1:im,1:kb) = fold*sbnb(1:im,1:kb)+fnew*sbnf(1:im,1:kb)
+      vbn(1:im,1:kb) = fold*vbnb(1:im,1:kb)+fnew*vbnf(1:im,1:kb)
+      tbs(1:im,1:kb) = fold*tbsb(1:im,1:kb)+fnew*tbsf(1:im,1:kb)
+      sbs(1:im,1:kb) = fold*sbsb(1:im,1:kb)+fnew*sbsf(1:im,1:kb)
+      vbs(1:im,1:kb) = fold*vbsb(1:im,1:kb)+fnew*vbsf(1:im,1:kb)
+      uabe = 0.
+      uabw = 0.
+      vabn = 0.
+      vabs = 0.
+      do k=1,kb
+        uabe(1:jm) = uabe(1:jm) + ube(1:jm,k)*dz(k)
+        uabw(1:jm) = uabw(1:jm) + ubw(1:jm,k)*dz(k)
+        vabn(1:im) = vabn(1:im) + vbn(1:im,k)*dz(k)
+        vabs(1:im) = vabs(1:im) + vbs(1:im,k)*dz(k)
       end do
 
       return

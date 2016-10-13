@@ -7,7 +7,7 @@
       include 'pom.h'
       integer date_time(8)
       character*10 tmp(3)
-      
+
       call date_and_time(tmp(1),tmp(2),tmp(3),date_time)
 
 ! initialize model

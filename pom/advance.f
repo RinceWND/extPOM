@@ -191,6 +191,9 @@
         end do
       end do
 
+      call exchange2d_mpi(utf, im_local, jm_local)
+      call exchange2d_mpi(vtf, im_local, jm_local)
+
       return
       end
 
@@ -281,7 +284,7 @@
       end do
       
       call bcond(2)
-      
+
       call exchange2d_mpi(uaf,im_local,jm_local)
       call exchange2d_mpi(vaf,im_local,jm_local)
       
@@ -342,6 +345,8 @@
             vtf(i,j)=vtf(i,j)+va(i,j)*(d(i,j)+d(i,j-1))*isp2i
           end do
         end do
+        call exchange2d_mpi(utf, im_local, jm_local)
+        call exchange2d_mpi(vtf, im_local, jm_local)
        end if
 
       return
