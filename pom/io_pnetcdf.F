@@ -1679,6 +1679,7 @@
 !      integer vdims(2)
 !      integer(mpi_offset_kind) length
       integer(mpi_offset_kind) start(2),edge(2)
+      double precision, dimension(im,jm) :: dat
 
 ! open netcdf file
       write(netcdf_grid_file,'(a,''in/'',a,''.grid.nc'')')
@@ -1764,58 +1765,62 @@
       start(2)=j_global(1)
       edge(1)=im
       edge(2)=jm
-      status=nfmpi_get_vara_double_all(ncid,dx_varid,start,edge
-     $                                ,dx(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+      status=nfmpi_get_vara_double_all(ncid,dx_varid,start,edge,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: dx',
      $                          status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,dy_varid,start,edge
-     $                                ,dy(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+      dx(1:im,1:jm) = dat
+      status=nfmpi_get_vara_double_all(ncid,dy_varid,start,edge,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: dy',
      $                          status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,east_u_varid,start,edge
-     $                                ,east_u(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+      dy(1:im,1:jm) = dat
+      status=nfmpi_get_vara_double_all(ncid,east_u_varid,start,edge,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: east_u',
      $                          status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,east_v_varid,start,edge
-     $                                ,east_v(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+      east_u(1:im,1:jm) = dat
+      status=nfmpi_get_vara_double_all(ncid,east_v_varid,start,edge,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: east_v',
      $                          status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,east_e_varid,start,edge
-     $                                ,east_e(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+      east_v(1:im,1:jm) = dat
+      status=nfmpi_get_vara_double_all(ncid,east_e_varid,start,edge,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: east_e',
      $                          status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,east_c_varid,start,edge
-     $                                ,east_c(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+      east_e(1:im,1:jm) = dat
+      status=nfmpi_get_vara_double_all(ncid,east_c_varid,start,edge,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: east_c',
      $                          status,nf_noerr)
+      east_c(1:im,1:jm) = dat
       status=nfmpi_get_vara_double_all(ncid,north_u_varid,start,edge
-     $                                ,north_u(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+     $                                ,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: north_u',
      $                          status,nf_noerr)
+      north_u(1:im,1:jm) = dat
       status=nfmpi_get_vara_double_all(ncid,north_v_varid,start,edge
-     $                                ,north_v(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+     $                                ,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: north_v',
      $                          status,nf_noerr)
+      north_v(1:im,1:jm) = dat
       status=nfmpi_get_vara_double_all(ncid,north_e_varid,start,edge
-     $                                ,north_e(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+     $                                ,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: north_e',
      $                          status,nf_noerr)
+      north_e(1:im,1:jm) = dat
       status=nfmpi_get_vara_double_all(ncid,north_c_varid,start,edge
-     $                                ,north_c(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+     $                                ,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: north_c',
      $                          status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,rot_varid,start,edge
-     $                                ,rot(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+      north_c(1:im,1:jm) = dat
+      status=nfmpi_get_vara_double_all(ncid,rot_varid,start,edge,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: rot',
      $                          status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,h_varid,start,edge
-     $                                ,h(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+      rot(1:im,1:jm) = dat
+      status=nfmpi_get_vara_double_all(ncid,h_varid,start,edge,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: h',
      $                          status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,fsm_varid,start,edge
-     $                                ,fsm(1:im,1:jm))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+      h(1:im,1:jm) = dat
+      status=nfmpi_get_vara_double_all(ncid,fsm_varid,start,edge,dat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: fsm',
      $                          status,nf_noerr)
+      fsm(1:im,1:jm) = dat
 ! derive u and v masks
 !      TODO: implement this properly?
       dvm = fsm
@@ -1830,6 +1835,8 @@
           if (fsm(i,j)==0..and.fsm(i+1,j)/=0.) dum(i+1,j) = 0.
         end do
       end do
+      call exchange2d_mpi(dum,im_local,jm_local)
+      call exchange2d_mpi(dvm,im_local,jm_local)
 
 ! close file:
       status=nfmpi_close(ncid)

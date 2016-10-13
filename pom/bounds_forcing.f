@@ -893,7 +893,7 @@
       if (iint.eq.1) then
         call read_wind_pnetcdf((iint+cont_bry)/iwind+1,wu,wv)
         wusurff(1:im,1:jm) = wu
-        wvsurff(1:im,1:jm) = wu
+        wvsurff(1:im,1:jm) = wv
       end if
       ! read wind file corresponding to next time
       if (iint.eq.1 .or. mod(iint,iwind).eq.0.) then
@@ -906,7 +906,7 @@
         if (iint.ne.iend) then
           call read_wind_pnetcdf((iint+cont_bry+iwind)/iwind+1,wu,wv)
           wusurff(1:im,1:jm) = wu
-          wvsurff(1:im,1:jm) = wu
+          wvsurff(1:im,1:jm) = wv
         end if
       end if
 
@@ -933,17 +933,17 @@
       double precision theat,fold,fnew
       double precision, dimension(im,jm) :: shf, swr
 
-      theat=.125 ! time between wind forcing (days)
+      theat=.125 ! time between heat forcing (days)
       iheat=int(theat*86400.d0/dti)
 
-! read wind stress data
+! read heat stress data
       ! read initial heat file
       if (iint.eq.1) then
         call read_heat_pnetcdf((iint+cont_bry)/iheat+1,shf,swr)
         wtsurff(1:im,1:jm) = shf
         swradf(1:im,1:jm) = swr
       end if
-      ! read heat forcing corresponding to next twind
+      ! read heat forcing corresponding to next theat
       if (iint.eq.1 .or. mod(iint,iheat).eq.0.) then
         do i=1,im
           do j=1,jm
