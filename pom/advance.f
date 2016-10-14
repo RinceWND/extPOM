@@ -19,7 +19,7 @@
       
 ! set lateral viscosity
       call lateral_viscosity
-      
+
 ! form vertical averages of 3-D fields for use in external (2-D) mode
       call mode_interaction
 
@@ -41,7 +41,9 @@
       end if
 
 ! write auxillary debug
-!      call write_aux_pnetcdf
+      if(netcdf_file.ne.'nonetcdf' .and. mod(iint,iprint).eq.1) then
+        call write_aux_pnetcdf
+      end if
 
 ! write restart
       if(mod(iint,irestart).eq.0) call write_restart_pnetcdf
@@ -51,7 +53,7 @@
 
 ! debug stop
 !      call finalize_mpi
-!      stop 'advance:52[user]'
+!      stop 'advance:[user]'
 !
       return
       end
@@ -558,30 +560,27 @@
           end do
         end do
 
-        do k=1,kb
-          do j=1,jm
-            do i=1,im
-              ub(i,j,k)=u(i,j,k)
-              u(i,j,k)=uf(i,j,k)
-              vb(i,j,k)=v(i,j,k)
-              v(i,j,k)=vf(i,j,k)
-            end do
-          end do
-        end do
+        ub = u
+        u  = uf
+        vb = v
+        v  = vf
+
+        call exchange3d_mpi(ub,im_local,jm_local,kb)
+        call exchange3d_mpi(u, im_local,jm_local,kb)
+        call exchange3d_mpi(uf,im_local,jm_local,kb)
+        call exchange3d_mpi(vb,im_local,jm_local,kb)
+        call exchange3d_mpi(v, im_local,jm_local,kb)
+        call exchange3d_mpi(vf,im_local,jm_local,kb)
 
       end if
 
-      do j=1,jm
-        do i=1,im
-          egb(i,j)=egf(i,j)
-          etb(i,j)=et(i,j)
-          et(i,j)=etf(i,j)
-          dt(i,j)=h(i,j)+et(i,j)
-          utb(i,j)=utf(i,j)
-          vtb(i,j)=vtf(i,j)
-          vfluxb(i,j)=vfluxf(i,j)
-        end do
-      end do
+      egb    = egf
+      etb    = et
+      et     = etf
+      dt     = h+et
+      utb    = utf
+      vtb    = vtf
+      vfluxb = vfluxf
 
 ! calculate real w as wr
       call realvertvl
