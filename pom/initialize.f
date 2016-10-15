@@ -42,6 +42,10 @@
 !      call finalize_mpi
 !      stop
 
+!      call write_aux_pnetcdf
+!      call finalize_mpi
+!      stop
+
 ! check for errors
       call sum0d_mpi(error_status,master_task)
       call bcast0d_mpi(error_status,master_task)
