@@ -39,9 +39,10 @@
         call write_output_pnetcdf
         call write_aux_pnetcdf
       end if
-
-! write auxillary debug
-!      call write_aux_pnetcdf
+      
+      if(netcdf_file.ne.'nonetcdf' .and. mod(iint,iprint).eq.1) then
+        call write_aux_pnetcdf
+      end if
 
 ! write restart
       if(mod(iint,irestart).eq.0) call write_restart_pnetcdf
@@ -691,3 +692,41 @@
 
       return
       end
+
+!_______________________________________________________________________
+      subroutine domain_stats(vtot,atot,stot,tavg,savg,eavg,ekin)
+! check if velocity condition is violated
+      implicit none
+      include 'pom.h'
+      
+      double precision, intent(out)::vtot,atot,stot,tavg,savg,eavg,ekin
+      double precision, dimension(im,jm)    :: darea
+      double precision, dimension(im,jm,kb) :: dvol
+      integer :: k
+      
+! local averages
+      vtot = 0.d0
+      atot = 0.d0
+      tavg = 0.d0
+      savg = 0.d0
+      eavg = 0.d0
+      ekin = 0.d0
+      
+      darea = dx*dy*fsm
+      atot = sum(darea(1:im,1:jm))
+      eavg = sum(et(1:im,1:jm)*darea(1:im,1:jm))/atot
+      do k=1,kbm1
+        dvol(1:im,1:jm,k) = darea(1:im,1:jm)*dt(1:im,1:jm)*dz(k)
+      end do
+      vtot = sum(dvol(1:im,1:jm,1:kbm1))
+      tavg = sum(tb(1:im,1:jm,1:kbm1)*dvol(1:im,1:jm,1:kbm1))/vtot
+      stot = sum(sb(1:im,1:jm,1:kbm1)*dvol(1:im,1:jm,1:kbm1))
+      savg = stot/vtot
+!      stot=(savg+sbias)*vtot
+      
+      do k=1,kbm1
+        darea = sqrt(u(1:im,1:jm,k)**2+v(1:im,1:jm,k)**2)  ! add vertical velocity maybe?
+        ekin = ekin + sum(darea)
+      end do
+
+      end subroutine

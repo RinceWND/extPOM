@@ -67,7 +67,7 @@
         end do
       end do
 
-      call exchange2d_mpi(advua,im_local,jm_local)
+!      call exchange2d_mpi(advua,im_local,jm_local)
 
 ! v-advection and diffusion
       advva  = 0.d0
@@ -118,7 +118,7 @@
         end do
       end do
 
-      call exchange2d_mpi(advva,im_local,jm_local)
+!      call exchange2d_mpi(advva,im_local,jm_local)
 
       if(mode.eq.2) then
 
@@ -1152,7 +1152,7 @@
         end do
       end do
 
-      call exchange3d_mpi(drhox,im_local,jm_local,kb)
+!      call exchange3d_mpi(drhox,im_local,jm_local,kb)
 
 ! compute terms correct to 4th order
       do i=1,im
@@ -1255,7 +1255,7 @@
         end do
       end do
 
-      call exchange3d_mpi(drhoy,im_local,jm_local,kb)
+!      call exchange3d_mpi(drhoy,im_local,jm_local,kb)
 
       do k=1,kb
         do j=2,jmm1

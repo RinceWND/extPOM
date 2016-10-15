@@ -37,6 +37,10 @@
 
 ! read restart data from a previous run
       if(nread_rst.ne.0) call read_restart_pnetcdf
+      
+!      call write_aux_pnetcdf
+!      call finalize_mpi
+!      stop
 
 ! check for errors
       call sum0d_mpi(error_status,master_task)
@@ -296,8 +300,8 @@
       ub = 0.d0
       vb = 0.d0
       
-!      drhox = 0.d0
-!      drhoy = 0.d0
+      drhox = 0.d0
+      drhoy = 0.d0
 
       return
       end
