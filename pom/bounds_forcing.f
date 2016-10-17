@@ -717,7 +717,7 @@
 
       end if
       ! read bc file corresponding to next time
-      if (iint.eq.1 .or. mod(iint,ibc).eq.0.) then
+      if (iint.eq.1 .or. mod(iint+cont_bry,ibc).eq.0.) then
         tbwb = tbwf
         sbwb = sbwf
         tbeb = tbef
@@ -878,7 +878,7 @@
         wvsurff(1:im,1:jm) = wv
       end if
       ! read wind file corresponding to next time
-      if (iint.eq.1 .or. mod(iint,iwind).eq.0.) then
+      if (iint.eq.1 .or. mod(iint+cont_bry,iwind).eq.0.) then
         do i=1,im
           do j=1,jm
             wusurfb(i,j)=wusurff(i,j)
@@ -922,7 +922,7 @@
         swradf(1:im,1:jm) = swr
       end if
       ! read heat forcing corresponding to next theat
-      if (iint.eq.1 .or. mod(iint,iheat).eq.0.) then
+      if (iint.eq.1 .or. mod(iint+cont_bry,iheat).eq.0.) then
         do i=1,im
           do j=1,jm
             wtsurfb(i,j)=wtsurff(i,j)
