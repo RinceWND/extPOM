@@ -619,11 +619,10 @@
 ! read bc data
       ! read initial bc file
       if (iint.eq.1) then
-        call read_boundary_conditions_pnetcdf((iint+cont_bry)/ibc,kb
+        call read_boundary_conditions_pnetcdf((iint+cont_bry)/ibc+1,kb
      $                         ,tbwf,sbwf,ubwf,tbef,sbef,ubef
      $                         ,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
 ! integrate by depth
-        write(*,*) "B:",tbwf(50,1)
         uabwf = 0.d0
         uabef = 0.d0
         vabnf = 0.d0
@@ -719,31 +718,22 @@
       end if
       ! read bc file corresponding to next time
       if (iint.eq.1 .or. mod(iint,ibc).eq.0.) then
-        do j=1,jm
-          do k=1,kb
-            tbwb(j,k)=tbwf(j,k)
-            sbwb(j,k)=sbwf(j,k)
-            tbeb(j,k)=tbef(j,k)
-            sbeb(j,k)=sbef(j,k)
-          end do
-          uabwb(j)=uabwf(j)
-          uabeb(j)=uabef(j)
-        end do
-        do i=1,im
-          do k=1,kb
-!            write(51,'(2(i4),e16.7)') i,k,sbnf(i,k)
-            tbnb(i,k)=tbnf(i,k)
-            sbnb(i,k)=sbnf(i,k)
-            tbsb(i,k)=tbsf(i,k)
-            sbsb(i,k)=sbsf(i,k)
-          end do
-          vabnb(i)=vabnf(i)
-          vabsb(i)=vabsf(i)
-        end do
+        tbwb = tbwf
+        sbwb = sbwf
+        tbeb = tbef
+        sbeb = sbef
+        tbnb = tbnf
+        sbnb = sbnf
+        tbsb = tbsf
+        sbsb = sbsf
+        uabwb = uabwf
+        uabeb = uabef
+        vabnb = vabnf
+        vabsb = vabsf
         if (iint.ne.iend) then
-          call read_boundary_conditions_pnetcdf((iint+cont_bry+ibc)/ibc,
-     $   kb,tbwf,sbwf,ubwf,tbef,sbef,ubef,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
-          write(*,*) "A:",tbwf(50,1)
+          call read_boundary_conditions_pnetcdf(
+     $                                     (iint+cont_bry+ibc)+1/ibc,kb
+     $     ,tbwf,sbwf,ubwf,tbef,sbef,ubef,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
 ! integrate by depth
           uabwf = 0.d0
           uabef = 0.d0
@@ -854,7 +844,6 @@
       tbs(1:im,1:kb) = fold*tbsb(1:im,1:kb)+fnew*tbsf(1:im,1:kb)
       sbs(1:im,1:kb) = fold*sbsb(1:im,1:kb)+fnew*sbsf(1:im,1:kb)
       vbs(1:im,1:kb) = fold*vbsb(1:im,1:kb)+fnew*vbsf(1:im,1:kb)
-      write(*,*) "O:",tbw(50,1)
       uabe = 0.
       uabw = 0.
       vabn = 0.
@@ -907,12 +896,8 @@
       ntime=int(time/twind)
       fnew=time/twind-ntime
       fold=1.-fnew
-      do i=1,im
-        do j=1,jm
-          wusurf(i,j)=fold*wusurfb(i,j)+fnew*wusurff(i,j)
-          wvsurf(i,j)=fold*wvsurfb(i,j)+fnew*wvsurff(i,j)
-        end do
-      end do
+      wusurf(1:im,1:jm)=fold*wusurfb(1:im,1:jm)+fnew*wusurff(1:im,1:jm)
+      wvsurf(1:im,1:jm)=fold*wvsurfb(1:im,1:jm)+fnew*wvsurff(1:im,1:jm)
 
       return
       end
@@ -944,9 +929,11 @@
             swradb(i,j)=swradf(i,j)
           end do
         end do
-        call read_heat_pnetcdf((iint+cont_bry+iheat)/iheat+1,shf,swr)
-        wtsurff(1:im,1:jm) = shf
-        swradf(1:im,1:jm) = swr
+        if (iint/=iend) then
+          call read_heat_pnetcdf((iint+cont_bry+iheat)/iheat+1,shf,swr)
+          wtsurff(1:im,1:jm) = shf
+          swradf(1:im,1:jm) = swr
+        end if
       end if
 
 ! linear interpolation in time

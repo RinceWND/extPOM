@@ -404,8 +404,9 @@
       integer vdims(4)
       integer(mpi_offset_kind) length
       integer(mpi_offset_kind) start(4),edge(4)
-      double precision, dimension(1:im,1:jm)      :: dat2d
-      double precision, dimension(1:im,1:jm,1:kb) :: dat3d
+      double precision, dimension(1:im,1:kb)      :: dat_lon
+      double precision, dimension(1:jm,1:kb)      :: dat_lat
+      double precision, dimension(1:im,1:jm,1:kb) :: dat
 
 ! create netcdf file
       nprint=iint
@@ -961,48 +962,49 @@
       start(2)=j_global(1)
       edge(1)=im
       edge(2)=jm
-      dat2d = cbc(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,cbc_varid,start,edge,dat2d)
+      dat(:,:,1) = cbc(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,cbc_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_var_double: cbc'
      $                                                 ,status,nf_noerr)
-      dat2d = east_u(1:im,1:jm)
+      dat(:,:,1) = east_u(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,east_u_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_var_double: east_u',status,
      $                                                         nf_noerr)
-      dat2d = east_v(1:im,1:jm)
+      dat(:,:,1) = east_v(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,east_v_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_var_double: east_v',status,
      $                                                         nf_noerr)
-      dat2d = east_e(1:im,1:jm)
+      dat(:,:,1) = east_e(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,east_e_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_var_double: east_e',status,
      $                                                         nf_noerr)
-      dat2d = east_c(1:im,1:jm)
+      dat(:,:,1) = east_c(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,east_c_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_var_double: east_c',status,
      $                                                         nf_noerr)
-      dat2d = north_u(1:im,1:jm)
+      dat(:,:,1) = north_u(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,north_u_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_var_double: north_u',status,
      $                                                         nf_noerr)
-      dat2d = north_v(1:im,1:jm)
+      dat(:,:,1) = north_v(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,north_v_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_var_double: north_v',status,
      $                                                         nf_noerr)
-      dat2d = north_e(1:im,1:jm)
+      dat(:,:,1) = north_e(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,north_e_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_var_double: north_e',status,
      $                                                         nf_noerr)
-      dat2d = north_c(1:im,1:jm)
+      dat(:,:,1) = north_c(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,north_c_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_var_double: north_c',status,
      $                                                         nf_noerr)
 
@@ -1010,44 +1012,44 @@
       start(2)=1
       edge(1)=im
       edge(2)=1
-      dat2d(:,1) = eln(1:im)
+      dat_lon(:,1) = eln(1:im)
       status=nfmpi_put_vara_double_all(ncid,eln_varid,start,edge
-     $                                                      ,dat2d(:,1))
+     $                                                    ,dat_lon(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: eln',
      $                                                  status,nf_noerr)
-      dat2d(:,1) = els(1:im)
+      dat_lon(:,1) = els(1:im)
       status=nfmpi_put_vara_double_all(ncid,els_varid,start,edge
-     $                                                      ,dat2d(:,1))
+     $                                                    ,dat_lon(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: els',
      $                                                  status,nf_noerr)
-      dat2d(:,1) = vabn(1:im)
+      dat_lon(:,1) = vabn(1:im)
       status=nfmpi_put_vara_double_all(ncid,vabn_varid,start,edge
-     $                                                      ,dat2d(:,1))
+     $                                                    ,dat_lon(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vabn',
      $                                                  status,nf_noerr)
-      dat2d(:,1) = vabnb(1:im)
+      dat_lon(:,1) = vabnb(1:im)
       status=nfmpi_put_vara_double_all(ncid,vabnb_varid,start,edge
-     $                                                      ,dat2d(:,1))
+     $                                                    ,dat_lon(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vabnb',
      $                                                  status,nf_noerr)
-      dat2d(:,1) = vabnf(1:im)
+      dat_lon(:,1) = vabnf(1:im)
       status=nfmpi_put_vara_double_all(ncid,vabnf_varid,start,edge
-     $                                                      ,dat2d(:,1))
+     $                                                    ,dat_lon(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vabnf',
      $                                                  status,nf_noerr)
-      dat2d(:,1) = vabs(1:im)
+      dat_lon(:,1) = vabs(1:im)
       status=nfmpi_put_vara_double_all(ncid,vabs_varid,start,edge
-     $                                                      ,dat2d(:,1))
+     $                                                    ,dat_lon(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vabs',
      $                                                  status,nf_noerr)
-      dat2d(:,1) = vabsb(1:im)
+      dat_lon(:,1) = vabsb(1:im)
       status=nfmpi_put_vara_double_all(ncid,vabsb_varid,start,edge
-     $                                                      ,dat2d(:,1))
+     $                                                    ,dat_lon(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vabsb',
      $                                                  status,nf_noerr)
-      dat2d(:,1) = vabsf(1:im)
+      dat_lon(:,1) = vabsf(1:im)
       status=nfmpi_put_vara_double_all(ncid,vabsf_varid,start,edge
-     $                                                      ,dat2d(:,1))
+     $                                                    ,dat_lon(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vabsf',
      $                                                  status,nf_noerr)
 
@@ -1055,102 +1057,118 @@
       start(2)=1
       edge(1)=jm
       edge(2)=1
-      dat2d(1,:) = ele(1:jm)
+      dat_lat(:,1) = ele(1:jm)
       status=nfmpi_put_vara_double_all(ncid,ele_varid,start,edge
-     $                                                      ,dat2d(1,:))
+     $                                                    ,dat_lat(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: ele',
      $                                                  status,nf_noerr)
-      dat2d(1,:) = elw(1:jm)
+      dat_lat(:,1) = elw(1:jm)
       status=nfmpi_put_vara_double_all(ncid,elw_varid,start,edge
-     $                                                      ,dat2d(1,:))
+     $                                                    ,dat_lat(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: elw',
      $                                                  status,nf_noerr)
-      dat2d(1,:) = uabe(1:jm)
+      dat_lat(:,1) = uabe(1:jm)
       status=nfmpi_put_vara_double_all(ncid,uabe_varid,start,edge
-     $                                                      ,dat2d(1,:))
+     $                                                    ,dat_lat(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: uabe',
      $                                                  status,nf_noerr)
-      dat2d(1,:) = uabeb(1:jm)
+      dat_lat(:,1) = uabeb(1:jm)
       status=nfmpi_put_vara_double_all(ncid,uabeb_varid,start,edge
-     $                                                      ,dat2d(1,:))
+     $                                                    ,dat_lat(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: uabeb',
      $                                                  status,nf_noerr)
-      dat2d(1,:) = uabef(1:jm)
+      dat_lat(:,1) = uabef(1:jm)
       status=nfmpi_put_vara_double_all(ncid,uabef_varid,start,edge
-     $                                                      ,dat2d(1,:))
+     $                                                    ,dat_lat(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: uabef',
      $                                                  status,nf_noerr)
-      dat2d(1,:) = uabw(1:jm)
+      dat_lat(:,1) = uabw(1:jm)
       status=nfmpi_put_vara_double_all(ncid,uabw_varid,start,edge
-     $                                                      ,dat2d(1,:))
+     $                                                    ,dat_lat(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: uabw',
      $                                                  status,nf_noerr)
-      dat2d(1,:) = uabwb(1:jm)
+      dat_lat(:,1) = uabwb(1:jm)
       status=nfmpi_put_vara_double_all(ncid,uabwb_varid,start,edge
-     $                                                      ,dat2d(1,:))
+     $                                                    ,dat_lat(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: uabwb',
      $                                                  status,nf_noerr)
-      dat2d(1,:) = uabwf(1:jm)
+      dat_lat(:,1) = uabwf(1:jm)
       status=nfmpi_put_vara_double_all(ncid,uabwf_varid,start,edge
-     $                                                      ,dat2d(1,:))
+     $                                                    ,dat_lat(:,1))
       call handle_error_pnetcdf('nf_put_vara_double: uabwf',
      $                                                  status,nf_noerr)
 
       start(1)=i_global(1)
       start(2)=1
+      start(3)=1
       edge(1)=im
       edge(2)=kb
+      edge(3)=1
+      dat_lon = vbn(1:im,1:kb)
       status=nfmpi_put_vara_double_all(ncid,vbn_varid,start,edge
-     $                                                  ,vbn(1:im,1:kb))
+     $                                                         ,dat_lon)
       call handle_error_pnetcdf('nf_put_vara_double: vbn',
      $                                                  status,nf_noerr)
+      dat_lon = vbs(1:im,1:kb)
       status=nfmpi_put_vara_double_all(ncid,vbs_varid,start,edge
-     $                                                  ,vbs(1:im,1:kb))
+     $                                                         ,dat_lon)
       call handle_error_pnetcdf('nf_put_vara_double: vbs',
      $                                                  status,nf_noerr)
+      dat_lon = tbn(1:im,1:kb)
       status=nfmpi_put_vara_double_all(ncid,tbn_varid,start,edge
-     $                                                  ,tbn(1:im,1:kb))
+     $                                                         ,dat_lon)
       call handle_error_pnetcdf('nf_put_vara_double: tbn',
      $                                                  status,nf_noerr)
+      dat_lon = tbs(1:im,1:kb)
       status=nfmpi_put_vara_double_all(ncid,tbs_varid,start,edge
-     $                                                  ,tbs(1:im,1:kb))
+     $                                                         ,dat_lon)
       call handle_error_pnetcdf('nf_put_vara_double: tbs',
      $                                                  status,nf_noerr)
+      dat_lon = sbn(1:im,1:kb)
       status=nfmpi_put_vara_double_all(ncid,sbn_varid,start,edge
-     $                                                  ,sbn(1:im,1:kb))
+     $                                                         ,dat_lon)
       call handle_error_pnetcdf('nf_put_vara_double: sbn',
      $                                                  status,nf_noerr)
+      dat_lon = sbs(1:im,1:kb)
       status=nfmpi_put_vara_double_all(ncid,sbs_varid,start,edge
-     $                                                  ,sbs(1:im,1:kb))
+     $                                                         ,dat_lon)
       call handle_error_pnetcdf('nf_put_vara_double: sbs',
      $                                                  status,nf_noerr)
 
       start(1)=j_global(1)
       start(2)=1
+      start(3)=1
       edge(1)=jm
       edge(2)=kb
+      edge(3)=1
+      dat_lat = ube(1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,ube_varid,start,edge
-     $                                                  ,ube(1:jm,1:kb))
+     $                                                         ,dat_lat)
       call handle_error_pnetcdf('nf_put_vara_double: ube',
      $                                                  status,nf_noerr)
+      dat_lat = ubw(1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,ubw_varid,start,edge
-     $                                                  ,ubw(1:jm,1:kb))
+     $                                                         ,dat_lat)
       call handle_error_pnetcdf('nf_put_vara_double: ubw',
      $                                                  status,nf_noerr)
+      dat_lat = tbe(1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,tbe_varid,start,edge
-     $                                                  ,tbe(1:jm,1:kb))
+     $                                                         ,dat_lat)
       call handle_error_pnetcdf('nf_put_vara_double: tbe',
      $                                                  status,nf_noerr)
+      dat_lat = tbw(1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,tbw_varid,start,edge
-     $                                                  ,tbw(1:jm,1:kb))
+     $                                                         ,dat_lat)
       call handle_error_pnetcdf('nf_put_vara_double: tbw',
      $                                                  status,nf_noerr)
+      dat_lat = sbe(1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,sbe_varid,start,edge
-     $                                                  ,sbe(1:jm,1:kb))
+     $                                                         ,dat_lat)
       call handle_error_pnetcdf('nf_put_vara_double: sbe',
      $                                                  status,nf_noerr)
+      dat_lat = sbw(1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,sbw_varid,start,edge
-     $                                                  ,sbw(1:jm,1:kb))
+     $                                                         ,dat_lat)
       call handle_error_pnetcdf('nf_put_vara_double: sbw',
      $                                                  status,nf_noerr)
 
@@ -1160,243 +1178,264 @@
       edge(1)=im
       edge(2)=jm
       edge(3)=1
-      dat2d = aam2d(1:im,1:jm)
+      dat(:,:,1) = aam2d(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,aam2d_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: aam2d',
      $                                                  status,nf_noerr)
-      dat2d = advua(1:im,1:jm)
+      dat(:,:,1) = advua(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,advua_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: advua',
      $                                                  status,nf_noerr)
-      dat2d = advva(1:im,1:jm)
+      dat(:,:,1) = advva(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,advva_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: advva',
      $                                                  status,nf_noerr)
-      dat2d = adx2d(1:im,1:jm)
+      dat(:,:,1) = adx2d(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,adx2d_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: adx2d',
      $                                                  status,nf_noerr)
-      dat2d = ady2d(1:im,1:jm)
+      dat(:,:,1) = ady2d(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,ady2d_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: ady2d',
      $                                                  status,nf_noerr)
-      dat2d = d(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,d_varid,start,edge,dat2d)
+      dat(:,:,1) = d(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,d_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: d',
      $                                                  status,nf_noerr)
-      dat2d = drx2d(1:im,1:jm)
+      dat(:,:,1) = drx2d(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,drx2d_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: drx2d',
      $                                                  status,nf_noerr)
-      dat2d = dry2d(1:im,1:jm)
+      dat(:,:,1) = dry2d(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,dry2d_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: dry2d',
      $                                                  status,nf_noerr)
-      dat2d = dt(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,dt_varid,start,edge,dat2d)
+      dat(:,:,1) = dt(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,dt_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: dt',
      $                                                  status,nf_noerr)
-      dat2d = e_atmos(1:im,1:jm)
+      dat(:,:,1) = e_atmos(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,e_atmos_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: e_atmos',
      $                                                  status,nf_noerr)
-      dat2d = egb(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,egb_varid,start,edge,dat2d)
+      dat(:,:,1) = egb(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,egb_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: egb',
      $                                                  status,nf_noerr)
-      dat2d = egf(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,egf_varid,start,edge,dat2d)
+      dat(:,:,1) = egf(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,egf_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: egf',
      $                                                  status,nf_noerr)
-      dat2d = elb(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,elb_varid,start,edge,dat2d)
+      dat(:,:,1) = elb(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,elb_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: elb',
      $                                                  status,nf_noerr)
-      dat2d = el(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,el_varid,start,edge,dat2d)
+      dat(:,:,1) = el(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,el_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: el',
      $                                                  status,nf_noerr)
-      dat2d = elf(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,elf_varid,start,edge,dat2d)
+      dat(:,:,1) = elf(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,elf_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: elf',
      $                                                  status,nf_noerr)
-      dat2d = et(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,et_varid,start,edge,dat2d)
+      dat(:,:,1) = et(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,et_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: et',
      $                                                  status,nf_noerr)
-      dat2d = etb(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,etb_varid,start,edge,dat2d)
+      dat(:,:,1) = etb(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,etb_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: etb',
      $                                                  status,nf_noerr)
-      dat2d = etf(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,etf_varid,start,edge,dat2d)
+      dat(:,:,1) = etf(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,etf_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: etf',
      $                                                  status,nf_noerr)
-      dat2d = fluxua(1:im,1:jm)
+      dat(:,:,1) = fluxua(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,fluxua_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: fluxua',
      $                                                  status,nf_noerr)
-      dat2d = fluxva(1:im,1:jm)
+      dat(:,:,1) = fluxva(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,fluxva_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: fluxva',
      $                                                  status,nf_noerr)
-      dat2d = psi(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,psi_varid,start,edge,dat2d)
+      dat(:,:,1) = psi(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,psi_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: psi',
      $                                                  status,nf_noerr)
-      dat2d = ssurf(1:im,1:jm)
+      dat(:,:,1) = ssurf(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,ssurf_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: ssurf',
      $                                                  status,nf_noerr)
-      dat2d = swrad(1:im,1:jm)
+      dat(:,:,1) = swrad(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,swrad_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: swrad',
      $                                                  status,nf_noerr)
-      dat2d = swradb(1:im,1:jm)
+      dat(:,:,1) = swradb(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,swradb_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: swradb',
      $                                                  status,nf_noerr)
-      dat2d = swradf(1:im,1:jm)
+      dat(:,:,1) = swradf(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,swradf_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: swradf',
      $                                                  status,nf_noerr)
-      dat2d = vfluxb(1:im,1:jm)
+      dat(:,:,1) = vfluxb(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,vfluxb_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vfluxb',
      $                                                  status,nf_noerr)
-      dat2d = tsurf(1:im,1:jm)
+      dat(:,:,1) = tsurf(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,tsurf_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: tsurf',
      $                                                  status,nf_noerr)
-      dat2d = ua(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,ua_varid,start,edge,dat2d)
+      dat(:,:,1) = ua(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,ua_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: ua',
      $                                                  status,nf_noerr)
-      dat2d = vfluxf(1:im,1:jm)
+      dat(:,:,1) = vfluxf(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,vfluxf_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vfluxf',
      $                                                  status,nf_noerr)
-      dat2d = uab(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,uab_varid,start,edge,dat2d)
+      dat(:,:,1) = uab(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,uab_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: uab',
      $                                                  status,nf_noerr)
-      dat2d = uaf(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,uaf_varid,start,edge,dat2d)
+      dat(:,:,1) = uaf(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,uaf_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: uaf',
      $                                                  status,nf_noerr)
-      dat2d = utb(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,utb_varid,start,edge,dat2d)
+      dat(:,:,1) = utb(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,utb_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: utb',
      $                                                  status,nf_noerr)
-      dat2d = utf(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,utf_varid,start,edge,dat2d)
+      dat(:,:,1) = utf(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,utf_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: utf',
      $                                                  status,nf_noerr)
-      dat2d = va(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,va_varid,start,edge,dat2d)
+      dat(:,:,1) = va(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,va_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: va',
      $                                                  status,nf_noerr)
-      dat2d = vaf(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,vaf_varid,start,edge,dat2d)
+      dat(:,:,1) = vaf(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,vaf_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vaf',
      $                                                  status,nf_noerr)
-      dat2d = vab(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,vab_varid,start,edge,dat2d)
+      dat(:,:,1) = vab(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,vab_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vab',
      $                                                  status,nf_noerr)
-      dat2d = vtb(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,vtb_varid,start,edge,dat2d)
+      dat(:,:,1) = vtb(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,vtb_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vtb',
      $                                                  status,nf_noerr)
-      dat2d = vtf(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,vtf_varid,start,edge,dat2d)
+      dat(:,:,1) = vtf(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,vtf_varid,start,edge
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: vtf',
      $                                                  status,nf_noerr)
-      dat2d = wssurf(1:im,1:jm)
+      dat(:,:,1) = wssurf(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wssurf_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wssurf',
      $                                                  status,nf_noerr)
-      dat2d = wssurfb(1:im,1:jm)
+      dat(:,:,1) = wssurfb(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wssurfb_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wssurfb',
      $                                                  status,nf_noerr)
-      dat2d = wssurff(1:im,1:jm)
+      dat(:,:,1) = wssurff(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wssurff_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wssurff',
      $                                                  status,nf_noerr)
-      dat2d = wtsurf(1:im,1:jm)
+      dat(:,:,1) = wtsurf(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wtsurf_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wtsurf',
      $                                                  status,nf_noerr)
-      dat2d = wtsurfb(1:im,1:jm)
+      dat(:,:,1) = wtsurfb(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wtsurfb_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wtsurfb',
      $                                                  status,nf_noerr)
-      dat2d = wtsurff(1:im,1:jm)
+      dat(:,:,1) = wtsurff(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wtsurff_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wtsurff',
      $                                                  status,nf_noerr)
-      dat2d = wubot(1:im,1:jm)
+      dat(:,:,1) = wubot(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wubot_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wubot',
      $                                                  status,nf_noerr)
-      dat2d = wusurf(1:im,1:jm)
+      dat(:,:,1) = wusurf(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wusurf_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wusurf',
      $                                                  status,nf_noerr)
-      dat2d = wusurfb(1:im,1:jm)
+      dat(:,:,1) = wusurfb(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wusurfb_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wusurfb',
      $                                                  status,nf_noerr)
-      dat2d = wusurff(1:im,1:jm)
+      dat(:,:,1) = wusurff(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wusurff_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wusurff',
      $                                                  status,nf_noerr)
-      dat2d = wvbot(1:im,1:jm)
+      dat(:,:,1) = wvbot(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wvbot_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wvbot',
      $                                                  status,nf_noerr)
-      dat2d = wvsurf(1:im,1:jm)
+      dat(:,:,1) = wvsurf(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wvsurf_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wvsurf',
      $                                                  status,nf_noerr)
-      dat2d = wvsurfb(1:im,1:jm)
+      dat(:,:,1) = wvsurfb(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wvsurfb_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wvsurfb',
      $                                                  status,nf_noerr)
-      dat2d = wvsurff(1:im,1:jm)
+      dat(:,:,1) = wvsurff(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,wvsurff_varid,start,edge
-     $                                                           ,dat2d)
+     $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: wvsurff',
      $                                                  status,nf_noerr)
 
@@ -1408,163 +1447,151 @@
       edge(2)=jm
       edge(3)=kb
       edge(4)=1
-      dat3d = aam(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,aam_varid,start,edge,dat3d)
+      dat = aam(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,aam_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: aam'
      $                                                 ,status,nf_noerr)
-      dat3d = advx(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,advx_varid,start,edge,dat3d)
+      dat = advx(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,advx_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: advx'
      $                                                 ,status,nf_noerr)
-      dat3d = advy(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,advy_varid,start,edge,dat3d)
+      dat = advy(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,advy_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: advy'
      $                                                 ,status,nf_noerr)
-      dat3d = drhox(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,drhox_varid,start,edge
-     $                                                           ,dat3d)
+      dat = drhox(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,drhox_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: drhox'
      $                                                 ,status,nf_noerr)
-      dat3d = drhoy(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,drhoy_varid,start,edge
-     $                                                           ,dat3d)
+      dat = drhoy(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,drhoy_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: drhoy'
      $                                                 ,status,nf_noerr)
-      dat3d = dtef(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,dtef_varid,start,edge,dat3d)
+      dat = dtef(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,dtef_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: dtef',
      $                                                  status,nf_noerr)
-      dat3d = kh(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,kh_varid,start,edge,dat3d)
+      dat = kh(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,kh_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: kh'
      $                                                 ,status,nf_noerr)
-      dat3d = km(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,km_varid,start,edge,dat3d)
+      dat = km(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,km_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: km'
      $                                                 ,status,nf_noerr)
-      dat3d = kq(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,kq_varid,start,edge,dat3d)
+      dat = kq(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,kq_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: kq',
      $                                                  status,nf_noerr)
-      dat3d = l(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,l_varid,start,edge,dat3d)
+      dat = l(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,l_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: l',
      $                                                  status,nf_noerr)
-      dat3d = q2b(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,q2b_varid,start,edge,dat3d)
+      dat = q2b(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,q2b_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: q2b'
      $                                                 ,status,nf_noerr)
-      dat3d = q2(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,q2_varid,start,edge,dat3d)
+      dat = q2(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,q2_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: q2',
      $                                                  status,nf_noerr)
-      dat3d = q2lb(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,q2lb_varid,start,edge,dat3d)
+      dat = q2lb(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,q2lb_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: q2lb'
      $                                                 ,status,nf_noerr)
-      dat3d = q2l(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,q2l_varid,start,edge,dat3d)
+      dat = q2l(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,q2l_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: q2l',
      $                                                  status,nf_noerr)
-      dat3d = rmean(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,rmean_varid,start,edge
-     $                                                           ,dat3d)
+      dat = rmean(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,rmean_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: rmean',
      $                                                  status,nf_noerr)
-      dat3d = sb(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,sb_varid,start,edge,dat3d)
+      dat = sb(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,sb_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: sb',
      $                                                  status,nf_noerr)
-      dat3d = s(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,s_varid,start,edge,dat3d)
+      dat = s(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,s_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: s',
      $                                                  status,nf_noerr)
-      dat3d = sclim(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,sclim_varid,start,edge
-     $                                                           ,dat3d)
+      dat = sclim(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,sclim_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: sclim',
      $                                                  status,nf_noerr)
-      dat3d = srstr(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,srstr_varid,start,edge
-     $                                                           ,dat3d)
+      dat = srstr(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,srstr_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: srstr',
      $                                                  status,nf_noerr)
-      dat3d = srstrb(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,srstrb_varid,start,edge
-     $                                                           ,dat3d)
+      dat = srstrb(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,srstrb_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: srstrb',
      $                                                  status,nf_noerr)
-      dat3d = srstrf(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,srstrf_varid,start,edge
-     $                                                           ,dat3d)
+      dat = srstrf(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,srstrf_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: srstrf',
      $                                                  status,nf_noerr)
-      dat3d = tb(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,tb_varid,start,edge,dat3d)
+      dat = tb(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,tb_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: tb',
      $                                                  status,nf_noerr)
-      dat3d = t(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,t_varid,start,edge,dat3d)
+      dat = t(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,t_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: t',
      $                                                  status,nf_noerr)
-      dat3d = tclim(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,tclim_varid,start,edge
-     $                                                           ,dat3d)
+      dat = tclim(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,tclim_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: tclim',
      $                                                  status,nf_noerr)
-      dat3d = trstr(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,trstr_varid,start,edge
-     $                                                           ,dat3d)
+      dat = trstr(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,trstr_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: trstr',
      $                                                  status,nf_noerr)
-      dat3d = trstrb(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,trstrb_varid,start,edge
-     $                                                           ,dat3d)
+      dat = trstrb(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,trstrb_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: trstrb',
      $                                                  status,nf_noerr)
-      dat3d = trstrf(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,trstrf_varid,start,edge
-     $                                                           ,dat3d)
+      dat = trstrf(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,trstrf_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: trstrf',
      $                                                  status,nf_noerr)
-      dat3d = taurstr(1:im,1:jm,1:kb)
+      dat = taurstr(1:im,1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,taurstr_varid,start,edge
-     $                                                           ,dat3d)
+     $                                                             ,dat)
       call handle_error_pnetcdf('nf_put_vara_double: taurstr',
      $                                                  status,nf_noerr)
-      dat3d = taurstrb(1:im,1:jm,1:kb)
+      dat = taurstrb(1:im,1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,taurstrb_varid,start,edge
-     $                                                           ,dat3d)
+     $                                                             ,dat)
       call handle_error_pnetcdf('nf_put_vara_double: taurstrb',
      $                                                  status,nf_noerr)
-      dat3d = taurstrf(1:im,1:jm,1:kb)
+      dat = taurstrf(1:im,1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,taurstrf_varid,start,edge
-     $                                                           ,dat3d)
+     $                                                             ,dat)
       call handle_error_pnetcdf('nf_put_vara_double: taurstrf',
      $                                                  status,nf_noerr)
-      dat3d = ub(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,ub_varid,start,edge,dat3d)
+      dat = ub(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,ub_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: ub',
      $                                                  status,nf_noerr)
-      dat3d = uf(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,uf_varid,start,edge,dat3d)
+      dat = uf(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,uf_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: uf',
      $                                                  status,nf_noerr)
-      dat3d = vb(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,vb_varid,start,edge,dat3d)
+      dat = vb(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,vb_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: vb',
      $                                                  status,nf_noerr)
-      dat3d = vf(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,vf_varid,start,edge,dat3d)
+      dat = vf(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,vf_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: vf',
      $                                                  status,nf_noerr)
-      dat3d = wr(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,wr_varid,start,edge,dat3d)
+      dat = wr(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,wr_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: wr',
      $                                                  status,nf_noerr)
-      dat3d = zflux(1:im,1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,zflux_varid,start,edge
-     $                                                           ,dat3d)
+      dat = zflux(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,zflux_varid,start,edge,dat)
       call handle_error_pnetcdf('nf_put_vara_double: zflux',
      $                                                  status,nf_noerr)
 
