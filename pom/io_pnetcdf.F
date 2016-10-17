@@ -368,10 +368,9 @@
       integer time_dimid,x_dimid,y_dimid,z_dimid
       integer z_varid,zz_varid,east_c_varid,
      $        east_e_varid,east_u_varid,east_v_varid,north_c_varid,
-     $        north_e_varid,north_u_varid,north_v_varid,rot_varid
-      integer art_varid,aru_varid,arv_varid
+     $        north_e_varid,north_u_varid,north_v_varid
       integer aam2d_varid,advua_varid,advva_varid,adx2d_varid
-     $       ,ady2d_varid,cbc_varid,cor_varid,d_varid,drx2d_varid
+     $       ,ady2d_varid,cbc_varid,d_varid,drx2d_varid
      $       ,dry2d_varid,dt_varid,e_atmos_varid,egb_varid,egf_varid
      $       ,el_varid,elf_varid,et_varid,etb_varid,etf_varid
      $       ,fluxua_varid,fluxva_varid,psi_varid,ssurf_varid
@@ -384,11 +383,22 @@
      $       ,wvsurf_varid,wvsurfb_varid,wvsurff_varid
       integer aam_varid,advx_varid,advy_varid,drhox_varid,drhoy_varid
      $       ,dtef_varid,kh_varid,km_varid,kq_varid,l_varid,q2b_varid
-     $       ,q2_varid,q2lb_varid,q2l_varid,rmean_varid,sb_varid
+     $       ,q2_varid,q2lb_varid,q2l_varid,rmean_varid,s_varid,sb_varid
      $       ,sclim_varid,srstr_varid,srstrb_varid,srstrf_varid
-     $       ,tb_varid,tclim_varid,trstr_varid,trstrb_varid
+     $       ,t_varid,tb_varid,tclim_varid,trstr_varid,trstrb_varid
      $       ,trstrf_varid,taurstr_varid,taurstrb_varid,taurstrf_varid
      $       ,ub_varid,uf_varid,vb_varid,vf_varid,wr_varid,zflux_varid
+      integer ele_varid,eln_varid,elw_varid,els_varid,uabe_varid
+     $       ,uabeb_varid,uabef_varid,vabn_varid,vabnb_varid
+     $       ,vabnf_varid,uabw_varid,uabwb_varid,uabwf_varid
+     $       ,vabs_varid,vabsb_varid,vabsf_varid,ube_varid,ubeb_varid
+     $       ,ubef_varid,vbn_varid,vbnb_varid,vbnf_varid,ubw_varid
+     $       ,ubwb_varid,ubwf_varid,vbs_varid,vbsb_varid,vbsf_varid
+     $       ,sbe_varid,sbeb_varid,sbef_varid,sbn_varid,sbnb_varid
+     $       ,sbnf_varid,sbw_varid,sbwb_varid,sbwf_varid,sbs_varid
+     $       ,sbsb_varid,sbsf_varid,tbe_varid,tbeb_varid,tbef_varid
+     $       ,tbn_varid,tbnb_varid,tbnf_varid,tbw_varid,tbwb_varid
+     $       ,tbwf_varid,tbs_varid,tbsb_varid,tbsf_varid
       integer time_varid,elb_varid
       integer ncid,status
       integer vdims(4)
@@ -481,29 +491,183 @@
      $   'northing of elevation points','metre','east_e north_e',.true.)
       call def_var_pnetcdf(ncid,'north_c',2,vdims,north_c_varid,
      $       'northing of cell corners','metre','east_c north_c',.true.)
-      call def_var_pnetcdf(ncid,'rot',2,vdims,rot_varid,
-     $                    'Rotation angle of x-axis wrt. east','degree',
-     $                                          'east_e north_e',.true.)
-      call def_var_pnetcdf(ncid,'art',2,vdims,art_varid,
-     $            'cell area centered on T grid points'
-     $           ,'metre^2','east_e north_e',.true.)
-      call def_var_pnetcdf(ncid,'aru',2,vdims,aru_varid,
-     $            'cell area centered on U grid points'
-     $           ,'meter^2','east_u north_u',.true.)
-      call def_var_pnetcdf(ncid,'arv',2,vdims,arv_varid,
-     $            'cell area centered on V grid points'
-     $           ,'meter^2','east_v north_v',.true.)
       call def_var_pnetcdf(ncid,'cbc',2,vdims,cbc_varid,
      $            'bottom friction coefficient'
      $           ,'tba','east_e north_e',.true.)
-      call def_var_pnetcdf(ncid,'cor',2,vdims,cor_varid,
-     $            'coriolis parameter'
-     $           ,'unitless','east_e north_e',.true.)
+
+      vdims(1)=x_dimid
+      vdims(2)=time_dimid
+      call def_var_pnetcdf(ncid,'eln',2,vdims,eln_varid,
+     $            'elevation at north'
+     $           ,'metre','north_e',.true.)
+      call def_var_pnetcdf(ncid,'els',2,vdims,els_varid,
+     $            'elevation at south'
+     $           ,'metre','north_e',.true.)
+      call def_var_pnetcdf(ncid,'vabs',2,vdims,vabs_varid,
+     $            'y-velocity at south'
+     $           ,'psu','north_e',.true.)
+      call def_var_pnetcdf(ncid,'vabsb',2,vdims,vabsb_varid,
+     $            'y-velocity at south at time n-1'
+     $           ,'psu','north_e',.true.)
+      call def_var_pnetcdf(ncid,'vabsf',2,vdims,vabsf_varid,
+     $            'y-velocity at south at time n+1'
+     $           ,'psu','north_e',.true.)
+      call def_var_pnetcdf(ncid,'vabn',2,vdims,vabn_varid,
+     $            'y-velocity at north'
+     $           ,'psu','north_e',.true.)
+      call def_var_pnetcdf(ncid,'vabnb',2,vdims,vabnb_varid,
+     $            'y-velocity at north at time n-1'
+     $           ,'psu','north_e',.true.)
+      call def_var_pnetcdf(ncid,'vabnf',2,vdims,vabnf_varid,
+     $            'y-velocity at north at time n+1'
+     $           ,'psu','north_e',.true.)
+
+      vdims(1)=y_dimid
+      vdims(2)=time_dimid
+      call def_var_pnetcdf(ncid,'ele',2,vdims,ele_varid,
+     $            'elevation at east'
+     $           ,'metre','east_e',.true.)
+      call def_var_pnetcdf(ncid,'elw',2,vdims,elw_varid,
+     $            'elevation at west'
+     $           ,'metre','east_e',.true.)
+      call def_var_pnetcdf(ncid,'uabe',2,vdims,uabe_varid,
+     $            'x-velocity at east'
+     $           ,'psu','east_e',.true.)
+      call def_var_pnetcdf(ncid,'uabeb',2,vdims,uabeb_varid,
+     $            'x-velocity at east at time n-1'
+     $           ,'psu','east_e',.true.)
+      call def_var_pnetcdf(ncid,'uabef',2,vdims,uabef_varid,
+     $            'x-velocity at east at time n+1'
+     $           ,'psu','east_e',.true.)
+      call def_var_pnetcdf(ncid,'uabw',2,vdims,uabw_varid,
+     $            'x-velocity at west'
+     $           ,'psu','east_e',.true.)
+      call def_var_pnetcdf(ncid,'uabwb',2,vdims,uabwb_varid,
+     $            'x-velocity at west at time n-1'
+     $           ,'psu','east_e',.true.)
+      call def_var_pnetcdf(ncid,'uabwf',2,vdims,uabwf_varid,
+     $            'x-velocity at west at time n+1'
+     $           ,'psu','east_e',.true.)
+
+      vdims(1)=x_dimid
+      vdims(2)=z_dimid
+      vdims(3)=time_dimid
+      call def_var_pnetcdf(ncid,'sbn',3,vdims,sbn_varid,
+     $            'salinity at north'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'sbnb',3,vdims,sbnb_varid,
+     $            'salinity at north at time n-1'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'sbnf',3,vdims,sbnf_varid,
+     $            'salinity at north at time n+1'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'sbs',3,vdims,sbs_varid,
+     $            'salinity at south'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'sbsb',3,vdims,sbsb_varid,
+     $            'salinity at south at time n-1'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'sbsf',3,vdims,sbsf_varid,
+     $            'salinity at south at time n+1'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbn',3,vdims,tbn_varid,
+     $            'temperature at north'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbnb',3,vdims,tbnb_varid,
+     $            'temperature at north at time n-1'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbnf',3,vdims,tbnf_varid,
+     $            'temperature at north at time n+1'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbs',3,vdims,tbs_varid,
+     $            'temperature at south'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbsb',3,vdims,tbsb_varid,
+     $            'temperature at south at time n-1'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbsf',3,vdims,tbsf_varid,
+     $            'temperature at south at time n+1'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'vbs',3,vdims,vbs_varid,
+     $            'y-velocity at south'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'vbsb',3,vdims,vbsb_varid,
+     $            'y-velocity at south at time n-1'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'vbsf',3,vdims,vbsf_varid,
+     $            'y-velocity at south at time n+1'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'vbn',3,vdims,vbn_varid,
+     $            'y-velocity at north'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'vbnb',3,vdims,vbnb_varid,
+     $            'y-velocity at north at time n-1'
+     $           ,'psu','north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'vbnf',3,vdims,vbnf_varid,
+     $            'y-velocity at north at time n+1'
+     $           ,'psu','north_e zz',.true.)
+
+      vdims(1)=y_dimid
+      vdims(2)=z_dimid
+      vdims(3)=time_dimid
+      call def_var_pnetcdf(ncid,'sbe',3,vdims,sbe_varid,
+     $            'salinity at east'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'sbeb',3,vdims,sbeb_varid,
+     $            'salinity at east at time n-1'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'sbef',3,vdims,sbef_varid,
+     $            'salinity at east at time n+1'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'sbw',3,vdims,sbw_varid,
+     $            'salinity at west'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'sbwb',3,vdims,sbwb_varid,
+     $            'salinity at west at time n-1'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'sbwf',3,vdims,sbwf_varid,
+     $            'salinity at west at time n+1'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbe',3,vdims,tbe_varid,
+     $            'temperature at east'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbeb',3,vdims,tbeb_varid,
+     $            'temperature at east at time n-1'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbef',3,vdims,tbef_varid,
+     $            'temperature at east at time n+1'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbw',3,vdims,tbw_varid,
+     $            'temperature at west'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbwb',3,vdims,tbwb_varid,
+     $            'temperature at west at time n-1'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'tbwf',3,vdims,tbwf_varid,
+     $            'temperature at west at time n+1'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'ube',3,vdims,ube_varid,
+     $            'x-velocity at east'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'ubeb',3,vdims,ubeb_varid,
+     $            'x-velocity at east at time n-1'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'ubef',3,vdims,ubef_varid,
+     $            'x-velocity at east at time n+1'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'ubw',3,vdims,ubw_varid,
+     $            'x-velocity at west'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'ubwb',3,vdims,ubwb_varid,
+     $            'x-velocity at west at time n-1'
+     $           ,'psu','east_e zz',.true.)
+      call def_var_pnetcdf(ncid,'ubwf',3,vdims,ubwf_varid,
+     $            'x-velocity at west at time n+1'
+     $           ,'psu','east_e zz',.true.)
 
       vdims(1)=x_dimid
       vdims(2)=y_dimid
       vdims(3)=time_dimid
-
       call def_var_pnetcdf(ncid,'aam2d',3,vdims,aam2d_varid,
      $            'vertical average of aam'
      $           ,'tba','east_e north_e',.true.)
@@ -713,6 +877,9 @@
       call def_var_pnetcdf(ncid,'sb'     ,3,vdims,sb_varid,
      $            'salinity at time n-1'
      $           ,'tba','east_e north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'s'      ,3,vdims,s_varid,
+     $            'salinity at time n'
+     $           ,'tba','east_e north_e zz',.true.)
       call def_var_pnetcdf(ncid,'sclim'  ,3,vdims,sclim_varid,
      $            'horizontally averaged salinity'
      $           ,'tba','east_e north_e zz',.true.)
@@ -727,6 +894,9 @@
      $           ,'tba','east_e north_e zz',.true.)
       call def_var_pnetcdf(ncid,'tb'     ,3,vdims,tb_varid,
      $            'temperature at time n-1'
+     $           ,'tba','east_e north_e zz',.true.)
+      call def_var_pnetcdf(ncid,'t'      ,3,vdims,t_varid,
+     $            'temperature at time n'
      $           ,'tba','east_e north_e zz',.true.)
       call def_var_pnetcdf(ncid,'tclim'  ,3,vdims,tclim_varid,
      $            'horizontally averaged temperature'
@@ -791,27 +961,10 @@
       start(2)=j_global(1)
       edge(1)=im
       edge(2)=jm
-      dat2d = art(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,art_varid,start,edge,dat2d)
-      call handle_error_pnetcdf('nf_put_var_double: art'
-     $                                                 ,status,nf_noerr)
-      dat2d = aru(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,aru_varid,start,edge,dat2d)
-      call handle_error_pnetcdf('nf_put_var_double: aru'
-     $                                                 ,status,nf_noerr)
-      dat2d = arv(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,arv_varid,start,edge,dat2d)
-      call handle_error_pnetcdf('nf_put_var_double: arv'
-     $                                                 ,status,nf_noerr)
       dat2d = cbc(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,cbc_varid,start,edge,dat2d)
       call handle_error_pnetcdf('nf_put_var_double: cbc'
      $                                                 ,status,nf_noerr)
-      dat2d = cor(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,cor_varid,start,edge,dat2d)
-      call handle_error_pnetcdf('nf_put_var_double: cor'
-     $                                                 ,status,nf_noerr)
-
       dat2d = east_u(1:im,1:jm)
       status=nfmpi_put_vara_double_all(ncid,east_u_varid,start,edge
      $                                                           ,dat2d)
@@ -852,6 +1005,154 @@
      $                                                           ,dat2d)
       call handle_error_pnetcdf('nf_put_var_double: north_c',status,
      $                                                         nf_noerr)
+
+      start(1)=i_global(1)
+      start(2)=1
+      edge(1)=im
+      edge(2)=1
+      dat2d(:,1) = eln(1:im)
+      status=nfmpi_put_vara_double_all(ncid,eln_varid,start,edge
+     $                                                      ,dat2d(:,1))
+      call handle_error_pnetcdf('nf_put_vara_double: eln',
+     $                                                  status,nf_noerr)
+      dat2d(:,1) = els(1:im)
+      status=nfmpi_put_vara_double_all(ncid,els_varid,start,edge
+     $                                                      ,dat2d(:,1))
+      call handle_error_pnetcdf('nf_put_vara_double: els',
+     $                                                  status,nf_noerr)
+      dat2d(:,1) = vabn(1:im)
+      status=nfmpi_put_vara_double_all(ncid,vabn_varid,start,edge
+     $                                                      ,dat2d(:,1))
+      call handle_error_pnetcdf('nf_put_vara_double: vabn',
+     $                                                  status,nf_noerr)
+      dat2d(:,1) = vabnb(1:im)
+      status=nfmpi_put_vara_double_all(ncid,vabnb_varid,start,edge
+     $                                                      ,dat2d(:,1))
+      call handle_error_pnetcdf('nf_put_vara_double: vabnb',
+     $                                                  status,nf_noerr)
+      dat2d(:,1) = vabnf(1:im)
+      status=nfmpi_put_vara_double_all(ncid,vabnf_varid,start,edge
+     $                                                      ,dat2d(:,1))
+      call handle_error_pnetcdf('nf_put_vara_double: vabnf',
+     $                                                  status,nf_noerr)
+      dat2d(:,1) = vabs(1:im)
+      status=nfmpi_put_vara_double_all(ncid,vabs_varid,start,edge
+     $                                                      ,dat2d(:,1))
+      call handle_error_pnetcdf('nf_put_vara_double: vabs',
+     $                                                  status,nf_noerr)
+      dat2d(:,1) = vabsb(1:im)
+      status=nfmpi_put_vara_double_all(ncid,vabsb_varid,start,edge
+     $                                                      ,dat2d(:,1))
+      call handle_error_pnetcdf('nf_put_vara_double: vabsb',
+     $                                                  status,nf_noerr)
+      dat2d(:,1) = vabsf(1:im)
+      status=nfmpi_put_vara_double_all(ncid,vabsf_varid,start,edge
+     $                                                      ,dat2d(:,1))
+      call handle_error_pnetcdf('nf_put_vara_double: vabsf',
+     $                                                  status,nf_noerr)
+
+      start(1)=j_global(1)
+      start(2)=1
+      edge(1)=jm
+      edge(2)=1
+      dat2d(1,:) = ele(1:jm)
+      status=nfmpi_put_vara_double_all(ncid,ele_varid,start,edge
+     $                                                      ,dat2d(1,:))
+      call handle_error_pnetcdf('nf_put_vara_double: ele',
+     $                                                  status,nf_noerr)
+      dat2d(1,:) = elw(1:jm)
+      status=nfmpi_put_vara_double_all(ncid,elw_varid,start,edge
+     $                                                      ,dat2d(1,:))
+      call handle_error_pnetcdf('nf_put_vara_double: elw',
+     $                                                  status,nf_noerr)
+      dat2d(1,:) = uabe(1:jm)
+      status=nfmpi_put_vara_double_all(ncid,uabe_varid,start,edge
+     $                                                      ,dat2d(1,:))
+      call handle_error_pnetcdf('nf_put_vara_double: uabe',
+     $                                                  status,nf_noerr)
+      dat2d(1,:) = uabeb(1:jm)
+      status=nfmpi_put_vara_double_all(ncid,uabeb_varid,start,edge
+     $                                                      ,dat2d(1,:))
+      call handle_error_pnetcdf('nf_put_vara_double: uabeb',
+     $                                                  status,nf_noerr)
+      dat2d(1,:) = uabef(1:jm)
+      status=nfmpi_put_vara_double_all(ncid,uabef_varid,start,edge
+     $                                                      ,dat2d(1,:))
+      call handle_error_pnetcdf('nf_put_vara_double: uabef',
+     $                                                  status,nf_noerr)
+      dat2d(1,:) = uabw(1:jm)
+      status=nfmpi_put_vara_double_all(ncid,uabw_varid,start,edge
+     $                                                      ,dat2d(1,:))
+      call handle_error_pnetcdf('nf_put_vara_double: uabw',
+     $                                                  status,nf_noerr)
+      dat2d(1,:) = uabwb(1:jm)
+      status=nfmpi_put_vara_double_all(ncid,uabwb_varid,start,edge
+     $                                                      ,dat2d(1,:))
+      call handle_error_pnetcdf('nf_put_vara_double: uabwb',
+     $                                                  status,nf_noerr)
+      dat2d(1,:) = uabwf(1:jm)
+      status=nfmpi_put_vara_double_all(ncid,uabwf_varid,start,edge
+     $                                                      ,dat2d(1,:))
+      call handle_error_pnetcdf('nf_put_vara_double: uabwf',
+     $                                                  status,nf_noerr)
+
+      start(1)=i_global(1)
+      start(2)=1
+      edge(1)=im
+      edge(2)=kb
+      status=nfmpi_put_vara_double_all(ncid,vbn_varid,start,edge
+     $                                                  ,vbn(1:im,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: vbn',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,vbs_varid,start,edge
+     $                                                  ,vbs(1:im,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: vbs',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,tbn_varid,start,edge
+     $                                                  ,tbn(1:im,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: tbn',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,tbs_varid,start,edge
+     $                                                  ,tbs(1:im,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: tbs',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,sbn_varid,start,edge
+     $                                                  ,sbn(1:im,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: sbn',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,sbs_varid,start,edge
+     $                                                  ,sbs(1:im,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: sbs',
+     $                                                  status,nf_noerr)
+
+      start(1)=j_global(1)
+      start(2)=1
+      edge(1)=jm
+      edge(2)=kb
+      status=nfmpi_put_vara_double_all(ncid,ube_varid,start,edge
+     $                                                  ,ube(1:jm,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: ube',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,ubw_varid,start,edge
+     $                                                  ,ubw(1:jm,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: ubw',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,tbe_varid,start,edge
+     $                                                  ,tbe(1:jm,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: tbe',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,tbw_varid,start,edge
+     $                                                  ,tbw(1:jm,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: tbw',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,sbe_varid,start,edge
+     $                                                  ,sbe(1:jm,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: sbe',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,sbw_varid,start,edge
+     $                                                  ,sbw(1:jm,1:kb))
+      call handle_error_pnetcdf('nf_put_vara_double: sbw',
+     $                                                  status,nf_noerr)
 
       start(1)=i_global(1)
       start(2)=j_global(1)
@@ -1174,6 +1475,10 @@
       status=nfmpi_put_vara_double_all(ncid,sb_varid,start,edge,dat3d)
       call handle_error_pnetcdf('nf_put_vara_double: sb',
      $                                                  status,nf_noerr)
+      dat3d = s(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,s_varid,start,edge,dat3d)
+      call handle_error_pnetcdf('nf_put_vara_double: s',
+     $                                                  status,nf_noerr)
       dat3d = sclim(1:im,1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,sclim_varid,start,edge
      $                                                           ,dat3d)
@@ -1197,6 +1502,10 @@
       dat3d = tb(1:im,1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,tb_varid,start,edge,dat3d)
       call handle_error_pnetcdf('nf_put_vara_double: tb',
+     $                                                  status,nf_noerr)
+      dat3d = t(1:im,1:jm,1:kb)
+      status=nfmpi_put_vara_double_all(ncid,t_varid,start,edge,dat3d)
+      call handle_error_pnetcdf('nf_put_vara_double: t',
      $                                                  status,nf_noerr)
       dat3d = tclim(1:im,1:jm,1:kb)
       status=nfmpi_put_vara_double_all(ncid,tclim_varid,start,edge
@@ -3070,7 +3379,7 @@
 !      status=nfmpi_get_vara_double_all(ncid,ss_varid,start,edge,s_s)
 !      call handle_error_pnetcdf('nfmpi_get_vara_double_all: s_s',
 !     $                                                  status,nf_noerr)
-     
+
       t_w(1:jm,:) = tclim(   2,1:jm,:)
       t_e(1:jm,:) = tclim(imm1,1:jm,:)
       t_s(1:im,:) = tclim(1:im,   2,:)
