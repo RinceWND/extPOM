@@ -624,16 +624,10 @@
       integer i,j,k,itera
 
 ! calculate horizontal mass fluxes
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            xflux(i,j,k)=0.d0
-            yflux(i,j,k)=0.d0
-            xmassflux(i,j,k)=0.d0
-            ymassflux(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      xflux = 0.d0
+      yflux = 0.d0
+      xmassflux = 0.d0
+      ymassflux = 0.d0
 
       do k=1,kbm1
         do j=2,jmm1
@@ -651,21 +645,11 @@
         end do
       end do
 
-      do j=1,jm
-        do i=1,im
-          fb(i,j,kb)=fb(i,j,kbm1)
-          eta(i,j)=etb(i,j)
-        end do
-      end do
+      fb(:,:,kb) = fb(:,:,kbm1)
+      eta = etb(1:im,1:jm)
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            zwflux(i,j,k)=w(i,j,k)
-            fbmem(i,j,k)=fb(i,j,k)
-          end do
-        end do
-      end do
+      zwflux = w(1:im,1:jm,:)
+      fbmem  = fb(1:im,1:jm,:)
 
 ! start Smolarkiewicz scheme
       do itera=1,nitera
@@ -789,6 +773,8 @@
           end do
         end do
       end do
+
+      call exchange3d_mpi(ff(:,:,1:kbm1),im_local,jm_local,kbm1)
 
       return
       end

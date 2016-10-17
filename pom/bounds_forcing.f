@@ -619,10 +619,11 @@
 ! read bc data
       ! read initial bc file
       if (iint.eq.1) then
-        call read_boundary_conditions_pnetcdf(iint/ibc,kb
+        call read_boundary_conditions_pnetcdf((iint+cont_bry)/ibc,kb
      $                         ,tbwf,sbwf,ubwf,tbef,sbef,ubef
      $                         ,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
 ! integrate by depth
+        write(*,*) "B:",tbwf(50,1)
         uabwf = 0.d0
         uabef = 0.d0
         vabnf = 0.d0
@@ -720,10 +721,6 @@
       if (iint.eq.1 .or. mod(iint,ibc).eq.0.) then
         do j=1,jm
           do k=1,kb
-            tbwf(j,k)=t(2,j,k)
-            sbwf(j,k)=s(2,j,k)
-            tbef(j,k)=t(imm1,j,k)
-            sbef(j,k)=s(imm1,j,k)
             tbwb(j,k)=tbwf(j,k)
             sbwb(j,k)=sbwf(j,k)
             tbeb(j,k)=tbef(j,k)
@@ -744,8 +741,9 @@
           vabsb(i)=vabsf(i)
         end do
         if (iint.ne.iend) then
-          call read_boundary_conditions_pnetcdf((iint+ibc)/ibc,kb,
-     $    tbwf,sbwf,ubwf,tbef,sbef,ubef,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
+          call read_boundary_conditions_pnetcdf((iint+cont_bry+ibc)/ibc,
+     $   kb,tbwf,sbwf,ubwf,tbef,sbef,ubef,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
+          write(*,*) "A:",tbwf(50,1)
 ! integrate by depth
           uabwf = 0.d0
           uabef = 0.d0
@@ -856,6 +854,7 @@
       tbs(1:im,1:kb) = fold*tbsb(1:im,1:kb)+fnew*tbsf(1:im,1:kb)
       sbs(1:im,1:kb) = fold*sbsb(1:im,1:kb)+fnew*sbsf(1:im,1:kb)
       vbs(1:im,1:kb) = fold*vbsb(1:im,1:kb)+fnew*vbsf(1:im,1:kb)
+      write(*,*) "O:",tbw(50,1)
       uabe = 0.
       uabw = 0.
       vabn = 0.

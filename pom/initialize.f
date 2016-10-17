@@ -425,14 +425,14 @@
 ! density
       call dens(sb,tb,rho)
 
-      do k=1,kbm1
-        do j=1,jm
-          do i=1,im
-            tclim(i,j,k)=tb(i,j,k)
-            sclim(i,j,k)=sb(i,j,k)
-          end do
-        end do
-      end do
+!      do k=1,kbm1
+!        do j=1,jm
+!          do i=1,im
+!            tclim(i,j,k)=tb(i,j,k)
+!            sclim(i,j,k)=sb(i,j,k)
+!          end do
+!        end do
+!      end do
 
 ! iniital heat and water fluxes (see subroutine surface_forcing)
       do i=1,im
