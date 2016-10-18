@@ -90,7 +90,7 @@
 ! internal (3-D) velocity boundary conditions
 ! radiation conditions
 ! smoothing is used in the direction tangential to the boundaries
-        hmax=maxval(h) !4500.d0
+        hmax=maxval(d)
 
         do k=1,kbm1
           do j=2,jmm1
@@ -619,104 +619,94 @@
 ! read bc data
       ! read initial bc file
       if (iint.eq.1) then
-        call read_boundary_conditions_pnetcdf(iint/ibc,kb,
-     $  tbwf,sbwf,ubwf,tbef,sbef,ubef,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
-! integrate by depth
-        uabwf = sum(ubwf, 2)
-        uabef = sum(ubef, 2)
-        vabnf = sum(vbnf, 2)
-        vabsf = sum(vbsf, 2)
+        call read_boundary_conditions_pnetcdf(iint/ibc,nz,z0,
+     $  t_w,s_w,uabwf,t_e,s_e,uabef,t_n,s_n,vabnf,t_s,s_s,vabsf)
 !  south
-!        do i=1,im
-!          do j=1,jm
-!            hs(i,j)=h(i,2)
-!            do k=1,nz
-!              ts1(i,j,k)=t_s(i,k)
-!              ss1(i,j,k)=s_s(i,k)
-!            end do
-!          end do
-!        end do
-!        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        do i=1,im
-!          do k=1,kb
-!            !write(52,'(2(i4),e16.7)') i,k,ss2(i,jm/2,k)
-!            tbsf(i,k)=ts2(i,jm/2,k)
-!            sbsf(i,k)=ss2(i,jm/2,k)
-!          end do
-!        end do
+        do i=1,im
+          do j=1,jm
+            hs(i,j)=h(i,2)
+            do k=1,nz
+              ts1(i,j,k)=t_s(i,k)
+              ss1(i,j,k)=s_s(i,k)
+            end do
+          end do
+        end do
+        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        do i=1,im
+          do k=1,kb
+            tbsf(i,k)=ts2(i,jm/2,k)
+            sbsf(i,k)=ss2(i,jm/2,k)
+          end do
+        end do
 ! north
-!        do i=1,im
-!          do j=1,jm
-!            hs(i,j)=h(i,jmm1)
-!            do k=1,nz
-!              ts1(i,j,k)=t_n(i,k)
-!              ss1(i,j,k)=s_n(i,k)
-!            end do
-!          end do
-!        end do
-!        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        do i=1,im
-!          do k=1,kb
-!            tbnf(i,k)=ts2(i,jm/2,k)
-!            sbnf(i,k)=ss2(i,jm/2,k)
-!          end do
-!        end do
+        do i=1,im
+          do j=1,jm
+            hs(i,j)=h(i,jmm1)
+            do k=1,nz
+              ts1(i,j,k)=t_n(i,k)
+              ss1(i,j,k)=s_n(i,k)
+            end do
+          end do
+        end do
+        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        do i=1,im
+          do k=1,kb
+            tbnf(i,k)=ts2(i,jm/2,k)
+            sbnf(i,k)=ss2(i,jm/2,k)
+          end do
+        end do
 ! east
-!        do i=1,im
-!          do j=1,jm
-!            hs(i,j)=h(imm1,j)
-!            do k=1,nz
-!              ts1(i,j,k)=t_e(j,k)
-!              ss1(i,j,k)=s_e(j,k)
-!            end do
-!          end do
-!        end do
-!        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        do j=1,jm
-!          do k=1,kb
-!            tbef(j,k)=ts2(im/2,j,k)
-!            sbef(j,k)=ss2(im/2,j,k)
-!          end do
-!        end do
+        do i=1,im
+          do j=1,jm
+            hs(i,j)=h(imm1,j)
+            do k=1,nz
+              ts1(i,j,k)=t_e(j,k)
+              ss1(i,j,k)=s_e(j,k)
+            end do
+          end do
+        end do
+        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        do j=1,jm
+          do k=1,kb
+            tbef(j,k)=ts2(im/2,j,k)
+            sbef(j,k)=ss2(im/2,j,k)
+          end do
+        end do
 ! west
-!        do i=1,im
-!          do j=1,jm
-!            hs(i,j)=h(2,j)
-!            do k=1,nz
-!              ts1(i,j,k)=t_w(j,k)
-!              ss1(i,j,k)=s_w(j,k)
-!            end do
-!          end do
-!        end do
-!        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        do j=1,jm
-!          do k=1,kb
-!            tbwf(j,k)=ts2(im/2,j,k)
-!            sbwf(j,k)=ss2(im/2,j,k)
-!          end do
-!        end do
+        do i=1,im
+          do j=1,jm
+            hs(i,j)=h(2,j)
+            do k=1,nz
+              ts1(i,j,k)=t_w(j,k)
+              ss1(i,j,k)=s_w(j,k)
+            end do
+          end do
+        end do
+        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        do j=1,jm
+          do k=1,kb
+            tbwf(j,k)=ts2(im/2,j,k)
+            sbwf(j,k)=ss2(im/2,j,k)
+          end do
+        end do
 
       end if
       ! read bc file corresponding to next time
       if (iint.eq.1 .or. mod(iint,ibc).eq.0.) then
         do j=1,jm
           do k=1,kb
-            tbwf(j,k)=t(2,j,k)
-            sbwf(j,k)=s(2,j,k)
-            tbef(j,k)=t(imm1,j,k)
-            sbef(j,k)=s(imm1,j,k)
             tbwb(j,k)=tbwf(j,k)
             sbwb(j,k)=sbwf(j,k)
             tbeb(j,k)=tbef(j,k)
@@ -727,7 +717,6 @@
         end do
         do i=1,im
           do k=1,kb
-            write(51,'(2(i4),e16.7)') i,k,sbnf(i,k)
             tbnb(i,k)=tbnf(i,k)
             sbnb(i,k)=sbnf(i,k)
             tbsb(i,k)=tbsf(i,k)
@@ -737,93 +726,88 @@
           vabsb(i)=vabsf(i)
         end do
         if (iint.ne.iend) then
-          call read_boundary_conditions_pnetcdf((iint+ibc)/ibc,kb,
-     $    tbwf,sbwf,ubwf,tbef,sbef,ubef,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
-! integrate by depth
-          uabwf = sum(ubwf, 2)
-          uabef = sum(ubef, 2)
-          vabnf = sum(vbnf, 2)
-          vabsf = sum(vbsf, 2)
+          call read_boundary_conditions_pnetcdf((iint+ibc)/ibc,nz,z0,
+     $    t_w,s_w,uabwf,t_e,s_e,uabef,t_n,s_n,vabnf,t_s,s_s,vabsf)
 ! south
-!        do i=1,im
-!          do j=1,jm
-!            hs(i,j)=h(i,2)
-!            do k=1,nz
-!              ts1(i,j,k)=t_s(i,k)
-!              ss1(i,j,k)=s_s(i,k)
-!            end do
-!          end do
-!        end do
-!        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        do i=1,im
-!          do k=1,kb
-!            tbsf(i,k)=ts2(i,jm/2,k)
-!            sbsf(i,k)=ss2(i,jm/2,k)
-!          end do
-!        end do
+        do i=1,im
+          do j=1,jm
+            hs(i,j)=h(i,2)
+            do k=1,nz
+              ts1(i,j,k)=t_s(i,k)
+              ss1(i,j,k)=s_s(i,k)
+            end do
+          end do
+        end do
+        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        do i=1,im
+          do k=1,kb
+            tbsf(i,k)=ts2(i,jm/2,k)
+            sbsf(i,k)=ss2(i,jm/2,k)
+          end do
+        end do
 ! north
-!        do i=1,im
-!          do j=1,jm
-!            hs(i,j)=h(i,jmm1)
-!            do k=1,nz
-!              ts1(i,j,k)=t_n(i,k)
-!              ss1(i,j,k)=s_n(i,k)
-!            end do
-!          end do
-!        end do
-!        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        do i=1,im
-!          do k=1,kb
-!            tbnf(i,k)=ts2(i,jm/2,k)
-!            sbnf(i,k)=ss2(i,jm/2,k)
-!          end do
-!        end do
+        do i=1,im
+          do j=1,jm
+            hs(i,j)=h(i,jmm1)
+            do k=1,nz
+              ts1(i,j,k)=t_n(i,k)
+              ss1(i,j,k)=s_n(i,k)
+            end do
+          end do
+        end do
+        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        do i=1,im
+          do k=1,kb
+            tbnf(i,k)=ts2(i,jm/2,k)
+            sbnf(i,k)=ss2(i,jm/2,k)
+          end do
+        end do
 ! east
-!        do i=1,im
-!          do j=1,jm
-!            hs(i,j)=h(imm1,j)
-!            do k=1,nz
-!              ts1(i,j,k)=t_e(j,k)
-!              ss1(i,j,k)=s_e(j,k)
-!            end do
-!          end do
-!        end do
-!        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        do j=1,jm
-!          do k=1,kb
-!            tbef(j,k)=ts2(im/2,j,k)
-!            sbef(j,k)=ss2(im/2,j,k)
-!          end do
-!        end do
+        do i=1,im
+          do j=1,jm
+            hs(i,j)=h(imm1,j)
+            do k=1,nz
+              ts1(i,j,k)=t_e(j,k)
+              ss1(i,j,k)=s_e(j,k)
+            end do
+          end do
+        end do
+        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        do j=1,jm
+          do k=1,kb
+            tbef(j,k)=ts2(im/2,j,k)
+            sbef(j,k)=ss2(im/2,j,k)
+          end do
+        end do
 ! west
-!        do i=1,im
-!          do j=1,jm
-!            hs(i,j)=h(2,j)
-!            do k=1,nz
-!              ts1(i,j,k)=t_w(j,k)
-!              ss1(i,j,k)=s_w(j,k)
-!            end do
-!          end do
-!        end do
-!        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!        do j=1,jm
-!          do k=1,kb
-!            tbwf(j,k)=ts2(im/2,j,k)
-!            sbwf(j,k)=ss2(im/2,j,k)
-!          end do
-!        end do
+        do i=1,im
+          do j=1,jm
+            hs(i,j)=h(2,j)
+            do k=1,nz
+              ts1(i,j,k)=t_w(j,k)
+              ss1(i,j,k)=s_w(j,k)
+            end do
+          end do
+        end do
+        call ztosig(z0,ts1,zz,hs,ts2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        call ztosig(z0,ss1,zz,hs,ss2,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+        do j=1,jm
+          do k=1,kb
+            tbwf(j,k)=ts2(im/2,j,k)
+            sbwf(j,k)=ss2(im/2,j,k)
+          end do
+        end do
 ! end
         end if
       end if
@@ -832,32 +816,23 @@
       fnew=time/tbc-real(ntime, 8)
       fold=1.-fnew
       do j=1,jm
-        uabe(j) = 0.
-        uabw(j) = 0.
         do k=1,kb
           tbw(j,k)=fold*tbwb(j,k)+fnew*tbwf(j,k)
           sbw(j,k)=fold*sbwb(j,k)+fnew*sbwf(j,k)
           tbe(j,k)=fold*tbeb(j,k)+fnew*tbef(j,k)
           sbe(j,k)=fold*sbeb(j,k)+fnew*sbef(j,k)
-          ube(j,k)=fold*ubeb(j,k)+fnew*ubef(j,k)
-          ubw(j,k)=fold*ubwb(j,k)+fnew*ubwf(j,k)
-          uabe(j) = uabe(j) + ube(j,k)
-          uabw(j) = uabw(j) + ubw(j,k)
         end do
+        uabe(j)=fold*uabeb(j)+fnew*uabef(j)
       end do
       do i=1,im
-        vabn(i) = 0.
-        vabs(i) = 0.
         do k=1,kb
           tbn(i,k)=fold*tbnb(i,k)+fnew*tbnf(i,k)
           sbn(i,k)=fold*sbnb(i,k)+fnew*sbnf(i,k)
           tbs(i,k)=fold*tbsb(i,k)+fnew*tbsf(i,k)
           sbs(i,k)=fold*sbsb(i,k)+fnew*sbsf(i,k)
-          vbn(i,k)=fold*vbnb(i,k)+fnew*vbnf(i,k)
-          vbs(i,k)=fold*vbsb(i,k)+fnew*vbsf(i,k)
-          vabn(i) = vabn(i) + vbn(i,k)
-          vabs(i) = vabs(i) + vbs(i,k)
         end do
+        vabn(i)=fold*vabnb(i)+fnew*vabnf(i)
+        vabs(i)=fold*vabsb(i)+fnew*vabsf(i)
       end do
 
       return
@@ -871,7 +846,7 @@
       integer i,j,ntime,iwind
       double precision twind,fold,fnew
 
-      twind= .125!30. ! time between wind files (days)
+      twind=30. ! time between wind files (days)
       iwind=int(twind*86400.d0/dti)
 
 ! read wind stress data
@@ -912,7 +887,7 @@
       integer i,j,ntime,iheat
       double precision theat,fold,fnew
 
-      theat=.125 ! time between wind forcing (days)
+      theat=1. ! time between wind forcing (days)
       iheat=int(theat*86400.d0/dti)
 
 ! read wind stress data

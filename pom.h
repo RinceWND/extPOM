@@ -19,10 +19,13 @@
 ! will allocate more memory than is necessary. Value that are too low
 ! will cause the code to exit
 
-!      parameter(
-!     $  im_global=282  ,
-!     $  jm_global=306   ,
-!     $  kb=40          ,
+      parameter(
+     $  im_global=282  ,
+     $  jm_global=306   ,
+     $  kb=40          ,
+     $  im_local=142    ,
+     $  jm_local=155    ,
+     $  n_proc=4       )
 !     $  im_local=142    ,
 !     $  jm_local=306    ,
 !     $  n_proc=2       )
@@ -30,15 +33,15 @@
 !     $  jm_local=306 ,
 !     $  n_proc=1 )
         
-      parameter(
-     $  im_global=180  ,
-     $  jm_global=313  ,
-     $  kb=33          ,
-     $  im_local=47    ,
+!      parameter(
+!     $  im_global=180  ,
+!     $  jm_global=313  ,
+!     $  kb=33          ,
+!     $  im_local=47    ,
 !     $  im_local=91    ,
 !     $  im_local=180   ,
-     $  jm_local=313   ,
-     $  n_proc=4       )
+!     $  jm_local=313   ,
+!     $  n_proc=4       )
 !     $  n_proc=2       )
 !     $  n_proc=1       )
 

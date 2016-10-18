@@ -1,7 +1,7 @@
 &pom_nml
   title = 'sbPOM test case: US east coast'
   wrk_pth = '/home/rincewnd/POM/src/sbPOM/'
-  netcdf_file = 'jes'
+  netcdf_file = 'ecoast'
   mode = 3
   nadv = 2
   nitera = 1
