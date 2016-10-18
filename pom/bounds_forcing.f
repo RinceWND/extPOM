@@ -17,22 +17,30 @@
 
       if(idx.eq.1) then
 
-! eExternal (2-D) elevation boundary conditions
+! External (2-D) elevation boundary conditions (Clamped)
         do j=1,jm
-          if(n_west.eq.-1) elf(1,j)=elf(2,j)
-          if(n_east.eq.-1) elf(im,j)=elf(imm1,j)
+          if(n_west.eq.-1) then
+!            elf(2,j) = elw(j)
+            elf(1,j) = elf(2,j)
+          end if
+          if(n_east.eq.-1) then
+!            elf(imm1,j) = ele(j)
+            elf(im  ,j) = elf(imm1,j)
+          end if
         end do
 
         do i=1,im
-          if(n_south.eq.-1) elf(i,1)=elf(i,2)
-          if(n_north.eq.-1) elf(i,jm)=elf(i,jmm1)
+          if(n_south.eq.-1) then
+!            elf(i,2) = els(i)
+            elf(i,1) = elf(i,2)
+          end if
+          if(n_north.eq.-1) then
+!            elf(i,jmm1) = eln(i)
+            elf(i,jm)   = elf(i,jmm1)
+          end if
         end do
 
-        do j=1,jm
-          do i=1,im
-            elf(i,j)=elf(i,j)*fsm(i,j)
-          end do
-        end do
+        elf = elf*fsm
 
         return
 
@@ -42,7 +50,7 @@
         do j=2,jmm1
           ! west
           if(n_west.eq.-1) then
-            uaf(2,j)=uabw(j)-rfw*sqrt(grav/h(2,j))*(el(2,j)-elw(j))
+            uaf(2,j)=uabw(j)-rfw*sqrt(grav/d(2,j))*(el(2,j)-elw(j))
             uaf(2,j)=ramp*uaf(2,j)
             uaf(1,j)=uaf(2,j)
             vaf(1,j)=0.d0
@@ -51,7 +59,7 @@
           ! east
           if(n_east.eq.-1) then
              uaf(im,j)=uabe(j)
-     $                     +rfe*sqrt(grav/h(imm1,j))*(el(imm1,j)-ele(j))
+     $                     +rfe*sqrt(grav/d(imm1,j))*(el(imm1,j)-ele(j))
             uaf(im,j)=ramp*uaf(im,j)
             vaf(im,j)=0.d0
           end if
@@ -61,7 +69,7 @@
           ! south
           if(n_south.eq.-1) then
             vaf(i,2)=vabs(i)
-     $              -rfs*sqrt(grav/h(i,2))*(el(i,2)-els(i))
+     $              -rfs*sqrt(grav/d(i,2))*(el(i,2)-els(i))
             vaf(i,2)=ramp*vaf(i,2)
             vaf(i,1)=vaf(i,2)
             uaf(i,1)=0.d0
@@ -70,7 +78,7 @@
           ! north
           if(n_north.eq.-1) then
             vaf(i,jm)=vabn(i)
-     $                     +rfn*sqrt(grav/h(i,jmm1))*(el(i,jmm1)-eln(i))
+     $                     +rfn*sqrt(grav/d(i,jmm1))*(el(i,jmm1)-eln(i))
             vaf(i,jm)=ramp*vaf(i,jm)
             uaf(i,jm)=0.d0
           end if
@@ -90,26 +98,26 @@
 ! internal (3-D) velocity boundary conditions
 ! radiation conditions
 ! smoothing is used in the direction tangential to the boundaries
-        hmax=maxval(h) !4500.d0
+        hmax=maxval(d) !4500.d0
 
         do k=1,kbm1
           do j=2,jmm1
             ! east
             if(n_east.eq.-1) then
-              ga=sqrt(h(im,j)/hmax)
+              ga=sqrt(d(im,j)/hmax)
               uf(im,j,k)=ga*(.25d0*u(imm1,j-1,k)+.5d0*u(imm1,j,k)
      $                       +.25d0*u(imm1,j+1,k))
-     $                    +(1.d0-ga)*(.25d0*u(im,j-1,k)+.5d0*u(im,j,k)
-     $                      +.25d0*u(im,j+1,k))
+     $                    +(1.d0-ga)*(.25d0*ube(j-1,k)+.5d0*ube(j,k)
+     $                      +.25d0*ube(j+1,k))
               vf(im,j,k)=0.d0
             end if
             ! west
             if(n_west.eq.-1) then
-              ga=sqrt(h(1,j)/hmax)
+              ga=sqrt(d(1,j)/hmax)
               uf(2,j,k)=ga*(.25d0*u(3,j-1,k)+.5d0*u(3,j,k)
      $                      +.25d0*u(3,j+1,k))
-     $                   +(1.d0-ga)*(.25d0*u(2,j-1,k)+.5d0*u(2,j,k)
-     $                     +.25d0*u(2,j+1,k))
+     $                   +(1.d0-ga)*(.25d0*ubw(j-1,k)+.5d0*ubw(j,k)
+     $                     +.25d0*ubw(j+1,k))
               uf(1,j,k)=uf(2,j,k)
               vf(1,j,k)=0.d0
             end if
@@ -120,21 +128,21 @@
           do i=2,imm1
             ! south
             if(n_south.eq.-1) then
-              ga=sqrt(h(i,1)/hmax)
+              ga=sqrt(d(i,1)/hmax)
               vf(i,2,k)=ga*(.25d0*v(i-1,3,k)+.5d0*v(i,3,k)
      $                      +.25d0*v(i+1,3,k))
-     $                   +(1.d0-ga)*(.25d0*v(i-1,2,k)+.5d0*v(i,2,k)
-     $                     +.25d0*v(i+1,2,k))
+     $                   +(1.d0-ga)*(.25d0*vbs(i-1,k)+.5d0*vbs(i,k)
+     $                     +.25d0*vbs(i+1,k))
               vf(i,1,k)=vf(i,2,k)
               uf(i,1,k)=0.d0
             end if
             ! north
             if(n_north.eq.-1) then
-              ga=sqrt(h(i,jm)/hmax)
+              ga=sqrt(d(i,jm)/hmax)
               vf(i,jm,k)=ga*(.25d0*v(i-1,jmm1,k)+.5d0*v(i,jmm1,k)
      $                       +.25d0*v(i+1,jmm1,k))
-     $                    +(1.d0-ga)*(.25d0*v(i-1,jm,k)+.5d0*v(i,jm,k)
-     $                      +.25d0*v(i+1,jm,k))
+     $                    +(1.d0-ga)*(.25d0*vbn(i-1,k)+.5d0*vbn(i,k)
+     $                      +.25d0*vbn(i+1,k))
               uf(i,jm,k)=0.d0
             end if
           end do
@@ -621,7 +629,8 @@
       if (iint.eq.1) then
         call read_boundary_conditions_pnetcdf((iint+cont_bry)/ibc+1,kb
      $                         ,tbwf,sbwf,ubwf,tbef,sbef,ubef
-     $                         ,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
+     $                         ,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf
+     $                         ,elw,ele,eln,els)
 ! integrate by depth
         uabwf = 0.d0
         uabef = 0.d0
@@ -733,7 +742,8 @@
         if (iint.ne.iend) then
           call read_boundary_conditions_pnetcdf(
      $                                     (iint+cont_bry+ibc)+1/ibc,kb
-     $     ,tbwf,sbwf,ubwf,tbef,sbef,ubef,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf)
+     $     ,tbwf,sbwf,ubwf,tbef,sbef,ubef,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf
+     $                                                 ,elw,ele,eln,els)
 ! integrate by depth
           uabwf = 0.d0
           uabef = 0.d0
