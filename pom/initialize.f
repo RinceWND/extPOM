@@ -377,12 +377,8 @@
         arv(:,1)=arv(:,2)
       end if
 
-      do i=1,im
-        do j=1,jm
-          d(i,j)=h(i,j)+el(i,j)
-          dt(i,j)=h(i,j)+et(i,j)
-        end do
-      end do
+      d  = h+el
+      dt = h+et
 
       call check_cflmin_mpi
 
@@ -435,19 +431,15 @@
 !      end do
 
 ! initital heat and water fluxes (see subroutine surface_forcing)
-      do i=1,im
-        do j=1,jm
-          tsurf(i,j)=tb(i,j,1)
-          ssurf(i,j)=sb(i,j,1)
-        end do
-      end do
+      tsurf(:,:)=tb(:,:,1)
+      ssurf(:,:)=sb(:,:,1)
 
 ! lateral boundary conditions
 ! boundary conditions are variable (see subroutine lateral_bc)
-      rfe=1.d0
-      rfw=1.d0
-      rfn=1.d0
-      rfs=1.d0
+      rfe=1.
+      rfw=1.
+      rfn=1.
+      rfs=1.
 
       do k=1,kbm1
         do j=1,jm
@@ -474,18 +466,14 @@
       include 'pom.h'
       integer i,j,k
 
-      do i=1,im
-        do j=1,jm
-          ua(i,j)=uab(i,j)
-          va(i,j)=vab(i,j)
-          el(i,j)=elb(i,j)
-          et(i,j)=etb(i,j)
-          etf(i,j)=et(i,j)
-          d(i,j)=h(i,j)+el(i,j)
-          dt(i,j)=h(i,j)+et(i,j)
-          w(i,j,1)=vfluxf(i,j)
-        end do
-      end do
+      ua  = uab
+      va  = vab
+      el  = elb
+      et  = etb
+      etf = et
+      d   = h+el
+      dt  = h+et
+      w(:,:,1) = vfluxf(:,:)
 
       do k=1,kb
         do j=1,jm
@@ -501,18 +489,12 @@
         end do
       end do
 
-      do k=1,kbm1
-        do i=1,im
-          do j=1,jm
-            q2(i,j,k)=q2b(i,j,k)
-            q2l(i,j,k)=q2lb(i,j,k)
-            t(i,j,k)=tb(i,j,k)
-            s(i,j,k)=sb(i,j,k)
-            u(i,j,k)=ub(i,j,k)
-            v(i,j,k)=vb(i,j,k)
-          end do
-        end do
-      end do
+      q2  = q2b
+      q2l = q2lb
+      t   = tb
+      s   = sb
+      u   = ub
+      v   = vb
 
       if (npg.eq.1) then
         call baropg
@@ -570,10 +552,10 @@
       double precision tmax
       integer i,j,k
       
-      t = 0.d0
+      t = 0.
 
-      do i=2,im-1
       do j=2,jm-1
+      do i=2,im-1
         if (h(i,j).gt.1.0) then
 ! special interp on z-lev for cases of no data because h smoothing
           do k=1,ks
@@ -593,9 +575,7 @@
 ! vertical spline interp
           call splinc(zs,tin,ks,2.d30,2.d30,zzh,tout,kb)
 
-          do k=1,kb
-              t(i,j,k)=tout(k)
-          end do
+          t(i,j,:) = tout(:)
 
         end if
       end do
@@ -603,16 +583,10 @@
       call exchange3d_mpi(t,im_local,jm_local,kb)
 
 ! boundaries
-      do k=1,kb
-        do j=1,jm
-          if(n_west.eq.-1) t(1,j,k)=t(2,j,k)
-          if(n_east.eq.-1) t(im,j,k)=t(im-1,j,k)
-        end do
-        do i=1,im
-          if(n_south.eq.-1) t(i,1,k)=t(i,2,k)
-          if(n_north.eq.-1) t(i,jm,k)=t(i,jm-1,k)
-        end do
-      end do
+      if(n_west.eq.-1)  t(1,:,:)  = t(2,:,:)
+      if(n_east.eq.-1)  t(im,:,:) = t(im-1,:,:)
+      if(n_south.eq.-1) t(:,1,:)  = t(:,2,:)
+      if(n_north.eq.-1) t(:,jm,:) = t(:,jm-1,:)
 
       return
       end
