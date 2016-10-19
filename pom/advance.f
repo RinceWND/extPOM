@@ -87,6 +87,8 @@
       call heat
 ! water fluxes are suplied in subroutine water
 !      call water
+! surface fields (SST,SSS) are suplied in subroutine surface
+      call surface
       return
       end
 
