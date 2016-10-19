@@ -961,6 +961,29 @@
       end
 
 !_______________________________________________________________________
+      subroutine surface
+! read and interpolate heat flux in time
+      implicit none
+      include 'pom.h'
+      integer i,j,ntime,isrf
+      double precision tsrf!,fold,fnew
+      double precision, dimension(im,jm) :: sst, sss
+
+      tsrf=.125 ! time between heat forcing (days)
+      isrf=int(tsrf*86400.d0/dti)
+
+! read heat stress data
+      ! read surface fields (no interpolation)
+      if (iint.eq.1 .or. mod(iint+cont_bry,isrf).eq.0.) then
+        call read_surface_pnetcdf((iint+cont_bry)/isrf+1,sst,sss)
+        tsurf(1:im,1:jm) = sst
+!        ssurf(1:im,1:jm) = sss ! Do not overwrite SSS yet.
+      end if
+
+      return
+      end
+
+!_______________________________________________________________________
       subroutine water
 ! read and interpolate water flux in time
       implicit none

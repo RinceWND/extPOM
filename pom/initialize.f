@@ -434,7 +434,7 @@
 !        end do
 !      end do
 
-! iniital heat and water fluxes (see subroutine surface_forcing)
+! initital heat and water fluxes (see subroutine surface_forcing)
       do i=1,im
         do j=1,jm
           tsurf(i,j)=tb(i,j,1)

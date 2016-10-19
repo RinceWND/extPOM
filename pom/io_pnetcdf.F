@@ -3114,6 +3114,63 @@
       end
 
 !_______________________________________________________________________
+      subroutine read_surface_pnetcdf(n,sst,sss)
+! read heat flux
+      implicit none
+# include "mpif.h"
+# include "pnetcdf.inc"
+      include 'pom.h'
+      double precision sst(im,jm),sss(im,jm)
+!      integer i,j
+      integer n
+      character*120 netcdf_heat_file
+      integer ncid,status
+      integer sst_varid,sss_varid
+!      integer vdims(2)
+!      integer(mpi_offset_kind) length
+      integer(mpi_offset_kind) start(3),edge(3)
+
+! open netcdf heat file
+      write(netcdf_heat_file,'(a,''in/'',a,''.sfrc.nc'')')
+     $                                 trim(wrk_pth),trim(netcdf_file)
+      if(my_task.eq.master_task)
+     $                  write(*,'(/''reading surface '',a," [",i3,"]")')
+     $                                          trim(netcdf_heat_file),n
+      status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
+     $                  mpi_info_null,ncid)
+      call handle_error_pnetcdf('nfmpi_open: '//netcdf_heat_file,
+     $                          status,nf_noerr)
+
+! get variables
+      status=nfmpi_inq_varid(ncid,'SST',sst_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: sst'
+     $                          ,status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'SSS',sss_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: sss'
+     $                          ,status,nf_noerr)
+
+! get data
+      start(1)=i_global(1)
+      start(2)=j_global(1)
+      start(3)=n
+      edge(1)=im
+      edge(2)=jm
+      edge(3)=1
+      status=nfmpi_get_vara_double_all(ncid,sst_varid,start,edge,sst)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: sst',
+     $                          status,nf_noerr)
+      status=nfmpi_get_vara_double_all(ncid,sss_varid,start,edge,sss)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: sss',
+     $                          status,nf_noerr)
+
+! close file
+      status=nfmpi_close(ncid)
+      call handle_error_pnetcdf('nf_close: surface',status,nf_noerr)
+
+      return
+      end
+
+!_______________________________________________________________________
       subroutine read_water_pnetcdf(n,wat)
 ! read water flux
       implicit none
@@ -3447,15 +3504,15 @@
 !      call handle_error_pnetcdf('nfmpi_get_vara_double_all: s_s',
 !     $                                                  status,nf_noerr)
 
-      t_w(1:jm,:) = tclim(   2,1:jm,:)
-      t_e(1:jm,:) = tclim(imm1,1:jm,:)
-      t_s(1:im,:) = tclim(1:im,   2,:)
-      t_n(1:im,:) = tclim(1:im,jmm1,:)
+      t_w(1:jm,:) = tclim( 1,1:jm,:)
+      t_e(1:jm,:) = tclim(im,1:jm,:)
+      t_s(1:im,:) = tclim(1:im, 1,:)
+      t_n(1:im,:) = tclim(1:im,jm,:)
       
-      s_w(1:jm,:) = sclim(   2,1:jm,:)
-      s_e(1:jm,:) = sclim(imm1,1:jm,:)
-      s_s(1:im,:) = sclim(1:im,   2,:)
-      s_n(1:im,:) = sclim(1:im,jmm1,:)
+      s_w(1:jm,:) = sclim( 1,1:jm,:)
+      s_e(1:jm,:) = sclim(im,1:jm,:)
+      s_s(1:im,:) = sclim(1:im, 1,:)
+      s_n(1:im,:) = sclim(1:im,jm,:)
 
 ! close file
       status=nfmpi_close(ncid)
