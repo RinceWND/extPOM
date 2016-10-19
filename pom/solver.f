@@ -210,16 +210,10 @@
       double precision dtaam
       integer i,j,k
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            curv(i,j,k)=0.d0
-            advx(i,j,k)=0.d0
-            xflux(i,j,k)=0.d0
-            yflux(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      curv  = 0.
+      advx  = 0.
+      xflux = 0.
+      yflux = 0.
 
       do k=1,kbm1
         do j=2,jmm1
@@ -322,15 +316,9 @@
 
 ! calculate y-component of velocity advection
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            advy(i,j,k)=0.d0
-            xflux(i,j,k)=0.d0
-            yflux(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      advy  = 0.
+      xflux = 0.
+      yflux = 0.
 
 ! calculate horizontal advective fluxes
       do k=1,kbm1
@@ -430,14 +418,8 @@
       double precision xflux(im,jm,kb),yflux(im,jm,kb)
       integer i,j,k
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            xflux(i,j,k)=0.d0
-            yflux(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      xflux = 0.
+      yflux = 0.
 
 ! do horizontal advection
       do k=2,kbm1
@@ -507,21 +489,11 @@
       double precision xflux(im,jm,kb),yflux(im,jm,kb)
       integer i,j,k
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            xflux(i,j,k)=0.d0
-            yflux(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      xflux = 0.
+      yflux = 0.
 
-      do j=1,jm
-        do i=1,im
-           f(i,j,kb)=f(i,j,kbm1)
-           fb(i,j,kb)=fb(i,j,kbm1)
-        end do
-      end do
+      f(:,:,kb)  = f(:,:,kbm1)
+      fb(:,:,kb) = fb(:,:,kbm1)
 
 ! do advective fluxes
       do k=1,kbm1
@@ -536,13 +508,7 @@
       end do
 
 ! add diffusive fluxes
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            fb(i,j,k)=fb(i,j,k)-fclim(i,j,k)
-          end do
-        end do
-      end do
+      fb = fb-fclim
 
       do k=1,kbm1
         do j=2,jm
@@ -563,13 +529,7 @@
         end do
       end do
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            fb(i,j,k)=fb(i,j,k)+fclim(i,j,k)
-          end do
-        end do
-      end do
+      fb = fb+fclim
 
 ! do vertical advection
       do j=2,jmm1
@@ -588,16 +548,26 @@
       end do
 
 ! add net horizontal fluxes and then step forward in time
-      do j=2,jmm1
-        do i=2,imm1
-          do k=1,kbm1
-            ff(i,j,k)=xflux(i+1,j,k)-xflux(i,j,k)
-     $                 +yflux(i,j+1,k)-yflux(i,j,k)
-     $                 +(zflux(i,j,k)-zflux(i,j,k+1))/dz(k)
-            ff(i,j,k)=(fb(i,j,k)*dble((h(i,j)+etb(i,j))*art(i,j))
-     $                 -dti2*ff(i,j,k))/dble((h(i,j)+etf(i,j))*art(i,j))
-          end do
-        end do
+!      do j=2,jmm1
+!        do i=2,imm1
+!          do k=1,kbm1
+!            ff(i,j,k)=xflux(i+1,j,k)-xflux(i,j,k)
+!     $                 +yflux(i,j+1,k)-yflux(i,j,k)
+!     $                 +(zflux(i,j,k)-zflux(i,j,k+1))/dz(k)
+!            ff(i,j,k)=(fb(i,j,k)*dble((h(i,j)+etb(i,j))*art(i,j))
+!     $                 -dti2*ff(i,j,k))/dble((h(i,j)+etf(i,j))*art(i,j))
+!          end do
+!        end do
+!      end do
+      do k=1,kbm1
+        ff(2:imm1,2:jmm1,k)=xflux(3:im,2:jmm1,k)-xflux(2:imm1,2:jmm1,k)
+     $          +yflux(2:imm1,3:jm,k)-yflux(2:imm1,2:jmm1,k)
+     $          +(zflux(2:imm1,2:jmm1,k)-zflux(2:imm1,2:jmm1,k+1))/dz(k)
+        ff(2:imm1,2:jmm1,k)=(fb(2:imm1,2:jmm1,k)
+     $         *(h(2:imm1,2:jmm1)+etb(2:imm1,2:jmm1))*art(2:imm1,2:jmm1)
+     $         -dti2*ff(2:imm1,2:jmm1,k))
+     $         /((h(2:imm1,2:jmm1)+etf(2:imm1,2:jmm1))
+     $         *art(2:imm1,2:jmm1))
       end do
 
       return
@@ -624,10 +594,10 @@
       integer i,j,k,itera
 
 ! calculate horizontal mass fluxes
-      xflux = 0.d0
-      yflux = 0.d0
-      xmassflux = 0.d0
-      ymassflux = 0.d0
+      xflux = 0.
+      yflux = 0.
+      xmassflux = 0.
+      ymassflux = 0.
 
       do k=1,kbm1
         do j=2,jmm1
@@ -673,13 +643,12 @@
           end do
         end do
 
-        do j=2,jmm1
-          do i=2,imm1
-            zflux(i,j,1)=0.d0
-            if(itera.eq.1) zflux(i,j,1)=w(i,j,1)*f(i,j,1)*art(i,j)
-            zflux(i,j,kb)=0.d0
-          end do
-        end do
+        zflux(2:imm1,2:jmm1,1) = 0.
+        if(itera.eq.1) then
+          zflux(2:imm1,2:jmm1,1) = w(2:imm1,2:jmm1,1)*f(2:imm1,2:jmm1,1)
+     $                            *art(2:imm1,2:jmm1)
+        end if
+        zflux(2:imm1,2:jmm1,kb) = 0.
 
         do k=2,kbm1
           do j=2,jmm1
@@ -712,26 +681,14 @@
 ! calculate antidiffusion velocity
         call smol_adif(xmassflux,ymassflux,zwflux,ff)
 
-        do j=1,jm
-          do i=1,im
-            eta(i,j)=etf(i,j)
-            do k=1,kb
-              fbmem(i,j,k)=ff(i,j,k)
-            end do
-          end do
-        end do
+        eta = etf(1:im,1:jm)
+        fbmem = ff(1:im,1:jm,:)
 
 ! end of Smolarkiewicz scheme
       end do
 
 ! add horizontal diffusive fluxes
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            fb(i,j,k)=fb(i,j,k)-fclim(i,j,k)
-          end do
-        end do
-      end do
+      fb = fb-fclim
 
       do k=1,kbm1
         do j=2,jm
@@ -755,13 +712,7 @@
         end do
       end do
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            fb(i,j,k)=fb(i,j,k)+fclim(i,j,k)
-          end do
-        end do
-      end do
+      fb = fb+fclim
 
 ! add net horizontal fluxes and step forward in time
       do j=2,jmm1
@@ -788,13 +739,7 @@
       integer i,j,k
 
 ! do vertical advection
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            uf(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      uf = 0.
 
       do k=2,kbm1
         do j=1,jm
@@ -851,13 +796,7 @@
       integer i,j,k
 
 ! do vertical advection
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            vf(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      vf = 0.
 
       do k=2,kbm1
         do j=2,jm
@@ -912,13 +851,7 @@
       include 'pom.h'
       integer i,j,k
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            rho(i,j,k)=rho(i,j,k)-rmean(i,j,k)
-          end do
-        end do
-      end do
+      rho = rho-rmean
       
 ! calculate x-component of baroclinic pressure gradient
       do j=2,jmm1
@@ -954,7 +887,7 @@
         end do
       end do
 
-      call exchange3d_mpi(drhox,im_local,jm_local,kb)
+!      call exchange3d_mpi(drhox,im_local,jm_local,kb)
 
 ! calculate y-component of baroclinic pressure gradient
       do j=2,jmm1
@@ -990,7 +923,7 @@
         end do
       end do
 
-      call exchange3d_mpi(drhoy,im_local,jm_local,kb)
+!      call exchange3d_mpi(drhoy,im_local,jm_local,kb)
 
       do k=1,kb
         do j=2,jmm1
@@ -1001,13 +934,7 @@
         end do
       end do
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            rho(i,j,k)=rho(i,j,k)+rmean(i,j,k)
-          end do
-        end do
-      end do
+      rho = rho+rmean
 
       return
       end
@@ -1024,13 +951,7 @@
       double precision rho4th(0:im_local,0:jm_local,kb)
      $                ,d4th(0:im_local,0:jm_local)
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            rho(i,j,k)=rho(i,j,k)-rmean(i,j,k)
-          end do
-        end do
-      end do
+      rho = rho-rmean
 
 ! convert a 2nd order matrices to special 4th order
 ! special 4th order case
@@ -1038,20 +959,10 @@
       call order3d_mpi(rho,rho4th,im_local,jm_local,kb)
 
 ! compute terms correct to 4th order
-      do i=1,im
-        do j=1,jm
-          ddx(i,j)=0.
-          d4(i,j)=0.
-        end do
-      end do
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            rhou(i,j,k)=0.
-            drho(i,j,k)=0.
-          end do
-        end do
-      end do
+      ddx = 0.
+      d4  = 0.
+      rhou = 0.
+      drho = 0.
 
 ! compute DRHO, RHOU, DDX and D4
       do j=1,jm
@@ -1141,20 +1052,10 @@
 !      call exchange3d_mpi(drhox,im_local,jm_local,kb)
 
 ! compute terms correct to 4th order
-      do i=1,im
-        do j=1,jm
-          ddx(i,j)=0.
-          d4(i,j)=0.
-        end do
-      end do
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            rhou(i,j,k)=0.
-            drho(i,j,k)=0.
-          end do
-        end do
-      end do
+      ddx = 0.
+      d4  = 0.
+      rhou = 0.
+      drho = 0.
 
 ! compute DRHO, RHOU, DDX and D4
       do j=2,jm
@@ -1252,13 +1153,7 @@
         end do
       end do
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            rho(i,j,k)=rho(i,j,k)+rmean(i,j,k)
-          end do
-        end do
-      end do
+      rho = rho+rmean
 
       return
       end
@@ -1354,17 +1249,11 @@
         end do
       end do
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            a(i,j,k)=0.d0
-            c(i,j,k)=0.d0
-            ee(i,j,k)=0.d0
-            gg(i,j,k)=0.d0
-          end do
-        end do
-      end do
-      utau2 = 0.d0
+      a  = 0.
+      c  = 0.
+      ee = 0.
+      gg = 0.
+      utau2 = 0.
 
       do k=2,kbm1
         do j=1,jm
@@ -1385,19 +1274,9 @@
 
 ! initialize fields that are not calculated on all boundaries
 ! but are later used there
-      do i=1,im
-        do j=1,jm
-          l0(i,j)=0.
-         end do
-      end do
-      do i=1,im
-        do j=1,jm
-          do k=1,kb
-            boygr(i,j,k)=0.
-            prod(i,j,k)=0.
-          end do
-        end do
-      end do
+      l0    = 0.
+      boygr = 0.
+      prod  = 0.
 
       do j=1,jmm1
         do i=1,imm1
@@ -1422,13 +1301,7 @@
       end do
 
 ! calculate speed of sound squared
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            cc(i,j,k)=0.
-          end do
-        end do
-      end do
+      cc = 0.
       do k=1,kbm1
         do j=1,jm
           do i=1,im
@@ -1718,16 +1591,10 @@
         end do
       end do
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            a(i,j,k)=0.d0
-            c(i,j,k)=0.d0
-            ee(i,j,k)=0.d0
-            gg(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      a  = 0.
+      c  = 0.
+      ee = 0.
+      gg = 0.
 
       do k=2,kbm1
         do j=1,jm
@@ -1742,13 +1609,7 @@
 
 ! calculate penetrative radiation. At the bottom any unattenuated
 ! radiation is deposited in the bottom layer
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            rad(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      rad = 0.
 
       if(nbc.eq.2.or.nbc.eq.4) then
         do k=1,kbm1
@@ -1845,11 +1706,7 @@
 
 ! the following section solves the equation
 !   dti2*(km*u')'-u=-ub
-      do j=1,jm
-        do i=1,im
-          dh(i,j)=1.d0
-        end do
-      end do
+      dh = 1.
 
       do j=2,jm
         do i=2,im
@@ -1857,16 +1714,10 @@
         end do
       end do
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            a(i,j,k)=0.d0
-            c(i,j,k)=0.d0
-            ee(i,j,k)=0.d0
-            gg(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      a  = 0.
+      c  = 0.
+      ee = 0.
+      gg = 0.
 
       do k=1,kb
         do j=2,jm
@@ -1953,11 +1804,7 @@
 ! the following section solves the equation
 !     dti2*(km*u')'-u=-ub
 
-      do j=1,jm
-        do i=1,im
-          dh(i,j)=1.d0
-        end do
-      end do
+      dh = 1.
 
       do j=2,jm
         do i=2,im
@@ -1965,16 +1812,10 @@
         end do
       end do
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            a(i,j,k)=0.d0
-            c(i,j,k)=0.d0
-            ee(i,j,k)=0.d0
-            gg(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      a  = 0.
+      c  = 0.
+      ee = 0.
+      gg = 0.
 
       do k=1,kb
         do j=2,jm
@@ -2065,11 +1906,7 @@
 
 ! apply temperature and salinity mask
       do k=1,kb
-        do i=1,im
-          do j=1,jm
-            ff(i,j,k)=ff(i,j,k)*fsm(i,j)
-          end do
-        end do
+        ff(:,:,k) = ff(:,:,k)*fsm
       end do
 
 ! recalculate mass fluxes with antidiffusion velocity
@@ -2147,14 +1984,8 @@
       double precision xflux(im,jm,kb),yflux(im,jm,kb)
       integer i,j,k
 
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            xflux(i,j,k)=0.d0
-            yflux(i,j,k)=0.d0
-          end do
-        end do
-      end do
+      xflux = 0.
+      yflux = 0.
 
 ! reestablish boundary conditions
       do k=1,kbm1
@@ -2206,13 +2037,8 @@
       include 'pom.h'
       integer i,j,k
       double precision dxr,dxl,dyt,dyb
-      do k=1,kb
-        do j=1,jm
-          do i=1,im
-            wr(i,j,k)=0.
-          end do
-        end do
-      end do
+
+      wr = 0.
 
       do k=1,kbm1
         do j=1,jm
@@ -2252,11 +2078,7 @@
       end do
 
       do k=1,kbm1
-        do j=1,jm
-          do i=1,im
-            wr(i,j,k)=fsm(i,j)*wr(i,j,k)
-          end do
-        end do
+        wr(:,:,k) = fsm(:,:)*wr(:,:,k)
       end do
 
       return
