@@ -18,27 +18,23 @@
       if(idx.eq.1) then
 
 ! External (2-D) elevation boundary conditions (Clamped)
-        do j=1,jm
-          if(n_west.eq.-1) then
-!            elf(2,j) = elw(j)
-            elf(1,j) = elf(2,j)
-          end if
-          if(n_east.eq.-1) then
-!            elf(imm1,j) = ele(j)
-            elf(im  ,j) = elf(imm1,j)
-          end if
-        end do
+        if(n_west.eq.-1) then
+!          elf(1,:) = elw
+          elf(1,:) = elf(2,:)
+        end if
+        if(n_east.eq.-1) then
+!          elf(im,:) = ele
+          elf(im,:) = elf(imm1,:)
+        end if
 
-        do i=1,im
-          if(n_south.eq.-1) then
-!            elf(i,2) = els(i)
-            elf(i,1) = elf(i,2)
-          end if
-          if(n_north.eq.-1) then
-!            elf(i,jmm1) = eln(i)
-            elf(i,jm)   = elf(i,jmm1)
-          end if
-        end do
+        if(n_south.eq.-1) then
+!          elf(:,1) = els
+          elf(:,1) = elf(:,2)
+        end if
+        if(n_north.eq.-1) then
+!          elf(:,jm) = eln
+          elf(:,jm) = elf(:,jmm1)
+        end if
 
         elf = elf*fsm
 
@@ -47,49 +43,42 @@
       else if(idx.eq.2) then
 
 ! external (2-D) velocity boundary conditions
-        do j=2,jmm1
-          ! west
-          if(n_west.eq.-1) then
-            uaf(2,j)=uabw(j)-rfw*sqrt(grav/d(2,j))*(el(2,j)-elw(j))
-            uaf(2,j)=ramp*uaf(2,j)
-            uaf(1,j)=uaf(2,j)
-            vaf(1,j)=0.d0
-          end if
+        ! west
+        if(n_west.eq.-1) then
+          uaf(2,2:jmm1) = uabw(2:jmm1)
+     $            -rfw*sqrt(grav/d(2,2:jmm1))*(el(2,2:jmm1)-elw(2:jmm1))
+          uaf(2,2:jmm1) = ramp*uaf(2,2:jmm1)
+          uaf(1,2:jmm1) = uaf(2,2:jmm1)
+          vaf(1,2:jmm1) = 0.
+        end if
 
-          ! east
-          if(n_east.eq.-1) then
-             uaf(im,j)=uabe(j)
-     $                     +rfe*sqrt(grav/d(imm1,j))*(el(imm1,j)-ele(j))
-            uaf(im,j)=ramp*uaf(im,j)
-            vaf(im,j)=0.d0
-          end if
-        end do
+        ! east
+        if(n_east.eq.-1) then
+          uaf(im,2:jmm1) = uabe(2:jmm1)
+     $      +rfe*sqrt(grav/d(imm1,2:jmm1))*(el(imm1,2:jmm1)-ele(2:jmm1))
+          uaf(im,2:jmm1) = ramp*uaf(im,2:jmm1)
+          vaf(im,2:jmm1) = 0.
+        end if
 
-        do i=2,imm1
-          ! south
-          if(n_south.eq.-1) then
-            vaf(i,2)=vabs(i)
-     $              -rfs*sqrt(grav/d(i,2))*(el(i,2)-els(i))
-            vaf(i,2)=ramp*vaf(i,2)
-            vaf(i,1)=vaf(i,2)
-            uaf(i,1)=0.d0
-          end if
+        ! south
+        if(n_south.eq.-1) then
+          vaf(2:imm1,2) = vabs(2:imm1)
+     $            -rfs*sqrt(grav/d(2:imm1,2))*(el(2:imm1,2)-els(2:imm1))
+          vaf(2:imm1,2) = ramp*vaf(2:imm1,2)
+          vaf(2:imm1,1) = vaf(2:imm1,2)
+          uaf(2:imm1,1) = 0.
+        end if
 
-          ! north
-          if(n_north.eq.-1) then
-            vaf(i,jm)=vabn(i)
-     $                     +rfn*sqrt(grav/d(i,jmm1))*(el(i,jmm1)-eln(i))
-            vaf(i,jm)=ramp*vaf(i,jm)
-            uaf(i,jm)=0.d0
-          end if
-        end do
+        ! north
+        if(n_north.eq.-1) then
+          vaf(2:imm1,jm) = vabn(2:imm1)
+     $      +rfn*sqrt(grav/d(2:imm1,jmm1))*(el(2:imm1,jmm1)-eln(2:imm1))
+          vaf(2:imm1,jm) = ramp*vaf(2:imm1,jm)
+          uaf(2:imm1,jm) = 0.
+        end if
 
-        do j=1,jm
-          do i=1,im
-            uaf(i,j)=uaf(i,j)*dum(i,j)
-            vaf(i,j)=vaf(i,j)*dvm(i,j)
-          end do
-        end do
+        uaf = uaf*dum
+        vaf = vaf*dvm
 
         return
 
@@ -353,16 +342,10 @@
       if(idx.eq.1) then
 
 ! external (2-D) elevation boundary conditions
-        do  j=1,jm
-          if(n_west.eq.-1) elf(1,j)=elf(2,j)
-          if(n_east.eq.-1) elf(im,j)=elf(imm1,j)
-        end do
+        if(n_west.eq.-1) elf(1,:)=elf(2,:)
+        if(n_east.eq.-1) elf(im,:)=elf(imm1,:)
 
-        do j=1,jm
-          do i=1,im
-            elf(i,j)=elf(i,j)*fsm(i,j)
-          end do
-        end do
+        elf = elf*fsm
 
         return
 

@@ -318,20 +318,16 @@
       end if
       
 ! apply filter to remove time split
-      do j=1,jm
-        do i=1,im
-          ua(i,j)=ua(i,j)+.5d0*smoth*(uab(i,j)-2.d0*ua(i,j)+uaf(i,j))
-          va(i,j)=va(i,j)+.5d0*smoth*(vab(i,j)-2.d0*va(i,j)+vaf(i,j))
-          el(i,j)=el(i,j)+.5d0*smoth*(elb(i,j)-2.d0*el(i,j)+elf(i,j))
-          elb(i,j)=el(i,j)
-          el(i,j)=elf(i,j)
-          d(i,j)=h(i,j)+el(i,j)
-          uab(i,j)=ua(i,j)
-          ua(i,j)=uaf(i,j)
-          vab(i,j)=va(i,j)
-          va(i,j)=vaf(i,j)
-        end do
-      end do
+      ua  = ua+.5*smoth*(uab-2.*ua+uaf)
+      va  = va+.5*smoth*(vab-2.*va+vaf)
+      el  = el+.5*smoth*(elb-2.*el+elf)
+      elb = el
+      el  = elf
+      d   = h+el
+      uab = ua
+      ua  = uaf
+      vab = va
+      va  = vaf
       
       if(iext.ne.isplit) then
         do j=1,jm
@@ -366,18 +362,10 @@
       if((iint.ne.1.or.time0.ne.0.d0).and.mode.ne.2) then
 
 ! adjust u(z) and v(z) such that depth average of (u,v) = (ua,va)
-        do j=1,jm
-          do i=1,im
-            tps(i,j)=0.d0
-          end do
-        end do
+        tps = 0.
 
         do k=1,kbm1
-          do j=1,jm
-            do i=1,im
-              tps(i,j)=tps(i,j)+u(i,j,k)*dz(k)
-            end do
-          end do
+          tps = tps+u(:,:,k)*dz(k)
         end do
 
         do k=1,kbm1
@@ -389,18 +377,10 @@
           end do
         end do
 
-        do j=1,jm
-          do i=1,im
-            tps(i,j)=0.d0
-          end do
-        end do
+        tps = 0.
 
         do k=1,kbm1
-          do j=1,jm
-            do i=1,im
-              tps(i,j)=tps(i,j)+v(i,j,k)*dz(k)
-            end do
-          end do
+          tps = tps+v(:,:,k)*dz(k)
         end do
 
         do k=1,kbm1
@@ -420,14 +400,8 @@
         call exchange3d_mpi(w,im_local,jm_local,kb)
 
 ! set uf and vf to zero
-        do k=1,kb
-          do j=1,jm
-            do i=1,im
-              uf(i,j,k)=0.d0
-              vf(i,j,k)=0.d0
-            end do
-          end do
-        end do
+        uf = 0.
+        vf = 0.
 
 ! calculate q2f and q2lf using uf, vf, a and c as temporary variables
         call advq(q2b,q2,uf)
@@ -439,22 +413,12 @@
         call exchange3d_mpi(uf(:,:,2:kbm1),im_local,jm_local,kbm2)
         call exchange3d_mpi(vf(:,:,2:kbm1),im_local,jm_local,kbm2)
 
-        do k=1,kb
-          do j=1,jm
-            do i=1,im
-              q2(i,j,k)=q2(i,j,k)
-     $                   +.5d0*smoth*(uf(i,j,k)+q2b(i,j,k)
-     $                                -2.d0*q2(i,j,k))
-              q2l(i,j,k)=q2l(i,j,k)
-     $                   +.5d0*smoth*(vf(i,j,k)+q2lb(i,j,k)
-     $                                -2.d0*q2l(i,j,k))
-              q2b(i,j,k)=q2(i,j,k)
-              q2(i,j,k)=uf(i,j,k)
-              q2lb(i,j,k)=q2l(i,j,k)
-              q2l(i,j,k)=vf(i,j,k)
-            end do
-          end do
-        end do
+        q2  = q2+.5*smoth*(uf+q2b-2.*q2)
+        q2l = q2l+.5*smoth*(vf+q2lb-2.*q2l)
+        q2b  = q2
+        q2   = uf
+        q2lb = q2l
+        q2l  = vf
 
 ! calculate tf and sf using uf, vf, a and c as temporary variables
         if(mode.ne.4) then
@@ -477,22 +441,12 @@
 
           call bcond(4)
 
-          do k=1,kb
-            do j=1,jm
-              do i=1,im
-                t(i,j,k)=t(i,j,k)
-     $                    +.5d0*smoth*(uf(i,j,k)+tb(i,j,k)
-     $                                 -2.d0*t(i,j,k))
-                s(i,j,k)=s(i,j,k)
-     $                    +.5d0*smoth*(vf(i,j,k)+sb(i,j,k)
-     $                                 -2.d0*s(i,j,k))
-                tb(i,j,k)=t(i,j,k)
-                t(i,j,k)=uf(i,j,k)
-                sb(i,j,k)=s(i,j,k)
-                s(i,j,k)=vf(i,j,k)
-              end do
-            end do
-          end do
+          t = t+.5*smoth*(uf+tb-2.*t)
+          s = s+.5*smoth*(vf+sb-2.*s)
+          tb = t
+          t  = uf
+          sb = s
+          s  = vf
 
           ! restore temperature and salinity
           !call restore_interior ! TODO: Do not restore t and s yet
@@ -512,11 +466,7 @@
         call exchange3d_mpi(uf(:,:,1:kbm1),im_local,jm_local,kbm1)
         call exchange3d_mpi(vf(:,:,1:kbm1),im_local,jm_local,kbm1)
 
-        do j=1,jm
-          do i=1,im
-            tps(i,j)=0.d0
-          end do
-        end do
+        tps = 0.
 
         do k=1,kbm1
           do j=1,jm
@@ -537,11 +487,7 @@
           end do
         end do
 
-        do j=1,jm
-          do i=1,im
-            tps(i,j)=0.d0
-          end do
-        end do
+        tps = 0.
 
         do k=1,kbm1
           do j=1,jm
@@ -617,11 +563,11 @@
         end if
 
 ! local averages
-        vtot=0.d0
-        atot=0.d0
-        taver=0.d0
-        saver=0.d0
-        eaver=0.d0
+        vtot=0.
+        atot=0.
+        taver=0.
+        saver=0.
+        eaver=0.
         do k=1,kbm1
           do j=1,jm
             do i=1,im

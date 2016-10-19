@@ -1507,41 +1507,31 @@
 
 ! cosmetics: make boundr. values as interior (even if not used, printout
 ! may show strange values)
-      do k=1,kb
-        do i=1,im
-          if(n_north.eq.-1) then
-            km(i,jm,k)=km(i,jmm1,k)
-            kh(i,jm,k)=kh(i,jmm1,k)
-            kq(i,jm,k)=kq(i,jmm1,k)
-          end if
-          if(n_south.eq.-1) then
-            km(i,1,k)=km(i,2,k)
-            kh(i,1,k)=kh(i,2,k)
-            kq(i,1,k)=kq(i,2,k)
-          end if
-        end do
-        do j=1,jm
-          if(n_east.eq.-1) then
-            km(im,j,k)=km(imm1,j,k)
-            kh(im,j,k)=kh(imm1,j,k)
-            kq(im,j,k)=kq(imm1,j,k)
-          end if
-          if(n_west.eq.-1) then
-            km(1,j,k)=km(2,j,k)
-            kh(1,j,k)=kh(2,j,k)
-            kq(1,j,k)=kq(2,j,k)
-          end if
-        end do
-      end do
+      if(n_north.eq.-1) then
+        km(:,jm,:) = km(:,jmm1,:)
+        kh(:,jm,:) = kh(:,jmm1,:)
+        kq(:,jm,:) = kq(:,jmm1,:)
+      end if
+      if(n_south.eq.-1) then
+        km(:,1,:) = km(:,2,:)
+        kh(:,1,:) = kh(:,2,:)
+        kq(:,1,:) = kq(:,2,:)
+      end if
+      if(n_east.eq.-1) then
+        km(im,:,:) = km(imm1,:,:)
+        kh(im,:,:) = kh(imm1,:,:)
+        kq(im,:,:) = kq(imm1,:,:)
+      end if
+      if(n_west.eq.-1) then
+        km(1,:,:) = km(2,:,:)
+        kh(1,:,:) = kh(2,:,:)
+        kq(1,:,:) = kq(2,:,:)
+      end if
 
       do k=1,kb
-        do i=1,im
-          do j=1,jm
-            km(i,j,k)=km(i,j,k)*fsm(i,j)
-            kh(i,j,k)=kh(i,j,k)*fsm(i,j)
-            kq(i,j,k)=kq(i,j,k)*fsm(i,j)
-          end do
-        end do
+        km(:,:,k) = km(:,:,k)*fsm
+        kh(:,:,k) = kh(:,:,k)*fsm
+        kq(:,:,k) = kq(:,:,k)*fsm
       end do
 
       return
@@ -2064,18 +2054,10 @@
 
       call exchange3d_mpi(wr(:,:,1:kbm1),im_local,jm_local,kbm1)
 
-      do k=1,kb
-        do i=1,im
-          if(n_south.eq.-1) wr(i,1,k)=wr(i,2,k)
-          if(n_north.eq.-1) wr(i,jm,k)=wr(i,jmm1,k)
-        end do
-      end do
-      do k=1,kb
-        do j=1,jm
-          if(n_west.eq.-1) wr(1,j,k)=wr(2,j,k)
-          if(n_east.eq.-1) wr(im,j,k)=wr(imm1,j,k)
-        end do
-      end do
+      if (n_south.eq.-1) wr(:,1,:) =wr(:,2,:)
+      if (n_north.eq.-1) wr(:,jm,:)=wr(:,jmm1,:)
+      if (n_west.eq.-1)  wr(1,:,:) =wr(2,:,:)
+      if (n_east.eq.-1)  wr(im,:,:)=wr(imm1,:,:)
 
       do k=1,kbm1
         wr(:,:,k) = fsm(:,:)*wr(:,:,k)
