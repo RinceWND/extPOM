@@ -487,34 +487,27 @@
       include 'pom.h'
 
       double precision, dimension(im_local,jm_local) :: cfl
-      double precision, dimension(n_proc) :: cflmin
+      double precision cflmin, tmp
       integer ierr
 
-      cfl = 0.d0
+      cfl = 0.
       cflmin = 1.d10
 
       cfl(:,:) = .5d0/sqrt(1.d0/dx(:,:)**2+1.d0/dy(:,:)**2)
      $               /sqrt(grav*(h(:,:)+small))*fsm(:,:)
 
-      cflmin(my_task+1) = minval(cfl, cfl>0.)
+      cflmin = minval(cfl, cfl>0.)
+
+      call mpi_reduce(cflmin,tmp,1,mpi_double,mpi_min
+     $                                       ,master_task,pom_comm,ierr)
 
       if (my_task == 0) then
-        call mpi_gather(MPI_IN_PLACE,1,mpi_double
-     $                 ,cflmin      ,1,mpi_double
-     $                 ,0,pom_comm,ierr)
-      else
-        call mpi_gather(cflmin(my_task+1),1,mpi_double
-     $                 ,%val(0)          ,1,mpi_double
-     $                 ,0,pom_comm,ierr)
-      end if
-
-      if (my_task == 0) then
-        if (minval(cflmin) < dte) then
+        if (cflmin < dte) then
           write(*,'(/a,f5.2,a)')
      $                "[!] Specified timestep (", dte, ") is too large."
           write(*,'(a,f5.2,a/)')
      $         "    You are strongly advised to make dte smaller than "
-     $                                               ,minval(cflmin),"."
+     $                                                       ,cflmin,"."
         end if
       end if
 

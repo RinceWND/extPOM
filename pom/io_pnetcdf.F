@@ -74,6 +74,11 @@
       integer(mpi_offset_kind) length
       integer(mpi_offset_kind) start(4),edge(4)
       double precision, dimension(im,jm,kb) :: dat
+      double precision vtot,atot,mtot,stot,tavg,savg,eavg,ekin
+      integer vtot_varid,mtot_varid,tavg_varid,savg_varid
+     $       ,eavg_varid,ekin_varid
+
+      call domain_stats(vtot,atot,mtot,stot,tavg,savg,eavg,ekin)
 
 ! create netcdf file
       nprint=(iint+int(time0*86400./dti))/iprint
@@ -119,6 +124,24 @@
       str_tmp='days since '//time_start
       call def_var_pnetcdf(ncid,'time',1,vdims,time_varid,
      $                                       'time',str_tmp,' ',.false.)
+      call def_var_pnetcdf(ncid,'vtot',1,vdims,vtot_varid,
+     $                   'domain total volume','metre^3',' ',.false.)
+      length=18
+      status=nfmpi_put_att_text(ncid,vtot_varid,'standard_name',
+     $                                      length,'basin total volume')
+      length=26
+      status=nfmpi_put_att_text(ncid,vtot_varid,'formula_terms',
+     $                              length,'time: time')
+      call def_var_pnetcdf(ncid,'mtot',1,vdims,mtot_varid,
+     $                        'domain total mass','kg^3',' ',.false.)
+      call def_var_pnetcdf(ncid,'tavg',1,vdims,tavg_varid,
+     $    'domain average temperature','degrees Celsius',' ',.false.)
+      call def_var_pnetcdf(ncid,'savg',1,vdims,savg_varid,
+     $                   'domain average salinity','psu',' ',.false.)
+      call def_var_pnetcdf(ncid,'eavg',1,vdims,eavg_varid,
+     $       'domain potential energy (anomaly)','metre',' ',.false.)
+      call def_var_pnetcdf(ncid,'ekin',1,vdims,ekin_varid,
+     $                       'domain kinetic energy','J',' ',.false.)
 
       vdims(1)=z_dimid
       call def_var_pnetcdf(ncid,'z',1,vdims,z_varid,
@@ -212,6 +235,24 @@
       edge(1)=1
       status=nfmpi_put_vara_double_all(ncid,time_varid,start,edge,time)
       call handle_error_pnetcdf('nf_put_vara_double:time',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,vtot_varid,start,edge,vtot)
+      call handle_error_pnetcdf('nf_put_vara_double:vtot',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,mtot_varid,start,edge,mtot)
+      call handle_error_pnetcdf('nf_put_vara_double:mtot',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,tavg_varid,start,edge,tavg)
+      call handle_error_pnetcdf('nf_put_vara_double:tavg',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,savg_varid,start,edge,savg)
+      call handle_error_pnetcdf('nf_put_vara_double:savg',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,eavg_varid,start,edge,eavg)
+      call handle_error_pnetcdf('nf_put_vara_double:eavg',
+     $                                                  status,nf_noerr)
+      status=nfmpi_put_vara_double_all(ncid,ekin_varid,start,edge,ekin)
+      call handle_error_pnetcdf('nf_put_vara_double:ekin',
      $                                                  status,nf_noerr)
 
       start(1)=1

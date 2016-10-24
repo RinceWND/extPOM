@@ -541,7 +541,7 @@
 ! print output
       implicit none
       include 'pom.h'
-      double precision atot,darea,dvol,eaver,saver,taver,vtot,tsalt,ekin
+      double precision mtot,atot,eaver,saver,taver,vtot,tsalt,ekin
       integer i,j,k
 
       if(mod(iint,iprint).eq.0) then
@@ -592,7 +592,7 @@
 !        saver=saver/vtot
 !        eaver=eaver/atot
 !        tsalt=(saver+sbias)*vtot
-        call domain_stats(vtot,atot,tsalt,taver,saver,eaver,ekin)
+        call domain_stats(vtot,atot,mtot,tsalt,taver,saver,eaver,ekin)
 
 ! print averages
 ! global averages requiere to transfer high amounts of data between
@@ -641,23 +641,30 @@
       end
 
 !_______________________________________________________________________
-      subroutine domain_stats(vtot,atot,stot,tavg,savg,eavg,ekin)
+      subroutine domain_stats(vtot,atot,mtot,stot,tavg,savg,eavg,ekin)
 ! check if velocity condition is violated
       implicit none
       include 'pom.h'
       
-      double precision, intent(out)::vtot,atot,stot,tavg,savg,eavg,ekin
+      double precision, intent(out) ::
+     $                           vtot,atot,mtot,stot,tavg,savg,eavg,ekin
       double precision, dimension(im,jm)    :: darea
-      double precision, dimension(im,jm,kb) :: dvol
-      integer :: k
+      double precision, dimension(im,jm,kb) :: dvol,dmass
+      double precision tmp
+      integer k ,i,j
 
 ! local averages
       vtot = 0.
       atot = 0.
+      mtot = 0.
+      stot = 0.
       tavg = 0.
       savg = 0.
       eavg = 0.
       ekin = 0.
+
+      darea = 0.
+      dvol  = 0.
 
       darea = dx(1:im,1:jm)*dy(1:im,1:jm)*fsm(1:im,1:jm)
       atot = sum(darea(2:imm1,2:jmm1))
@@ -692,6 +699,10 @@
       if (n_south==-1) vtot = vtot+sum(dvol(2:imm1, 1,1:kbm1))
       if (n_north==-1) vtot = vtot+sum(dvol(2:imm1,jm,1:kbm1))
       call sum0d_mpi(vtot,0)
+      dmass(:,:,1:kbm1) = dvol(:,:,1:kbm1)
+     $                             *(rho(1:im,1:jm,1:kbm1)*rhoref+1000.)
+      mtot = sum(dmass(2:imm1,2:jmm1,1:kbm1))
+      call sum0d_mpi(mtot,0)
       
       tavg = sum(tb(2:imm1,2:jmm1,1:kbm1)*dvol(2:imm1,2:jmm1,1:kbm1))
       stot = sum(sb(2:imm1,2:jmm1,1:kbm1)*dvol(2:imm1,2:jmm1,1:kbm1))
@@ -726,11 +737,20 @@
 !      stot=(savg+sbias)*vtot
 
       do k=1,kbm1
-        darea = sqrt(u(2:im,2:jm,k)**2+v(2:im,2:jm,k)**2)  ! add vertical velocity maybe?
-        ekin = ekin + sum(darea(2:imm1,2:jmm1))
+        darea = dmass(:,:,k)*(u(1:im,1:jm,k)**2+v(1:im,1:jm,k)**2)  ! add vertical velocity maybe?
+        ekin = ekin + .5*sum(darea(2:imm1,2:jmm1))
         if (n_east==-1)  ekin = ekin+sum(darea(im,2:jmm1))
         if (n_north==-1) ekin = ekin+sum(darea(2:imm1,jm))
       end do
       call sum0d_mpi(ekin,0)
+
+      call bcast0d_mpi(atot,0)
+      call bcast0d_mpi(vtot,0)
+      call bcast0d_mpi(mtot,0)
+      call bcast0d_mpi(stot,0)
+      call bcast0d_mpi(tavg,0)
+      call bcast0d_mpi(savg,0)
+      call bcast0d_mpi(eavg,0)
+      call bcast0d_mpi(ekin,0)
 
       end subroutine
