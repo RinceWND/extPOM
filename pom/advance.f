@@ -449,7 +449,7 @@
           s  = vf
 
           ! restore temperature and salinity
-          !call restore_interior ! TODO: Do not restore t and s yet
+          call restore_interior
           
           call dens(s,t,rho)
 

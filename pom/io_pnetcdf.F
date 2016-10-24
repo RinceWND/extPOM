@@ -3260,25 +3260,22 @@
       end
 
 !_______________________________________________________________________
-      subroutine read_restore_t_interior_pnetcdf(n,k,zlev,temp)
+      subroutine read_restore_ts_interior_pnetcdf(n,k,temp,salt)
 ! read restore temperature interior
       implicit none
 # include "mpif.h"
 # include "pnetcdf.inc"
       include 'pom.h'
       integer n,k
-      double precision zlev(k),temp(im,jm,k)
+      double precision, dimension(im,jm,k), intent(out) :: temp, salt
       character*120 netcdf_file2
       integer ncid,status
-      integer z_varid,t_varid
-!      integer vdims(3)
-!      integer(mpi_offset_kind) length
-      integer(mpi_offset_kind) start(3),edge(3)
+      integer t_varid,s_varid
+      integer(mpi_offset_kind) start(4),edge(4)
 
 ! open netcdf ic file
-      write(netcdf_file2,
-     $            '(a,''in/'',a,''.restore_t_interior.'',i4.4,''.nc'')')
-     $                                 trim(wrk_pth),trim(netcdf_file),n
+      write(netcdf_file2, '(a,''in/'',a,''.clim.nc'')')
+     $                                   trim(wrk_pth),trim(netcdf_file)
       if(my_task.eq.0) write(*,'(/''reading file '',a)')
      $                                                trim(netcdf_file2)
       status=nfmpi_open(pom_comm,netcdf_file2,nf_nowrite,
@@ -3287,26 +3284,33 @@
      $                                                  status,nf_noerr)
 
 ! get variables
-      status=nfmpi_inq_varid(ncid,'z',z_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: z',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'t',t_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: t',status,nf_noerr)
+!      status=nfmpi_inq_varid(ncid,'z',z_varid)
+!      call handle_error_pnetcdf('nfmpi_inq_varid: z',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'Tclim',t_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: tclm',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'Sclim',s_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: sclm',status,nf_noerr)
 
 ! get data
-      start(1)=1
-      edge(1)=k
-      status=nfmpi_get_vara_double_all(ncid,z_varid,start,edge,zlev)
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
-     $                                                  status,nf_noerr)
+!      start(1)=1
+!      edge(1)=k
+!      status=nfmpi_get_vara_double_all(ncid,z_varid,start,edge,zlev)
+!      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+!     $                                                  status,nf_noerr)
 
       start(1)=i_global(1)
       start(2)=j_global(1)
       start(3)=1
+      start(4)=mod(n+9,12)+1
       edge(1)=im
       edge(2)=jm
       edge(3)=k
+      edge(4)=1
       status=nfmpi_get_vara_double_all(ncid,t_varid,start,edge,temp)
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: tclm',
+     $                                                  status,nf_noerr)
+      status=nfmpi_get_vara_double_all(ncid,s_varid,start,edge,salt)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: sclm',
      $                                                  status,nf_noerr)
 
 ! close file

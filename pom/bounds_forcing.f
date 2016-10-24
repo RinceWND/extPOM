@@ -1010,26 +1010,29 @@
       include 'pom.h'
       integer nz
       parameter(nz=40)
-      double precision z0(nz),f0(im,jm,nz)
+      double precision z0(nz),tr(im,jm,kb),sr(im,jm,kb)
       integer i,j,k,ntime,irst
       double precision trst,fold,fnew
 
-      trst=30 ! time between restore files (days)
+      trst=30. ! time between restore files (days)
       irst=int(trst*86400.d0/dti)
       ntime=int(time/trst)
 
 ! read restore data
       ! read initial restore file
       if (iint.eq.2) then
-        call read_restore_t_interior_pnetcdf(iint/irst,nz,z0,f0)
-        call ztosig(z0,f0,zz,h,trstrf,im,jm,nz,kb,
-     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
-        call read_restore_s_interior_pnetcdf(iint/irst,nz,z0,f0)
-        call ztosig(z0,f0,zz,h,srstrf,im,jm,nz,kb,
-     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
-        call read_restore_tau_interior_pnetcdf(iint/irst,nz,z0,f0)
-        call ztosig(z0,f0,zz,h,taurstrf,im,jm,nz,kb,
-     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
+        call read_restore_ts_interior_pnetcdf((iint/irst)+1,kb,tr,sr)
+        trstrf(1:im,1:jm,:) = tr
+        srstrf(1:im,1:jm,:) = sr
+        taurstrf = 1./trst
+!        call ztosig(z0,f0,zz,h,trstrf,im,jm,nz,kb,
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
+!        call read_restore_s_interior_pnetcdf(iint/irst,nz,z0,f0)
+!        call ztosig(z0,f0,zz,h,srstrf,im,jm,nz,kb,
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
+!        call read_restore_tau_interior_pnetcdf(iint/irst,nz,z0,f0)
+!        call ztosig(z0,f0,zz,h,taurstrf,im,jm,nz,kb,
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
       end if
       ! read restore file corresponding to next time
       if (iint.eq.2 .or. mod(iint,irst).eq.0.) then
@@ -1043,18 +1046,21 @@
           end do
         end do
         if (iint.ne.iend) then
-          call read_restore_t_interior_pnetcdf((iint+irst)/irst,nz,z0,
-     $                                                               f0)
-          call ztosig(z0,f0,zz,h,trstrf,im,jm,nz,kb,
-     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
-          call read_restore_s_interior_pnetcdf((iint+irst)/irst,nz,z0,
-     $                                                               f0)
-          call ztosig(z0,f0,zz,h,srstrf,im,jm,nz,kb,
-     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
-          call read_restore_tau_interior_pnetcdf((iint+irst)/irst,nz,
-     $                                                            z0,f0)
-          call ztosig(z0,f0,zz,h,taurstrf,im,jm,nz,kb,
-     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
+          call read_restore_ts_interior_pnetcdf((iint+irst)/irst+1,kb,
+     $                                                            tr,sr)
+          trstrf(1:im,1:jm,:) = tr
+          srstrf(1:im,1:jm,:) = sr
+          taurstrf = 1./trst
+!          call ztosig(z0,f0,zz,h,trstrf,im,jm,nz,kb,
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
+!          call read_restore_s_interior_pnetcdf((iint+irst)/irst,nz,z0,
+!     $                                                               f0)
+!          call ztosig(z0,f0,zz,h,srstrf,im,jm,nz,kb,
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
+!          call read_restore_tau_interior_pnetcdf((iint+irst)/irst,nz,
+!     $                                                            z0,f0)
+!          call ztosig(z0,f0,zz,h,taurstrf,im,jm,nz,kb,
+!     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
         end if
       end if
 
@@ -1089,14 +1095,10 @@
 
 ! mask
       do k=1,kbm1
-        do j=1,jm
-          do i=1,im
-            t(i,j,k)=t(i,j,k)*fsm(i,j)
-            tb(i,j,k)=tb(i,j,k)*fsm(i,j)
-            s(i,j,k)=s(i,j,k)*fsm(i,j)
-            sb(i,j,k)=sb(i,j,k)*fsm(i,j)
-          end do
-        end do
+        t(:,:,k)  = t(:,:,k)*fsm
+        tb(:,:,k) = tb(:,:,k)*fsm
+        s(:,:,k)  = s(:,:,k)*fsm
+        sb(:,:,k) = sb(:,:,k)*fsm
       end do
 
       return
