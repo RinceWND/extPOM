@@ -944,6 +944,55 @@
       end
 
 !_______________________________________________________________________
+      subroutine heat_NNRP2
+! read and interpolate heat flux in time
+      implicit none
+      include 'pom.h'
+      integer i,j,ntime,iheat
+      double precision theat,fold,fnew
+      double precision, dimension(im,jm) :: shf, swr
+
+      theat=.25 ! time between heat forcing (days)
+      iheat=int(theat*86400./dti)
+      
+! read heat stress data
+      ! read initial heat file
+      if (iint.eq.1) then
+        call read_heat_NNRP2_pnetcdf((iint+cont_bry)/iheat+1,shf,swr)
+        wtsurff(1:im,1:jm) = shf
+        swradf(1:im,1:jm) = swr
+      end if
+      ! read heat forcing corresponding to next theat
+      if (iint.eq.1 .or. mod(iint+cont_bry,iheat).eq.0.) then
+        do i=1,im
+          do j=1,jm
+            wtsurfb(i,j)=wtsurff(i,j)
+            swradb(i,j)=swradf(i,j)
+          end do
+        end do
+        if (iint/=iend) then
+          call read_heat_NNRP2_pnetcdf((iint+cont_bry+iheat)/iheat+1
+     $                                                         ,shf,swr)
+          wtsurff(1:im,1:jm) = shf
+          swradf(1:im,1:jm) = swr
+        end if
+      end if
+
+! linear interpolation in time
+      ntime=int(time/theat)
+      fnew=time/theat-ntime
+      fold=1.-fnew
+      do i=1,im
+        do j=1,jm
+          wtsurf(i,j)=fold*wtsurfb(i,j)+fnew*wtsurff(i,j)
+          swrad(i,j)=fold*swradb(i,j)+fnew*swradf(i,j)
+        end do
+      end do
+
+      return
+      end
+
+!_______________________________________________________________________
       subroutine surface
 ! read and interpolate heat flux in time
       implicit none

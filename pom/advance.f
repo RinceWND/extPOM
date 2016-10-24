@@ -12,10 +12,10 @@
       call get_time
       
 ! set time dependent surface boundary conditions
-      call surface_forcing
+!      call surface_forcing
       
 ! set time dependent lateral boundary conditions
-      call lateral_bc
+!      call lateral_bc
       
 ! set lateral viscosity
       call lateral_viscosity
@@ -449,7 +449,7 @@
           s  = vf
 
           ! restore temperature and salinity
-          call restore_interior
+!          call restore_interior
           
           call dens(s,t,rho)
 
