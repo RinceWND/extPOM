@@ -251,61 +251,64 @@
 !      integer i,j,k
 
 ! boundary arrays
-      vabn = 0.d0
-      vabs = 0.d0
-      uabe = 0.d0
-      uabw = 0.d0
-      
-      eln  = 0.d0
-      els  = 0.d0
-      ele  = 0.d0
-      elw  = 0.d0
-      
-      vbn  = 0.d0
-      vbs  = 0.d0
-      tbn  = 0.d0
-      tbs  = 0.d0
-      sbn  = 0.d0
-      sbs  = 0.d0
+      vabn = 0.
+      vabs = 0.
+      uabe = 0.
+      uabw = 0.
 
-      ube  = 0.d0
-      ubw  = 0.d0
-      tbe  = 0.d0
-      tbw  = 0.d0
-      sbe  = 0.d0
-      sbw  = 0.d0
+      eln  = 0.
+      els  = 0.
+      ele  = 0.
+      elw  = 0.
 
-      fluxua = 0.d0
-      fluxva = 0.d0
+      vbn  = 0.
+      vbs  = 0.
+      tbn  = 0.
+      tbs  = 0.
+      sbn  = 0.
+      sbs  = 0.
+
+      ube  = 0.
+      ubw  = 0.
+      tbe  = 0.
+      tbw  = 0.
+      sbe  = 0.
+      sbw  = 0.
+
+      fluxua = 0.
+      fluxva = 0.
 ! 2-D arrays
-      uab     = 0.d0
-      vab     = 0.d0
-      elb     = 0.d0
-      etb     = 0.d0
-      e_atmos = 0.d0
-      vfluxb  = 0.d0
-      vfluxf  = 0.d0
-      wusurf  = 0.d0
-      wusurff = 0.d0
-      wusurfb = 0.d0
-      wvsurf  = 0.d0
-      wvsurff = 0.d0
-      wvsurfb = 0.d0
-      wtsurf  = 0.d0
-      wtsurff = 0.d0
-      wtsurfb = 0.d0
-      wssurf  = 0.d0
-      wssurff = 0.d0
-      wssurfb = 0.d0
-      swrad   = 0.d0
-      drx2d   = 0.d0
-      dry2d   = 0.d0
+      uab     = 0.
+      vab     = 0.
+      elb     = 0.
+      etb     = 0.
+      e_atmos = 0.
+      vfluxb  = 0.
+      vfluxf  = 0.
+      wusurf  = 0.
+      wusurff = 0.
+      wusurfb = 0.
+      wvsurf  = 0.
+      wvsurff = 0.
+      wvsurfb = 0.
+      wtsurf  = 0.
+      wtsurff = 0.
+      wtsurfb = 0.
+      wssurf  = 0.
+      wssurff = 0.
+      wssurfb = 0.
+      swrad   = 0.
+      drx2d   = 0.
+      dry2d   = 0.
 ! 3-D arrays
-      ub = 0.d0
-      vb = 0.d0
-      
-      drhox = 0.d0
-      drhoy = 0.d0
+      ub = 0.
+      vb = 0.
+
+      drhox = 0.
+      drhoy = 0.
+
+      t = 0.
+      s = 0.
 
       return
       end
