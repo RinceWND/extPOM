@@ -542,7 +542,7 @@
       implicit none
       include 'pom.h'
       double precision mtot,atot,eaver,saver,taver,vtot,tsalt,ekin
-      integer i,j,k
+!      integer i,j,k
 
       if(mod(iint,iprint).eq.0) then
 
@@ -650,8 +650,8 @@
      $                           vtot,atot,mtot,stot,tavg,savg,eavg,ekin
       double precision, dimension(im,jm)    :: darea
       double precision, dimension(im,jm,kb) :: dvol,dmass
-      double precision tmp
-      integer k ,i,j
+!      double precision tmp
+      integer k !,i,j
 
 ! local averages
       vtot = 0.
