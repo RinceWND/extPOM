@@ -19,30 +19,14 @@
 ! will allocate more memory than is necessary. Value that are too low
 ! will cause the code to exit
 
-!      parameter(
-!     $  im_global=282  ,
-!     $  jm_global=306   ,
-!     $  kb=40          ,
-!     $  im_local=142    ,
-!     $  jm_local=306    ,
-!     $  n_proc=2       )
-!     $  im_local=282 ,
-!     $  jm_local=306 ,
-!     $  n_proc=1 )
-        
       parameter(
-     $  im_global=180  ,
-     $  jm_global=313  ,
-     $  kb=33          ,
-!     $  im_local=47    ,
-!     $  im_local=91    ,
-     $  im_local=180   ,
-!     $  jm_local=313   ,
-     $  jm_local=158   ,
-!     $  n_proc=4       )
+     $  im_global=282  ,
+     $  jm_global=306  ,
+     $  kb=40          ,
+     $  im_local=142   ,
+     $  jm_local=306   ,
      $  n_proc=2       )
-!     $  n_proc=1       )
-
+        
 !_______________________________________________________________________
 ! Efective grid size
       integer
@@ -499,27 +483,51 @@
      $  uabe           ,! vertical mean of u at the eastern open boundary
      $  uabeb          ,! vertical mean of u at the eastern open boundary at time n-1
      $  uabef          ,! vertical mean of u at the eastern open boundary at time n+1
+     $  vabe           ,! vertical mean of v at the eastern open boundary
+     $  vabeb          ,! vertical mean of v at the eastern open boundary at time n-1
+     $  vabef          ,! vertical mean of v at the eastern open boundary at time n+1
      $  uabw           ,! vertical mean of u at the western open boundary
      $  uabwb          ,! vertical mean of u at the western open boundary at time n-1
      $  uabwf          ,! vertical mean of u at the western open boundary at time n+1
+     $  vabw           ,! vertical mean of v at the western open boundary
+     $  vabwb          ,! vertical mean of v at the western open boundary at time n-1
+     $  vabwf          ,! vertical mean of v at the western open boundary at time n+1
      $  ube            ,! u at the eastern open boundary
      $  ubeb           ,! u at the eastern open boundary at time n-1
      $  ubef           ,! u at the eastern open boundary at time n+1
+     $  vbe            ,! v at the eastern open boundary
+     $  vbeb           ,! v at the eastern open boundary at time n-1
+     $  vbef           ,! v at the eastern open boundary at time n+1
      $  ubw            ,! u at the western open boundary
      $  ubwb           ,! u at the western open boundary at time n-1
      $  ubwf           ,! u at the western open boundary at time n+1
+     $  vbw            ,! v at the western open boundary
+     $  vbwb           ,! v at the western open boundary at time n-1
+     $  vbwf           ,! v at the western open boundary at time n+1
      $  vabn           ,! vertical mean of v at the northern open boundary
      $  vabnb          ,! vertical mean of v at the northern open boundary at time n-1
      $  vabnf          ,! vertical mean of v at the northern open boundary at time n+1
+     $  uabn           ,! vertical mean of u at the northern open boundary
+     $  uabnb          ,! vertical mean of u at the northern open boundary at time n-1
+     $  uabnf          ,! vertical mean of u at the northern open boundary at time n+1
      $  vabs           ,! vertical mean of v at the southern open boundary
      $  vabsb          ,! vertical mean of v at the southern open boundary at time n-1
      $  vabsf          ,! vertical mean of v at the southern open boundary at time n+1
+     $  uabs           ,! vertical mean of u at the southern open boundary
+     $  uabsb          ,! vertical mean of u at the southern open boundary at time n-1
+     $  uabsf          ,! vertical mean of u at the southern open boundary at time n+1
      $  vbn            ,! v at the northern open boundary
      $  vbnb           ,! v at the northern open boundary at time n-1
      $  vbnf           ,! v at the northern open boundary at time n+1
+     $  ubn            ,! u at the northern open boundary
+     $  ubnb           ,! u at the northern open boundary at time n-1
+     $  ubnf           ,! u at the northern open boundary at time n+1
      $  vbs            ,! v at the southern open boundary
      $  vbsb           ,! v at the southern open boundary at time n-1
-     $  vbsf            ! v at the southern open boundary at time n+1
+     $  vbsf           ,! v at the southern open boundary at time n+1
+     $  ubs            ,! u at the southern open boundary
+     $  ubsb           ,! u at the southern open boundary at time n-1
+     $  ubsf            ! u at the southern open boundary at time n+1
 
       common/bdry/
      $  ele(jm_local)        ,
@@ -553,27 +561,51 @@
      $  uabe(jm_local)       ,
      $  uabeb(jm_local)      ,
      $  uabef(jm_local)      ,
+     $  vabe(jm_local)       ,
+     $  vabeb(jm_local)      ,
+     $  vabef(jm_local)      ,
      $  uabw(jm_local)       ,
      $  uabwb(jm_local)      ,
      $  uabwf(jm_local)      ,
+     $  vabw(jm_local)       ,
+     $  vabwb(jm_local)      ,
+     $  vabwf(jm_local)      ,
      $  ube(jm_local,kb)     ,
      $  ubeb(jm_local,kb)    ,
      $  ubef(jm_local,kb)    ,
+     $  vbe(jm_local,kb)     ,
+     $  vbeb(jm_local,kb)    ,
+     $  vbef(jm_local,kb)    ,
      $  ubw(jm_local,kb)     ,
      $  ubwb(jm_local,kb)    ,
      $  ubwf(jm_local,kb)    ,
+     $  vbw(jm_local,kb)     ,
+     $  vbwb(jm_local,kb)    ,
+     $  vbwf(jm_local,kb)    ,
      $  vabn(im_local)       ,
      $  vabnb(im_local)      ,
      $  vabnf(im_local)      ,
+     $  uabn(im_local)       ,
+     $  uabnb(im_local)      ,
+     $  uabnf(im_local)      ,
      $  vabs(im_local)       ,
      $  vabsb(im_local)      ,
      $  vabsf(im_local)      ,
+     $  uabs(im_local)       ,
+     $  uabsb(im_local)      ,
+     $  uabsf(im_local)      ,
      $  vbn(im_local,kb)     ,
      $  vbnb(im_local,kb)    ,
      $  vbnf(im_local,kb)    ,
+     $  ubn(im_local,kb)     ,
+     $  ubnb(im_local,kb)    ,
+     $  ubnf(im_local,kb)    ,
      $  vbs(im_local,kb)     ,
      $  vbsb(im_local,kb)    ,
-     $  vbsf(im_local,kb)
+     $  vbsf(im_local,kb)    ,
+     $  ubs(im_local,kb)     ,
+     $  ubsb(im_local,kb)    ,
+     $  ubsf(im_local,kb)
 
 !_______________________________________________________________________
 ! Character variables

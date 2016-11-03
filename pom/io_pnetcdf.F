@@ -3390,8 +3390,8 @@
       end
 
 !_______________________________________________________________________
-      subroutine read_boundary_conditions_pnetcdf(n,k,t_w,s_w,u_w,
-     $              t_e,s_e,u_e,t_n,s_n,v_n,t_s,s_s,v_s,e_w,e_e,e_n,e_s)
+      subroutine read_boundary_conditions_pnetcdf(n,k,t_w,s_w,u_w,v_w,
+     $  t_e,s_e,u_e,v_e,t_n,s_n,v_n,u_n,t_s,s_s,v_s,u_s,e_w,e_e,e_n,e_s)
 ! read boundary conditions
       implicit none
 # include "mpif.h"
@@ -3402,8 +3402,10 @@
 !      double precision zlev(k)
       double precision, dimension(jm_local) :: e_w,e_e
       double precision, dimension(im_local) :: e_n,e_s
-      double precision, dimension(jm_local,k) :: t_w,s_w,u_w,t_e,s_e,u_e
-      double precision, dimension(im_local,k) :: t_n,s_n,v_n,t_s,s_s,v_s
+      double precision, dimension(jm_local,k) ::
+     $                                   t_w,s_w,u_w,v_w,t_e,s_e,u_e,v_e
+      double precision, dimension(im_local,k) ::
+     $                                   t_n,s_n,v_n,u_n,t_s,s_s,v_s,u_s
       double precision, dimension(jm,k) :: dat_lat
       double precision, dimension(im,k) :: dat_lon
       integer ncid,status
@@ -3412,17 +3414,39 @@
 !      integer te_varid,se_varid,ue_varid
 !      integer tn_varid,sn_varid,vn_varid
 !      integer ts_varid,ss_varid,vs_varid
-      integer uw_varid,ue_varid,vn_varid,vs_varid
+      integer uw_varid,ue_varid,un_varid,us_varid
+      integer vw_varid,ve_varid,vn_varid,vs_varid
       integer ew_varid,ee_varid,en_varid,es_varid
+      integer tw_varid,te_varid,tn_varid,ts_varid
+      integer sw_varid,se_varid,sn_varid,ss_varid
 !      integer vdims(2)
 !      integer(mpi_offset_kind) length
       integer(mpi_offset_kind) start(3),edge(3)
 
+! reinitialize boundary arrays
+      t_w = 0.
+      s_w = 0.
+      u_w = 0.
+      v_w = 0.
+      t_e = 0.
+      s_e = 0.
+      u_e = 0.
+      v_e = 0.
+      t_n = 0.
+      s_n = 0.
+      u_n = 0.
+      v_n = 0.
+      t_s = 0.
+      s_s = 0.
+      u_s = 0.
+      v_s = 0.
+
 ! open netcdf ic file
       write(netcdf_file2,'(a,''in/'',a,''.lbry.nc'')')
      $                                   trim(wrk_pth),trim(netcdf_file)
-      if(my_task.eq.0) write(*,'(/''reading file '',a)')
-     $                                                trim(netcdf_file2)
+      if(my_task.eq.0)
+     $               write(*,'(/''reading boundaries '',a," [",i3,"]")')
+     $                                              trim(netcdf_file2),n
       status=nfmpi_open(pom_comm,netcdf_file2,nf_nowrite,
      $                                               mpi_info_null,ncid)
       call handle_error_pnetcdf('nfmpi_open: '//netcdf_file2,
@@ -3435,35 +3459,43 @@
 !      call handle_error_pnetcdf('nfmpi_inq_varid: tw',status,nf_noerr)
 !      status=nfmpi_inq_varid(ncid,'sw',sw_varid)
 !      call handle_error_pnetcdf('nfmpi_inq_varid: sw',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'west.u',uw_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: uw',status,nf_noerr)
-!      status=nfmpi_inq_varid(ncid,'te',te_varid)
-!      call handle_error_pnetcdf('nfmpi_inq_varid: te',status,nf_noerr)
-!      status=nfmpi_inq_varid(ncid,'se',se_varid)
-!      call handle_error_pnetcdf('nfmpi_inq_varid: se',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'east.u',ue_varid)
+!      status=nfmpi_inq_varid(ncid,'west.u',uw_varid)
+!      call handle_error_pnetcdf('nfmpi_inq_varid: uw',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'zeta.east',ee_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: ee',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'temp.east',te_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: te',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'salt.east',se_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: se',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'u.east',ue_varid)
       call handle_error_pnetcdf('nfmpi_inq_varid: ue',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'v.east',ve_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: ve',status,nf_noerr)
 !      status=nfmpi_inq_varid(ncid,'tn',tn_varid)
 !      call handle_error_pnetcdf('nfmpi_inq_varid: tn',status,nf_noerr)
 !      status=nfmpi_inq_varid(ncid,'sn',sn_varid)
 !      call handle_error_pnetcdf('nfmpi_inq_varid: sn',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'north.v',vn_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: vn',status,nf_noerr)
-!      status=nfmpi_inq_varid(ncid,'ts',ts_varid)
-!      call handle_error_pnetcdf('nfmpi_inq_varid: ts',status,nf_noerr)
-!      status=nfmpi_inq_varid(ncid,'ss',ss_varid)
-!      call handle_error_pnetcdf('nfmpi_inq_varid: ss',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'south.v',vs_varid)
+!      status=nfmpi_inq_varid(ncid,'north.v',vn_varid)
+!      call handle_error_pnetcdf('nfmpi_inq_varid: vn',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'zeta.south',es_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: es',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'temp.south',ts_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: ts',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'salt.south',ss_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: ss',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'u.south',us_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: vs',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'v.south',vs_varid)
       call handle_error_pnetcdf('nfmpi_inq_varid: vs',status,nf_noerr)
 
-      status=nfmpi_inq_varid(ncid,'west.el',ew_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: ew',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'east.el',ee_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: ee',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'north.el',en_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: en',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'south.el',es_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: es',status,nf_noerr)
+!      status=nfmpi_inq_varid(ncid,'west.el',ew_varid)
+!      call handle_error_pnetcdf('nfmpi_inq_varid: ew',status,nf_noerr)
+!      status=nfmpi_inq_varid(ncid,'east.el',ee_varid)
+!      call handle_error_pnetcdf('nfmpi_inq_varid: ee',status,nf_noerr)
+!      status=nfmpi_inq_varid(ncid,'north.el',en_varid)
+!      call handle_error_pnetcdf('nfmpi_inq_varid: en',status,nf_noerr)
+!      status=nfmpi_inq_varid(ncid,'south.el',es_varid)
+!      call handle_error_pnetcdf('nfmpi_inq_varid: es',status,nf_noerr)
 
 ! get data
 !      start(1)=1
@@ -3472,14 +3504,9 @@
 !      call handle_error_pnetcdf('nfmpi_get_vara_double_all',
 !     $                                                  status,nf_noerr)
       start(1)=j_global(1)
-      start(2)=mod(n+9,12)+1
+      start(2)=n
       edge(1)=jm
       edge(2)=1
-      status=nfmpi_get_vara_double_all(ncid,ew_varid,start,edge
-     $                                                    ,dat_lat(:,1))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all: e_w',
-     $                                                  status,nf_noerr)
-      e_w(1:jm) = dat_lat(:,1)
       status=nfmpi_get_vara_double_all(ncid,ee_varid,start,edge
      $                                                    ,dat_lat(:,1))
       call handle_error_pnetcdf('nfmpi_get_vara_double_all: e_e',
@@ -3487,14 +3514,9 @@
       e_e(1:jm) = dat_lat(:,1)
       
       start(1)=i_global(1)
-      start(2)=mod(n+9,12)+1
+      start(2)=n
       edge(1)=im
       edge(2)=1
-      status=nfmpi_get_vara_double_all(ncid,en_varid,start,edge
-     $                                                    ,dat_lon(:,1))
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all: e_n',
-     $                                                  status,nf_noerr)
-      e_n(1:im) = dat_lon(:,1)
       status=nfmpi_get_vara_double_all(ncid,es_varid,start,edge
      $                                                    ,dat_lon(:,1))
       call handle_error_pnetcdf('nfmpi_get_vara_double_all: e_s',
@@ -3503,29 +3525,49 @@
 
       start(1)=j_global(1)
       start(2)=1
-      start(3)=mod(n+9,12)+1
+      start(3)=n
       edge(1)=jm
       edge(2)=k
       edge(3)=1
-      status=nfmpi_get_vara_double_all(ncid,uw_varid,start,edge,dat_lat)
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all: u_w',
-     $                                                  status,nf_noerr)
-      u_w(1:jm,:) = dat_lat
       status=nfmpi_get_vara_double_all(ncid,ue_varid,start,edge,dat_lat)
       call handle_error_pnetcdf('nfmpi_get_vara_double_all: u_e',
      $                                                  status,nf_noerr)
       u_e(1:jm,:) = dat_lat
-
-      start(1)=i_global(1)
-      edge(1)=im
-      status=nfmpi_get_vara_double_all(ncid,vn_varid,start,edge,dat_lon)
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all: v_n',
+      status=nfmpi_get_vara_double_all(ncid,ve_varid,start,edge,dat_lat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: v_e',
      $                                                  status,nf_noerr)
-      v_n(1:im,:) = dat_lon
+      v_e(1:jm,:) = dat_lat
+      status=nfmpi_get_vara_double_all(ncid,te_varid,start,edge,dat_lat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: t_e',
+     $                                                  status,nf_noerr)
+      t_e(1:jm,:) = dat_lat
+      status=nfmpi_get_vara_double_all(ncid,se_varid,start,edge,dat_lat)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: s_e',
+     $                                                  status,nf_noerr)
+      s_e(1:jm,:) = dat_lat
+!
+      start(1)=i_global(1)
+      start(2)=1
+      start(3)=n
+      edge(1)=im
+      edge(2)=k
+      edge(3)=1
+      status=nfmpi_get_vara_double_all(ncid,us_varid,start,edge,dat_lon)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: u_s',
+     $                                                  status,nf_noerr)
+      u_s(1:im,:) = dat_lon
       status=nfmpi_get_vara_double_all(ncid,vs_varid,start,edge,dat_lon)
       call handle_error_pnetcdf('nfmpi_get_vara_double_all: v_s',
      $                                                  status,nf_noerr)
       v_s(1:im,:) = dat_lon
+      status=nfmpi_get_vara_double_all(ncid,ts_varid,start,edge,dat_lon)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: t_s',
+     $                                                  status,nf_noerr)
+      t_s(1:im,:) = dat_lon
+      status=nfmpi_get_vara_double_all(ncid,ss_varid,start,edge,dat_lon)
+      call handle_error_pnetcdf('nfmpi_get_vara_double_all: s_s',
+     $                                                  status,nf_noerr)
+      s_s(1:im,:) = dat_lon
 
 !      start(1)=j_global(1)
 !      start(2)=1
@@ -3562,13 +3604,13 @@
 !     $                                                  status,nf_noerr)
 
       t_w(1:jm,:) = tclim( 1,1:jm,:)
-      t_e(1:jm,:) = tclim(im,1:jm,:)
-      t_s(1:im,:) = tclim(1:im, 1,:)
+!      t_e(1:jm,:) = tclim(im,1:jm,:)
+!      t_s(1:im,:) = tclim(1:im, 1,:)
       t_n(1:im,:) = tclim(1:im,jm,:)
       
       s_w(1:jm,:) = sclim( 1,1:jm,:)
-      s_e(1:jm,:) = sclim(im,1:jm,:)
-      s_s(1:im,:) = sclim(1:im, 1,:)
+!      s_e(1:jm,:) = sclim(im,1:jm,:)
+!      s_s(1:im,:) = sclim(1:im, 1,:)
       s_n(1:im,:) = sclim(1:im,jm,:)
 
 ! close file
