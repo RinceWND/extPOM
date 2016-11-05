@@ -1109,8 +1109,7 @@
 # include "pnetcdf.inc"
       include 'pom.h'
       integer k
-      double precision zlev(k),temp(im_local,jm_local,k)
-     $                        ,salt(im_local,jm_local,k)
+      double precision zlev(k),temp(im,jm,k),salt(im,jm,k)
       character*120 netcdf_ic_file
       integer ncid,status
       integer z_varid,t_varid,s_varid
@@ -1149,12 +1148,10 @@
       edge(1)=im
       edge(2)=jm
       edge(3)=k
-      status=nfmpi_get_vara_double_all(ncid,t_varid,start,edge
-     $                                               ,temp(1:im,1:jm,:))
+      status=nfmpi_get_vara_double_all(ncid,t_varid,start,edge,temp)
       call handle_error_pnetcdf('nfmpi_get_vara_double_all',
      $                                                  status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,s_varid,start,edge
-     $                                               ,salt(1:im,1:jm,:))
+      status=nfmpi_get_vara_double_all(ncid,s_varid,start,edge,salt)
       call handle_error_pnetcdf('nfmpi_get_vara_double_all',
      $                                                  status,nf_noerr)
 

@@ -404,23 +404,23 @@
       double precision z2(nz)
 
 ! read initial temperature and salinity from ic file
-      call read_initial_ts_pnetcdf(kb,tb,sb)
-      call read_clim_ts_pnetcdf(kb,10,tclim,sclim)
+      call read_initial_ts_pnetcdf(nz,z2,tb2,sb2)
+      call read_clim_ts_pnetcdf(nz,z2,tb0,sb0)
 
 ! map onto sigma coordinate
-!      call ztosig(z2,tb0,zz,h,tclim,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!      call ztosig(z2,sb0,zz,h,sclim,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+      call ztosig(z2,tb0,zz,h,tclim,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+      call ztosig(z2,sb0,zz,h,sclim,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
 
 ! mean density
       call dens(sclim,tclim,rmean)
 
 ! map onto sigma coordinate
-!      call ztosig(z2,tb2,zz,h,tb,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
-!      call ztosig(z2,sb2,zz,h,sb,im,jm,nz,kb,
-!     $                                    n_west,n_east,n_south,n_north)
+      call ztosig(z2,tb2,zz,h,tb,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
+      call ztosig(z2,sb2,zz,h,sb,im,jm,nz,kb,
+     $                                    n_west,n_east,n_south,n_north)
 
 ! density
       call dens(sb,tb,rho)
@@ -543,8 +543,7 @@
       do i=1,im
         do j=1,jm
           tmp = minval(h)
-          write(50+my_task,*) minloc(h), tmp
-          !write(50+my_task,*) log(tmp)
+!          write(60+my_task,*) minloc(h), (log(1.+zz(kbm1))*h(i,j)/z0b)
           cbc(i,j)=(kappa/log((1.+zz(kbm1))*h(i,j)/z0b))**2
           cbc(i,j)=max(cbcmin,cbc(i,j))
 ! if the following is invoked, then it is probable that the wrong

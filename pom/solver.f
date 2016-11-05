@@ -64,6 +64,7 @@
       end do
 
       call exchange2d_mpi(fluxua,im,jm)
+      call exchange2d_mpi(fluxva,im,jm)
 
       do j=2,jmm1
         do i=2,imm1
@@ -71,6 +72,8 @@
      $                +fluxva(i,j+1)-fluxva(i,j)
         end do
       end do
+      
+      call exchange2d_mpi(advua,im,jm)
 
 ! v-advection and diffusion
       do j=1,jm
@@ -113,6 +116,7 @@
         end do
       end do
 
+      call exchange2d_mpi(fluxua,im,jm)
       call exchange2d_mpi(fluxva,im,jm)
 
       do j=2,jmm1
@@ -121,6 +125,8 @@
      $                +fluxva(i,j)-fluxva(i,j-1)
         end do
       end do
+      
+      call exchange2d_mpi(advva,im,jm)
 
       if(mode.eq.2) then
 
@@ -193,7 +199,7 @@
           end do
           end if
         end do
-
+        
       end if
 
       return
@@ -319,6 +325,8 @@
           end if
         end do
       end do
+      
+      call exchange3d_mpi(advx,im,jm,kb)
 
 ! calculate y-component of velocity advection
 
@@ -413,6 +421,8 @@
           end if
         end do
       end do
+      
+      call exchange3d_mpi(advy,im,jm,kb)
 
       return
       end

@@ -24,8 +24,8 @@
      $  jm_global=306   ,
      $  kb=40          ,
      $  im_local=142    ,
-     $  jm_local=155    ,
-     $  n_proc=4       )
+     $  jm_local=306    ,
+     $  n_proc=2       )
 !     $  im_local=142    ,
 !     $  jm_local=306    ,
 !     $  n_proc=2       )

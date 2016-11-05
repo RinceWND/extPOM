@@ -73,7 +73,7 @@
 ! wind forcing is suplied in subroutine wind
       call wind
 ! heat fluxes are suplied in subroutine heat
-      call heat
+!      call heat
 ! water fluxes are suplied in subroutine water
 !      call water
       return
@@ -185,6 +185,9 @@
           vtf(i,j)=va(i,j)*(d(i,j)+d(i,j-1))*isp2i
         end do
       end do
+      
+!      call exchange2d_mpi(utf, im, jm)
+!      call exchange2d_mpi(vtf, im, jm)
 
       return
       end
@@ -338,6 +341,9 @@
           end do
         end do
        end if
+       
+       call exchange2d_mpi(utf, im, jm)
+       call exchange2d_mpi(vtf, im, jm)
 
       return
       end
@@ -547,7 +553,12 @@
             end do
           end do
         end do
-
+        
+        call exchange3d_mpi(uf,im_local,jm_local,kb)
+        call exchange3d_mpi(vf,im_local,jm_local,kb)
+        call exchange3d_mpi(u ,im_local,jm_local,kb)
+        call exchange3d_mpi(v ,im_local,jm_local,kb)
+        
         do k=1,kb
           do j=1,jm
             do i=1,im
@@ -558,6 +569,9 @@
             end do
           end do
         end do
+
+!        call exchange3d_mpi(ub,im_local,jm_local,kb)
+!        call exchange3d_mpi(vb,im_local,jm_local,kb)
 
       end if
 
