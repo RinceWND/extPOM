@@ -13,9 +13,9 @@
 ! u-advection and diffusion
 
 ! advective fluxes
-      advua = 0.d0
-      fluxua = 0.d0
-      fluxva = 0.d0
+      advua  = 0.
+      fluxua = 0.
+      fluxva = 0.
 
       do j=2,jm
         do i=2,imm1
@@ -67,12 +67,12 @@
         end do
       end do
 
-!      call exchange2d_mpi(advua,im_local,jm_local)
+      call exchange2d_mpi(advua,im_local,jm_local)
 
 ! v-advection and diffusion
-      advva  = 0.d0
-      fluxua = 0.d0
-      fluxva = 0.d0
+      advva  = 0.
+      fluxua = 0.
+      fluxva = 0.
 
 ! advective fluxes
       do j=2,jm
@@ -118,7 +118,7 @@
         end do
       end do
 
-!      call exchange2d_mpi(advva,im_local,jm_local)
+      call exchange2d_mpi(advva,im_local,jm_local)
 
       if(mode.eq.2) then
 

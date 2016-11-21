@@ -19,21 +19,21 @@
 
 ! External (2-D) elevation boundary conditions (Clamped)
         if(n_west.eq.-1) then
-          elf(1,:) = elw
-!          elf(1,:) = elf(2,:)
+!          elf(1,:) = elw
+          elf(1,:) = elf(2,:)
         end if
         if(n_east.eq.-1) then
-          elf(im,:) = ele
-!          elf(im,:) = elf(imm1,:)
+!          elf(im,:) = ele
+          elf(im,:) = elf(imm1,:)
         end if
 
         if(n_south.eq.-1) then
-          elf(:,1) = els
-!          elf(:,1) = elf(:,2)
+!          elf(:,1) = els
+          elf(:,1) = elf(:,2)
         end if
         if(n_north.eq.-1) then
-          elf(:,jm) = eln
-!          elf(:,jm) = elf(:,jmm1)
+!          elf(:,jm) = eln
+          elf(:,jm) = elf(:,jmm1)
         end if
 
         elf = elf*fsm

@@ -39,7 +39,7 @@
         call write_output_pnetcdf
 !        call write_aux_pnetcdf
       end if
-
+      
 ! write auxillary debug
 !      if(netcdf_file.ne.'nonetcdf' .and. mod(iint,iprint).eq.1) then
 !        call write_aux_pnetcdf
@@ -408,10 +408,10 @@
         call advq(q2lb,q2l,vf)
         call profq
 
-        call bcond(6)
-
         call exchange3d_mpi(uf(:,:,2:kbm1),im_local,jm_local,kbm2)
         call exchange3d_mpi(vf(:,:,2:kbm1),im_local,jm_local,kbm2)
+
+        call bcond(6)
 
         q2  = q2+.5*smoth*(uf+q2b-2.*q2)
         q2l = q2l+.5*smoth*(vf+q2lb-2.*q2l)
