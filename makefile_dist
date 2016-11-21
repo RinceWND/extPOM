@@ -62,7 +62,8 @@ VPATH = $(SRCDIR)
 ${OBJECTDIR}/$(BIN): $(OBJS)
 	${MKDIR} -p ${OBJECTDIR}
 	@echo
-	$(LD) $(FFLAGS) -o ${OBJECTDIR}/$(BIN) $(OBJS) $(LIBS)
+	$(FC) -c $(FFLAGS) -ffree-form date_utility.f
+	$(LD) $(FFLAGS) -o ${OBJECTDIR}/$(BIN) $(OBJS) $(LIBS) date_utility.mod
 
 #-----------------------------------------------------------------------
 # Cleaning target

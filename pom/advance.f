@@ -10,6 +10,7 @@
       
 ! get time
       call get_time
+      call get_real_time
       
 ! set time dependent surface boundary conditions
       call surface_forcing
@@ -39,7 +40,7 @@
         call write_output_pnetcdf
 !        call write_aux_pnetcdf
       end if
-      
+
 ! write auxillary debug
 !      if(netcdf_file.ne.'nonetcdf' .and. mod(iint,iprint).eq.1) then
 !        call write_aux_pnetcdf
@@ -71,6 +72,18 @@
       else
         ramp=1.d0
       endif
+      return
+      end
+
+!_______________________________________________________________________
+      subroutine get_real_time
+! return the model time
+      use date_utility
+      implicit none
+      include 'pom.h'
+
+      if (my_task==master_task) write(*,*) Date_since(time_start, time)
+
       return
       end
 
