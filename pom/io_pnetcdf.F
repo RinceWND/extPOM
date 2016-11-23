@@ -56,6 +56,7 @@
 !_______________________________________________________________________
       subroutine write_output_pnetcdf
 ! write output data
+      use date_utility
       implicit none
 # include "mpif.h"
 # include "pnetcdf.inc"
@@ -77,13 +78,14 @@
       double precision vtot,atot,mtot,stot,tavg,savg,eavg,ekin
       integer vtot_varid,mtot_varid,tavg_varid,savg_varid
      $       ,eavg_varid,ekin_varid
+      character(len=26) timestamp
 
       call domain_stats(vtot,atot,mtot,stot,tavg,savg,eavg,ekin)
 
 ! create netcdf file
-      nprint=(iint+int(time0*86400./dti))/iprint
-      write(netcdf_out_file,'(a,''out/'',a,''.'',i4.4,''.nc'')')
-     $                            trim(wrk_pth),trim(netcdf_file),nprint
+      timestamp = Date_since(time_start, real(iint*dti,8), "f")
+      write(netcdf_out_file,'(a,''out/'',a,''.'',a,''.nc'')')
+     $                   trim(wrk_pth),trim(netcdf_file),timestamp(1:15)
       if(my_task.eq.0) write(*,'(/''writing file '',a)')
      $                                             trim(netcdf_out_file)
       status=nfmpi_create(pom_comm,netcdf_out_file,
@@ -168,39 +170,42 @@
      $                             length,'sigma: zz eta: elb depth: h')
       call handle_error_pnetcdf('nf_put_att_text: zz',status,nf_noerr)
 
-      vdims(1)=x_dimid
-      vdims(2)=y_dimid
-      call def_var_pnetcdf(ncid,'dx',2,vdims,dx_varid,
-     $            'grid increment in x','metre','east_e north_e',.true.)
-      call def_var_pnetcdf(ncid,'dy',2,vdims,dy_varid,
-     $            'grid increment in y','metre','east_e north_e',.true.)
-      call def_var_pnetcdf(ncid,'east_u',2,vdims,east_u_varid,
-     $            'easting of u-points','metre','east_u north_u',.true.)
-      call def_var_pnetcdf(ncid,'east_v',2,vdims,east_v_varid,
-     $            'easting of v-points','metre','east_v north_v',.true.)
-      call def_var_pnetcdf(ncid,'east_e',2,vdims,east_e_varid,
-     $    'easting of elevation points','metre','east_e north_e',.true.)
-      call def_var_pnetcdf(ncid,'east_c',2,vdims,east_c_varid,
-     $        'easting of cell corners','metre','east_c north_c',.true.)
-      call def_var_pnetcdf(ncid,'north_u',2,vdims,north_u_varid,
-     $           'northing of u-points','metre','east_u north_u',.true.)
-      call def_var_pnetcdf(ncid,'north_v',2,vdims,north_v_varid,
-     $           'northing of v-points','metre','east_v north_v',.true.)
-      call def_var_pnetcdf(ncid,'north_e',2,vdims,north_e_varid,
-     $   'northing of elevation points','metre','east_e north_e',.true.)
-      call def_var_pnetcdf(ncid,'north_c',2,vdims,north_c_varid,
-     $       'northing of cell corners','metre','east_c north_c',.true.)
-      call def_var_pnetcdf(ncid,'rot',2,vdims,rot_varid,
-     $                    'Rotation angle of x-axis wrt. east','degree',
-     $                                          'east_e north_e',.true.)
-      call def_var_pnetcdf(ncid,'h',2,vdims,h_varid,
-     $        'undisturbed water depth','metre','east_e north_e',.true.)
-      call def_var_pnetcdf(ncid,'fsm',2,vdims,fsm_varid,
-     $      'free surface mask','dimensionless','east_e north_e',.true.)
-      call def_var_pnetcdf(ncid,'dum',2,vdims,dum_varid,
-     $        'u-velocity mask','dimensionless','east_u north_u',.true.)
-      call def_var_pnetcdf(ncid,'dvm',2,vdims,dvm_varid,
-     $        'v-velocity mask','dimensionless','east_v north_v',.true.)
+! save disk space
+! to get the grid one can open grid file along this data file
+!
+!      vdims(1)=x_dimid
+!      vdims(2)=y_dimid
+!      call def_var_pnetcdf(ncid,'dx',2,vdims,dx_varid,
+!     $            'grid increment in x','metre','east_e north_e',.true.)
+!      call def_var_pnetcdf(ncid,'dy',2,vdims,dy_varid,
+!     $            'grid increment in y','metre','east_e north_e',.true.)
+!      call def_var_pnetcdf(ncid,'east_u',2,vdims,east_u_varid,
+!     $            'easting of u-points','metre','east_u north_u',.true.)
+!      call def_var_pnetcdf(ncid,'east_v',2,vdims,east_v_varid,
+!     $            'easting of v-points','metre','east_v north_v',.true.)
+!      call def_var_pnetcdf(ncid,'east_e',2,vdims,east_e_varid,
+!     $    'easting of elevation points','metre','east_e north_e',.true.)
+!      call def_var_pnetcdf(ncid,'east_c',2,vdims,east_c_varid,
+!     $        'easting of cell corners','metre','east_c north_c',.true.)
+!      call def_var_pnetcdf(ncid,'north_u',2,vdims,north_u_varid,
+!     $           'northing of u-points','metre','east_u north_u',.true.)
+!      call def_var_pnetcdf(ncid,'north_v',2,vdims,north_v_varid,
+!     $           'northing of v-points','metre','east_v north_v',.true.)
+!      call def_var_pnetcdf(ncid,'north_e',2,vdims,north_e_varid,
+!     $   'northing of elevation points','metre','east_e north_e',.true.)
+!      call def_var_pnetcdf(ncid,'north_c',2,vdims,north_c_varid,
+!     $       'northing of cell corners','metre','east_c north_c',.true.)
+!      call def_var_pnetcdf(ncid,'rot',2,vdims,rot_varid,
+!     $                    'Rotation angle of x-axis wrt. east','degree',
+!     $                                          'east_e north_e',.true.)
+!      call def_var_pnetcdf(ncid,'h',2,vdims,h_varid,
+!     $        'undisturbed water depth','metre','east_e north_e',.true.)
+!      call def_var_pnetcdf(ncid,'fsm',2,vdims,fsm_varid,
+!     $      'free surface mask','dimensionless','east_e north_e',.true.)
+!      call def_var_pnetcdf(ncid,'dum',2,vdims,dum_varid,
+!     $        'u-velocity mask','dimensionless','east_u north_u',.true.)
+!      call def_var_pnetcdf(ncid,'dvm',2,vdims,dvm_varid,
+!     $        'v-velocity mask','dimensionless','east_v north_v',.true.)
 
       vdims(1)=x_dimid
       vdims(2)=y_dimid
@@ -269,82 +274,82 @@
       status=nfmpi_put_vara_double_all(ncid,zz_varid,start,edge,zz)
       call handle_error_pnetcdf('nf_put_var_double: zz',status,nf_noerr)
 
-      start(1)=i_global(1)
-      start(2)=j_global(1)
-      edge(1)=im
-      edge(2)=jm
-      dat(:,:,1) = dx(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,dx_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: dx',status,nf_noerr)
-      dat(:,:,1) = dy(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,dy_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: dy',status,nf_noerr)
-      dat(:,:,1) = east_u(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,east_u_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: east_u',status,
-     $                                                         nf_noerr)
-      dat(:,:,1) = east_v(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,east_v_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: east_v',status,
-     $                                                         nf_noerr)
-      dat(:,:,1) = east_e(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,east_e_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: east_e',status,
-     $                                                         nf_noerr)
-      dat(:,:,1) = east_c(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,east_c_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: east_c',status,
-     $                                                         nf_noerr)
-      dat(:,:,1) = north_u(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,north_u_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: north_u',status,
-     $                                                         nf_noerr)
-      dat(:,:,1) = north_v(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,north_v_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: north_v',status,
-     $                                                         nf_noerr)
-      dat(:,:,1) = north_e(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,north_e_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: north_e',status,
-     $                                                         nf_noerr)
-      dat(:,:, 1) = north_c(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,north_c_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: north_c',status,
-     $                                                         nf_noerr)
-      dat(:,:,1) = rot(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,rot_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: rot',
-     $                                                  status,nf_noerr)
-      dat(:,:,1) = h(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,h_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: h',status,nf_noerr)
-      dat(:,:,1) = fsm(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,fsm_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: fsm',
-     $                                                  status,nf_noerr)
-      dat(:,:,1) = dum(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,dum_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: dum',
-     $                                                  status,nf_noerr)
-      dat(:,:,1) = dvm(1:im,1:jm)
-      status=nfmpi_put_vara_double_all(ncid,dvm_varid,start,edge
-     $                                                      ,dat(:,:,1))
-      call handle_error_pnetcdf('nf_put_var_double: dvm',
-     $                                                  status,nf_noerr)
+!      start(1)=i_global(1)
+!      start(2)=j_global(1)
+!      edge(1)=im
+!      edge(2)=jm
+!      dat(:,:,1) = dx(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,dx_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: dx',status,nf_noerr)
+!      dat(:,:,1) = dy(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,dy_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: dy',status,nf_noerr)
+!      dat(:,:,1) = east_u(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,east_u_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: east_u',status,
+!     $                                                         nf_noerr)
+!      dat(:,:,1) = east_v(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,east_v_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: east_v',status,
+!     $                                                         nf_noerr)
+!      dat(:,:,1) = east_e(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,east_e_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: east_e',status,
+!     $                                                         nf_noerr)
+!      dat(:,:,1) = east_c(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,east_c_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: east_c',status,
+!     $                                                         nf_noerr)
+!      dat(:,:,1) = north_u(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,north_u_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: north_u',status,
+!     $                                                         nf_noerr)
+!      dat(:,:,1) = north_v(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,north_v_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: north_v',status,
+!     $                                                         nf_noerr)
+!      dat(:,:,1) = north_e(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,north_e_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: north_e',status,
+!     $                                                         nf_noerr)
+!      dat(:,:, 1) = north_c(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,north_c_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: north_c',status,
+!     $                                                         nf_noerr)
+!      dat(:,:,1) = rot(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,rot_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: rot',
+!     $                                                  status,nf_noerr)
+!      dat(:,:,1) = h(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,h_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: h',status,nf_noerr)
+!      dat(:,:,1) = fsm(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,fsm_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: fsm',
+!     $                                                  status,nf_noerr)
+!      dat(:,:,1) = dum(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,dum_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: dum',
+!     $                                                  status,nf_noerr)
+!      dat(:,:,1) = dvm(1:im,1:jm)
+!      status=nfmpi_put_vara_double_all(ncid,dvm_varid,start,edge
+!     $                                                      ,dat(:,:,1))
+!      call handle_error_pnetcdf('nf_put_var_double: dvm',
+!     $                                                  status,nf_noerr)
 
       start(1)=i_global(1)
       start(2)=j_global(1)
@@ -1658,7 +1663,7 @@
       end
 
 !_______________________________________________________________________
-      subroutine write_restart_pnetcdf
+      subroutine write_restart_pnetcdf(nprint)
 ! write data for a seamless restart
       implicit none
 # include "mpif.h"
@@ -1681,7 +1686,6 @@
       double precision, dimension(1:im,1:jm,1:kb) :: dat
 
 ! create netcdf restart file
-      nprint=(iint+int(time0*86400./dti))/irestart
       write(netcdf_out_file,'(a,''out/'',a,''.'',i4.4,''.nc'')')
      $                         trim(wrk_pth),trim(write_rst_file),nprint
       if(my_task.eq.0) write(*,'(/''writing file '',a)')

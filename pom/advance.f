@@ -46,7 +46,7 @@
 !      end if
 
 ! write restart
-      if(mod(iint,irestart).eq.0) call write_restart_pnetcdf
+      if(int(iint/irestart)==1) call write_restart_pnetcdf(1)
 
 ! check CFL condition
       call check_velocity
