@@ -83,7 +83,7 @@
       call domain_stats(vtot,atot,mtot,stot,tavg,savg,eavg,ekin)
 
 ! create netcdf file
-      timestamp = Date_since(time_start, real(iint*dti,8), "f")
+      timestamp = Date_since(time_start, real(iint*dti/86400.,8), "f")
       write(netcdf_out_file,'(a,''out/'',a,''.'',a,''.nc'')')
      $                   trim(wrk_pth),trim(netcdf_file),timestamp(1:15)
       if(my_task.eq.0) write(*,'(/''writing file '',a)')
