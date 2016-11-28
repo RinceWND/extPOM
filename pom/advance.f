@@ -82,7 +82,7 @@
       implicit none
       include 'pom.h'
 
-      if (my_task==master_task) write(*,*) Date_since(time_start, time)
+!      if (my_task==master_task) write(*,*) Date_since(time_start, time)
 
       return
       end
@@ -220,6 +220,17 @@
       implicit none
       include 'pom.h'
       integer i,j
+      
+!      call bcond(0)
+      if (i_global(1)<50 .and. i_global(im_local)>=50) then
+        if (j_global(1)<50 .and. j_global(jm_local)>=50) then
+          elb(im_local/2,jm_local/2) = elb(im_local/2,jm_local/2)
+     $                               -.6*sin(2.*pi*time/1.)
+          el(im_local/2,jm_local/2) = elb(im_local/2,jm_local/2)
+          d(im_local/2,jm_local/2) = h(im_local/2,jm_local/2)
+     $                               +el(im_local/2,jm_local/2)
+        end if
+      end if
 
       do j=2,jm
         do i=2,im
