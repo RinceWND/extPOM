@@ -9,6 +9,13 @@
       character*10 tmp(3)
 
       call date_and_time(tmp(1),tmp(2),tmp(3),date_time)
+      
+      
+!      write(*,*) sqrt(0.96248316002930889)
+!      write(*,*) sqrt(0.96281115534397643*0.99938599829927965)
+!      write(*,*) sqrt(0.97287472982030265*0.99954987419770769)
+!      write(*,*) sqrt(0.99970963933504364*0.99999495627264168)
+!      stop
 
 ! initialize model
       call initialize

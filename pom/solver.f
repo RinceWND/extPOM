@@ -1311,12 +1311,9 @@
             p=grav*rhoref*(-zz(k)*h(i,j))*1.d-4
             cc(i,j,k)=1449.1d0+.00821d0*p+4.55d0*tp-.045d0*tp**2
      $                 +1.34d0*(sp-35.0d0)
-            if (iint>=48) write(40+my_task,*) iint, i,j,k,
-     $          (1.d0-.01642d0*p/cc(i,j,k)),
-     $          (1.d0-.40d0*p/cc(i,j,k)**2)
             cc(i,j,k)=cc(i,j,k)
      $                 /sqrt((1.d0-.01642d0*p/cc(i,j,k))
-     $                   *(1.d0-0.40d0*p/cc(i,j,k)**2))
+     $                      *(1.d0-0.40d0*p/cc(i,j,k)**2))
           end do
         end do
       end do
