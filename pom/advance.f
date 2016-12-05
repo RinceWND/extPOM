@@ -226,9 +226,9 @@
         if (j_global(1)<50 .and. j_global(jm_local)>=50) then
           elb(im_local/2,jm_local/2) = elb(im_local/2,jm_local/2)
      $                               -.6*sin(2.*pi*time/1.)
-          el(im_local/2,jm_local/2) = elb(im_local/2,jm_local/2)
+!          el(im_local/2,jm_local/2) = elb(im_local/2,jm_local/2)
           d(im_local/2,jm_local/2) = h(im_local/2,jm_local/2)
-     $                               +el(im_local/2,jm_local/2)
+     $                               +elb(im_local/2,jm_local/2)
         end if
       end if
 
