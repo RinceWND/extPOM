@@ -365,9 +365,46 @@
 
 ! adjust u(z) and v(z) such that depth average of (u,v) = (ua,va)
         tps = 0.
+        
+        if (.false.) then !-----------------------
 
         do k=1,kbm1
-          tps = tps+u(:,:,k)*dz(k)
+          tps = tps+u(:,:,k)*dz(k)*dt(:,:)*dy(:,:) ! rwnd: adjust volume transport instead of mean velocities
+        end do
+        tps = tps/dt
+
+        do k=1,kbm1
+          do j=1,jm
+            do i=2,im
+              u(i,j,k)=(u(i,j,k)*dz(k)*dt(i,j)*dy(i,j)-tps(i,j))+
+     $                 (utb(i,j)*(h(i,j)+etb(i,j))+
+     $                  utf(i,j)*(h(i,j)+etf(i,j)))
+     $                *dz(k)*dy(i,j)/(dt(i,j)+dt(i-1,j))
+            end do
+          end do
+        end do
+
+        tps = 0.
+
+        do k=1,kbm1
+          tps = tps+v(:,:,k)*dz(k)*dt(:,:)*dx(:,:)
+        end do
+
+        do k=1,kbm1
+          do j=2,jm
+            do i=1,im
+              v(i,j,k)=(v(i,j,k)*dz(k)*dt(:,:)*dx(:,:)-tps(i,j))+
+     $                 (vtb(i,j)*(h(i,j)+etb(i,j))+
+     $                  vtf(i,j)*(h(i,j)+etf(i,j)))
+     $                 *dz(k)*dx(i,j)/(dt(i,j)+dt(i,j-1))
+            end do
+          end do
+        end do
+        
+        else !-----------------------
+          
+        do k=1,kbm1
+          tps = tps+u(:,:,k)*dz(k) ! rwnd: adjust mean velocities instead of volume transport
         end do
 
         do k=1,kbm1
@@ -393,6 +430,8 @@
             end do
           end do
         end do
+        
+        end if !-----------------------
 
 ! calculate w from u, v, dt (h+et), etf and etb
         call vertvl
