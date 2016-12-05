@@ -19,21 +19,21 @@
 
 ! External (2-D) elevation boundary conditions (Clamped)
         if(n_west.eq.-1) then
-          elf(1,:) = elw
-!          elf(1,:) = elf(2,:)
+!          elf(1,:) = elw
+          elf(1,:) = elf(2,:)
         end if
         if(n_east.eq.-1) then
-          elf(im,:) = ele
-!          elf(im,:) = elf(imm1,:)
+!          elf(im,:) = ele
+          elf(im,:) = elf(imm1,:)
         end if
 
         if(n_south.eq.-1) then
-          elf(:,1) = els
-!          elf(:,1) = elf(:,2)
+!          elf(:,1) = els
+          elf(:,1) = elf(:,2)
         end if
         if(n_north.eq.-1) then
-          elf(:,jm) = eln
-!          elf(:,jm) = elf(:,jmm1)
+!          elf(:,jm) = eln
+          elf(:,jm) = elf(:,jmm1)
         end if
 
         elf = elf*fsm
@@ -49,7 +49,7 @@
      $            -rfw*sqrt(grav/d(2,2:jmm1))*(el(2,2:jmm1)-elw(2:jmm1))
           uaf(2,2:jmm1) = ramp*uaf(2,2:jmm1)
           uaf(1,2:jmm1) = uaf(2,2:jmm1)
-          vaf(1,2:jmm1) = 0.
+          vaf(1,2:jmm1) = vabw(2:jmm1)
         end if
 
         ! east
@@ -57,7 +57,7 @@
           uaf(im,2:jmm1) = uabe(2:jmm1)
      $      +rfe*sqrt(grav/d(imm1,2:jmm1))*(el(imm1,2:jmm1)-ele(2:jmm1))
           uaf(im,2:jmm1) = ramp*uaf(im,2:jmm1)
-          vaf(im,2:jmm1) = 0.
+          vaf(im,2:jmm1) = vabe(2:jmm1)
         end if
 
         ! south
@@ -66,7 +66,7 @@
      $            -rfs*sqrt(grav/d(2:imm1,2))*(el(2:imm1,2)-els(2:imm1))
           vaf(2:imm1,2) = ramp*vaf(2:imm1,2)
           vaf(2:imm1,1) = vaf(2:imm1,2)
-          uaf(2:imm1,1) = 0.
+          uaf(2:imm1,1) = uabs(2:imm1)
         end if
 
         ! north
@@ -74,7 +74,7 @@
           vaf(2:imm1,jm) = vabn(2:imm1)
      $      +rfn*sqrt(grav/d(2:imm1,jmm1))*(el(2:imm1,jmm1)-eln(2:imm1))
           vaf(2:imm1,jm) = ramp*vaf(2:imm1,jm)
-          uaf(2:imm1,jm) = 0.
+          uaf(2:imm1,jm) = uabn(2:imm1)
         end if
 
         uaf = uaf*dum
@@ -98,7 +98,7 @@
      $                       +.25d0*u(imm1,j+1,k))
      $                    +(1.d0-ga)*(.25d0*ube(j-1,k)+.5d0*ube(j,k)
      $                      +.25d0*ube(j+1,k))
-              vf(im,j,k)=0.d0
+              vf(im,j,k)=vbe(j,k)
             end if
             ! west
             if(n_west.eq.-1) then
@@ -108,7 +108,7 @@
      $                   +(1.d0-ga)*(.25d0*ubw(j-1,k)+.5d0*ubw(j,k)
      $                     +.25d0*ubw(j+1,k))
               uf(1,j,k)=uf(2,j,k)
-              vf(1,j,k)=0.d0
+              vf(1,j,k)=vbw(j,k)
             end if
           end do
         end do
@@ -123,7 +123,7 @@
      $                   +(1.d0-ga)*(.25d0*vbs(i-1,k)+.5d0*vbs(i,k)
      $                     +.25d0*vbs(i+1,k))
               vf(i,1,k)=vf(i,2,k)
-              uf(i,1,k)=0.d0
+              uf(i,1,k)=ubs(i,k)
             end if
             ! north
             if(n_north.eq.-1) then
@@ -132,7 +132,7 @@
      $                       +.25d0*v(i+1,jmm1,k))
      $                    +(1.d0-ga)*(.25d0*vbn(i-1,k)+.5d0*vbn(i,k)
      $                      +.25d0*vbn(i+1,k))
-              uf(i,jm,k)=0.d0
+              uf(i,jm,k)=ubn(i,k)
             end if
           end do
         end do
@@ -604,25 +604,33 @@
 !      double precision ts1(im,jm,nz),ss1(im,jm,nz)
 !      double precision ts2(im,jm,kb),ss2(im,jm,kb)
 
-      tbc=30. ! time between bc files (days)
+      tbc=1./24. ! time between bc files (days)
       ibc=int(tbc*86400.d0/dti)
       ntime=int(time/tbc)
 ! read bc data
       ! read initial bc file
       if (iint.eq.1) then
         call read_boundary_conditions_pnetcdf((iint+cont_bry)/ibc+1,kb
-     $                         ,tbwf,sbwf,ubwf,tbef,sbef,ubef
-     $                         ,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf
+     $                         ,tbwf,sbwf,ubwf,vbwf,tbef,sbef,ubef,vbef
+     $                         ,tbnf,sbnf,vbnf,ubnf,tbsf,sbsf,vbsf,ubsf
      $                         ,elw,ele,eln,els)
 ! integrate by depth
-        uabwf = 0.d0
-        uabef = 0.d0
-        vabnf = 0.d0
-        vabsf = 0.d0
+        uabwf = 0.
+        vabwf = 0.
+        uabef = 0.
+        vabef = 0.
+        uabnf = 0.
+        vabnf = 0.
+        uabsf = 0.
+        vabsf = 0.
         do k = 1,kb
           uabwf(:) = uabwf(:) + ubwf(:,k)*dz(k)
+          vabwf(:) = vabwf(:) + vbwf(:,k)*dz(k)
           uabef(:) = uabef(:) + ubef(:,k)*dz(k)
+          vabef(:) = vabef(:) + vbef(:,k)*dz(k)
+          uabnf(:) = uabnf(:) + ubnf(:,k)*dz(k)
           vabnf(:) = vabnf(:) + vbnf(:,k)*dz(k)
+          uabsf(:) = uabsf(:) + ubsf(:,k)*dz(k)
           vabsf(:) = vabsf(:) + vbsf(:,k)*dz(k)
         end do
 !  south
@@ -724,18 +732,26 @@
         vabsb = vabsf
         if (iint.ne.iend) then
           call read_boundary_conditions_pnetcdf(
-     $                                     (iint+cont_bry+ibc)+1/ibc,kb
-     $     ,tbwf,sbwf,ubwf,tbef,sbef,ubef,tbnf,sbnf,vbnf,tbsf,sbsf,vbsf
-     $                                                 ,elw,ele,eln,els)
+     $                                     (iint+cont_bry+ibc)/ibc+1,kb
+     $     ,tbwf,sbwf,ubwf,vbwf,tbef,sbef,ubef,vbef,tbnf,sbnf,vbnf,ubnf
+     $                             ,tbsf,sbsf,vbsf,ubsf,elw,ele,eln,els)
 ! integrate by depth
-          uabwf = 0.d0
-          uabef = 0.d0
-          vabnf = 0.d0
-          vabsf = 0.d0
+          uabwf = 0.
+          vabwf = 0.
+          uabef = 0.
+          vabef = 0.
+          uabnf = 0.
+          vabnf = 0.
+          uabsf = 0.
+          vabsf = 0.
           do k=1,kb
             uabwf(:) = uabwf(:) + ubwf(:,k)*dz(k)
+            vabwf(:) = vabwf(:) + vbwf(:,k)*dz(k)
             uabef(:) = uabef(:) + ubef(:,k)*dz(k)
+            vabef(:) = vabef(:) + vbef(:,k)*dz(k)
+            uabnf(:) = uabnf(:) + ubnf(:,k)*dz(k)
             vabnf(:) = vabnf(:) + vbnf(:,k)*dz(k)
+            uabsf(:) = uabsf(:) + ubsf(:,k)*dz(k)
             vabsf(:) = vabsf(:) + vbsf(:,k)*dz(k)
           end do
 ! south
