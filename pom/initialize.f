@@ -36,7 +36,7 @@
       call bottom_friction
 
 ! read restart data from a previous run
-      if(nread_rst/=0) call read_restart_pnetcdf(9999)
+      if(nread_rst/=0) call read_restart_pnetcdf
       
 !      call write_aux_pnetcdf
 !      call finalize_mpi

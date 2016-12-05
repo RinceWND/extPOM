@@ -48,7 +48,7 @@
 ! write restart
       if(mod(iint,irestart)==0 .and. 
      $                          (int(iint/irestart)==1 .or. iint==iend))
-     $                                     call write_restart_pnetcdf(1)
+     $                                        call write_restart_pnetcdf
 
 ! check CFL condition
       call check_velocity

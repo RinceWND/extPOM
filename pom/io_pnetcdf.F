@@ -1663,8 +1663,9 @@
       end
 
 !_______________________________________________________________________
-      subroutine write_restart_pnetcdf(nprint)
+      subroutine write_restart_pnetcdf
 ! write data for a seamless restart
+      use date_utility
       implicit none
 # include "mpif.h"
 # include "pnetcdf.inc"
@@ -1684,10 +1685,12 @@
       integer(mpi_offset_kind) length
       integer(mpi_offset_kind) start(3),edge(3)
       double precision, dimension(1:im,1:jm,1:kb) :: dat
+      character(len=26) timestamp
 
 ! create netcdf restart file
-      write(netcdf_out_file,'(a,''out/'',a,''.'',i4.4,''.nc'')')
-     $                         trim(wrk_pth),trim(write_rst_file),nprint
+      timestamp = Date_since(time_start, real(iint*dti/86400.,8), "f")
+      write(netcdf_out_file,'(a,''out/'',a,''.'',a,''.nc'')')
+     $                trim(wrk_pth),trim(write_rst_file),timestamp(1:15)
       if(my_task.eq.0) write(*,'(/''writing file '',a)')
      $                                             trim(netcdf_out_file)
       status=nfmpi_create(pom_comm,netcdf_out_file,
