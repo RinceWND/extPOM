@@ -604,7 +604,7 @@
 !      double precision ts1(im,jm,nz),ss1(im,jm,nz)
 !      double precision ts2(im,jm,kb),ss2(im,jm,kb)
 
-      tbc=1./24. ! time between bc files (days)
+      tbc=30. ! time between bc files (days)
       ibc=int(tbc*86400.d0/dti)
       ntime=int(time/tbc)
 ! read bc data
@@ -870,19 +870,29 @@
 !_______________________________________________________________________
       subroutine wind
 ! read and interpolate (in time) wind stress
+      use date_utility
       implicit none
       include 'pom.h'
       integer i,j,ntime,iwind
       double precision twind,fold,fnew
       double precision, dimension(im,jm) :: wu, wv
+      integer year
+      double precision doy
+      character(len=26) timestamp
 
-      twind= .125!30. ! time between wind files (days)
-      iwind=int(twind*86400.d0/dti)
+      twind=.25 ! time between wind files (days)
+      iwind=int(twind*86400./dti)
+
+      timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
+
+      read(timestamp, '(i4)') year
+      doy = Date_to_Day_of_Year(timestamp)
+      if (my_task==0) write(*,*) iint,"::",year,"::",int(doy/twind)
 
 ! read wind stress data
       ! read initial wind file
       if (iint.eq.1) then
-        call read_wind_pnetcdf((iint+cont_bry)/iwind+1,wu,wv)
+        call read_wind_pnetcdf(year,int(doy/twind),wu,wv)
         wusurff(1:im,1:jm) = wu
         wvsurff(1:im,1:jm) = wv
       end if
@@ -914,19 +924,29 @@
 !_______________________________________________________________________
       subroutine heat
 ! read and interpolate heat flux in time
+      use date_utility
       implicit none
       include 'pom.h'
       integer i,j,ntime,iheat
       double precision theat,fold,fnew
       double precision, dimension(im,jm) :: shf, swr
+      integer year
+      double precision doy
+      character(len=26) timestamp
 
-      theat=.125 ! time between heat forcing (days)
-      iheat=int(theat*86400.d0/dti)
+      theat=.25 ! time between heat forcing (days)
+      iheat=int(theat*86400./dti)
+      
+      timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
+
+      read(timestamp, '(i4)') year
+      doy = Date_to_Day_of_Year(timestamp)
+      write(*,*) doy/iheat
 
 ! read heat stress data
       ! read initial heat file
       if (iint.eq.1) then
-        call read_heat_pnetcdf((iint+cont_bry)/iheat+1,shf,swr)
+        call read_heat_pnetcdf(year,(iint+cont_bry)/iheat+1,shf,swr)
         wtsurff(1:im,1:jm) = shf
         swradf(1:im,1:jm) = swr
       end if
@@ -960,55 +980,6 @@
       end
 
 !_______________________________________________________________________
-      subroutine heat_NNRP2
-! read and interpolate heat flux in time
-      implicit none
-      include 'pom.h'
-      integer i,j,ntime,iheat
-      double precision theat,fold,fnew
-      double precision, dimension(im,jm) :: shf, swr
-
-      theat=.25 ! time between heat forcing (days)
-      iheat=int(theat*86400./dti)
-      
-! read heat stress data
-      ! read initial heat file
-      if (iint.eq.1) then
-        call read_heat_NNRP2_pnetcdf((iint+cont_bry)/iheat+1,shf,swr)
-        wtsurff(1:im,1:jm) = shf
-        swradf(1:im,1:jm) = swr
-      end if
-      ! read heat forcing corresponding to next theat
-      if (iint.eq.1 .or. mod(iint+cont_bry,iheat).eq.0.) then
-        do i=1,im
-          do j=1,jm
-            wtsurfb(i,j)=wtsurff(i,j)
-            swradb(i,j)=swradf(i,j)
-          end do
-        end do
-        if (iint/=iend) then
-          call read_heat_NNRP2_pnetcdf((iint+cont_bry+iheat)/iheat+1
-     $                                                         ,shf,swr)
-          wtsurff(1:im,1:jm) = shf
-          swradf(1:im,1:jm) = swr
-        end if
-      end if
-
-! linear interpolation in time
-      ntime=int(time/theat)
-      fnew=time/theat-ntime
-      fold=1.-fnew
-      do i=1,im
-        do j=1,jm
-          wtsurf(i,j)=fold*wtsurfb(i,j)+fnew*wtsurff(i,j)
-          swrad(i,j)=fold*swradb(i,j)+fnew*swradf(i,j)
-        end do
-      end do
-
-      return
-      end
-
-!_______________________________________________________________________
       subroutine surface
 ! read and interpolate heat flux in time
       implicit none
@@ -1017,7 +988,7 @@
       double precision tsrf!,fold,fnew
       double precision, dimension(im,jm) :: sst, sss
 
-      tsrf=.125 ! time between heat forcing (days)
+      tsrf=30. ! time between heat forcing (days)
       isrf=int(tsrf*86400.d0/dti)
 
 ! read heat stress data
@@ -1039,7 +1010,7 @@
       integer i,j,ntime,iwater
       double precision twater,fold,fnew
 
-      twater=1. ! time between wind forcing (days)
+      twater=30. ! time between wind forcing (days)
       iwater=int(twater*86400.d0/dti)
 
 ! read wind stress data

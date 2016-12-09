@@ -2804,16 +2804,16 @@
      $                                                  status,nf_noerr)
 
 ! get variables
-      status=nfmpi_inq_unlimdim(ncid,z_varid)
-      call handle_error_pnetcdf('nfmpi_inq_unlimdim',status,nf_noerr)
-      status=nfmpi_inq_dimlen(ncid,z_varid,length)
-      call handle_error_pnetcdf('nfmpi_inq_dimlen: Time',
-     $                          status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'Level',z_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: z',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'T',t_varid)
+!      status=nfmpi_inq_unlimdim(ncid,z_varid)
+!      call handle_error_pnetcdf('nfmpi_inq_unlimdim',status,nf_noerr)
+!      status=nfmpi_inq_dimlen(ncid,z_varid,length)
+!      call handle_error_pnetcdf('nfmpi_inq_dimlen: Time',
+!     $                          status,nf_noerr)
+      status=nfmpi_inq_dimid(ncid,'z',z_varid)
+      call handle_error_pnetcdf('nfmpi_inq_dimid: z',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'t',t_varid)
       call handle_error_pnetcdf('nfmpi_inq_varid: t',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'S',s_varid)
+      status=nfmpi_inq_varid(ncid,'s',s_varid)
       call handle_error_pnetcdf('nfmpi_inq_varid: s',status,nf_noerr)
 
 ! get data
@@ -2916,13 +2916,13 @@
       end
 
 !_______________________________________________________________________
-      subroutine read_wind_pnetcdf(n,wu,wv)
+      subroutine read_wind_pnetcdf(f,n,wu,wv)
 ! read wind stress
       implicit none
 # include "mpif.h"
 # include "pnetcdf.inc"
       include 'pom.h'
-      integer n
+      integer f,n
       double precision wu(im,jm),wv(im,jm)
 !      integer i,j
       character*120 netcdf_file2
@@ -2933,7 +2933,7 @@
       integer(mpi_offset_kind) start(3),edge(3)
 
 ! open netcdf file
-      write(netcdf_file2,'(a,''in/'',a,''.sfrc.nc'')')
+      write(netcdf_file2,'(a,''in/NNRP2-SFC/uflx.'',a,''.sfrc.nc'')')
      $                                 trim(wrk_pth),trim(netcdf_file)
       if(my_task.eq.0) write(*,'(/''reading wind '',a," [",i3,"]")')
      $                                             trim(netcdf_file2),n
@@ -3133,82 +3133,6 @@
 ! open netcdf heat file
       write(netcdf_heat_file,'(a,''in/'',a,''.sfrc.nc'')')
      $                                 trim(wrk_pth),trim(netcdf_file)
-      if(my_task.eq.master_task)
-     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
-     $                                          trim(netcdf_heat_file),n
-      status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
-     $                  mpi_info_null,ncid)
-      call handle_error_pnetcdf('nfmpi_open: '//netcdf_heat_file,
-     $                          status,nf_noerr)
-
-! get variables
-      status=nfmpi_inq_varid(ncid,'shflux',shf_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: shf'
-     $                          ,status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'swrad',swr_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: swr'
-     $                          ,status,nf_noerr)
-
-! get data
-      start(1)=i_global(1)
-      start(2)=j_global(1)
-      start(3)=n
-      edge(1)=im
-      edge(2)=jm
-      edge(3)=1
-      status=nfmpi_get_vara_double_all(ncid,shf_varid,start,edge,shf)
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all: shf',
-     $                          status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,swr_varid,start,edge,swr)
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all: swr',
-     $                          status,nf_noerr)
-
-! close file
-      status=nfmpi_close(ncid)
-      call handle_error_pnetcdf('nf_close: heat',status,nf_noerr)
-! convert heat fluxes
-      shf = -shf/rhoref/3986. ! J/kg
-      swr = -swr/rhoref/3986.
-
-      return
-      end
-
-!_______________________________________________________________________
-      subroutine read_heat_NNRP2_pnetcdf(n,shf,swr)
-! read heat flux
-      implicit none
-# include "mpif.h"
-# include "pnetcdf.inc"
-      include 'pom.h'
-      double precision shf(im,jm),swr(im,jm)
-!      integer i,j
-      integer n
-      character*120 netcdf_heat_file
-      integer ncid,status
-      integer shf_varid,swr_varid
-!      integer vdims(2)
-!      integer(mpi_offset_kind) length
-      integer(mpi_offset_kind) start(3),edge(3)
-      integer year,nrec
-
-      read(time_start, '(i4)') year
-      year = year-1
-      nrec = 0
-
-      do while (n > nrec)
-        year = year+1
-        if ((mod(year,4)==0 .and. 
-     $                     mod(year,100)/=0) .or. mod(year,400)==0) then
-          nrec = 366*4
-        else
-          nrec = 365*4
-        end if
-        n = n-nrec
-      end do
-
-! open netcdf heat file
-      write(netcdf_heat_file,'(a,''in/dswrf.sfc.gauss.'',i4,''.nc'')')
-     $                                                trim(wrk_pth),year
       if(my_task.eq.master_task)
      $                     write(*,'(/''reading heat '',a," [",i3,"]")')
      $                                          trim(netcdf_heat_file),n

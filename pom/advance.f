@@ -12,7 +12,7 @@
       call get_time
       
 ! set time dependent surface boundary conditions
-!      call surface_forcing
+      call surface_forcing
       
 ! set time dependent lateral boundary conditions
 !      call lateral_bc
