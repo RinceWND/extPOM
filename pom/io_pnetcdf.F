@@ -2804,16 +2804,16 @@
      $                                                  status,nf_noerr)
 
 ! get variables
-      status=nfmpi_inq_unlimdim(ncid,z_varid)
-      call handle_error_pnetcdf('nfmpi_inq_unlimdim',status,nf_noerr)
-      status=nfmpi_inq_dimlen(ncid,z_varid,length)
-      call handle_error_pnetcdf('nfmpi_inq_dimlen: Time',
-     $                          status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'Level',z_varid)
+!      status=nfmpi_inq_unlimdim(ncid,z_varid)
+!      call handle_error_pnetcdf('nfmpi_inq_unlimdim',status,nf_noerr)
+!      status=nfmpi_inq_dimlen(ncid,z_varid,length)
+!      call handle_error_pnetcdf('nfmpi_inq_dimlen: time',
+!     $                          status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'z',z_varid)
       call handle_error_pnetcdf('nfmpi_inq_varid: z',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'T',t_varid)
+      status=nfmpi_inq_varid(ncid,'t',t_varid)
       call handle_error_pnetcdf('nfmpi_inq_varid: t',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'S',s_varid)
+      status=nfmpi_inq_varid(ncid,'s',s_varid)
       call handle_error_pnetcdf('nfmpi_inq_varid: s',status,nf_noerr)
 
 ! get data
@@ -3167,8 +3167,10 @@
       status=nfmpi_close(ncid)
       call handle_error_pnetcdf('nf_close: heat',status,nf_noerr)
 ! convert heat fluxes
+      write(*,*) "B: ", my_task, "::", shf(40,40)
       shf = -shf/rhoref/3986. ! J/kg
       swr = -swr/rhoref/3986.
+      write(*,*) "A: ", my_task, "::", shf(40,40)
 
       return
       end
