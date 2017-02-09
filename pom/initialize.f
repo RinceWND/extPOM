@@ -395,16 +395,17 @@
       include 'pom.h'
       integer nz
       parameter(nz=40)
-      integer i,j,k
+      integer i,j,k,mnth
 !      double precision sum1,sum2
 !      double precision tb0(im,jm,nz),sb0(im,jm,nz)
 !      double precision tb2(im,jm,nz),sb2(im,jm,nz)
 !      double precision p1(im,jm,kb),p2(im,jm,kb)
 !      double precision z2(nz)
 
+      read(time_start, '(5x,i2)') mnth
 ! read initial temperature and salinity from ic file
-      call read_initial_ts_pnetcdf(kb,tb,sb)
-      call read_clim_ts_pnetcdf(kb,10,tclim,sclim)
+      call read_initial_ts_pnetcdf(kb,mnth,tb,sb)
+      call read_clim_ts_pnetcdf(kb,mnth,tclim,sclim)
 
 ! map onto sigma coordinate
 !      call ztosig(z2,tb0,zz,h,tclim,im,jm,nz,kb,

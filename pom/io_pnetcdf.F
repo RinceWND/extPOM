@@ -2775,13 +2775,13 @@
       end
 
 !_______________________________________________________________________
-      subroutine read_initial_ts_pnetcdf(k,temp,salt)
+      subroutine read_initial_ts_pnetcdf(k,n,temp,salt)
 ! read initial temperature and salinity
       implicit none
 # include "mpif.h"
 # include "pnetcdf.inc"
       include 'pom.h'
-      integer k
+      integer k,n
 !      double precision zlev(k)
       double precision, dimension(im_local,jm_local,k), intent(out) ::
      $                                                        temp, salt
@@ -2793,8 +2793,9 @@
       integer(mpi_offset_kind) length
       integer(mpi_offset_kind) start(4),edge(4)
 
-! open netcdf ic file
-      write(netcdf_ic_file,'(a,''in/'',a,''.init.nc'')')
+! open netcdf ic file (read initial conditions from climatology)
+      write(*,*) "Month: ",n
+      write(netcdf_ic_file,'(a,''in/'',a,''.clim.nc'')')
      $                                   trim(wrk_pth),trim(netcdf_file)
       if(my_task.eq.0) write(*,'(/''reading file '',a)')
      $                                              trim(netcdf_ic_file)
@@ -2809,12 +2810,12 @@
 !      status=nfmpi_inq_dimlen(ncid,z_varid,length)
 !      call handle_error_pnetcdf('nfmpi_inq_dimlen: Time',
 !     $                          status,nf_noerr)
-      status=nfmpi_inq_dimid(ncid,'z',z_varid)
-      call handle_error_pnetcdf('nfmpi_inq_dimid: z',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'t',t_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: t',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'s',s_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: s',status,nf_noerr)
+!      status=nfmpi_inq_dimid(ncid,'z',z_varid)
+!      call handle_error_pnetcdf('nfmpi_inq_dimid: z',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'Tclim',t_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: tclm',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'Sclim',s_varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: sclm',status,nf_noerr)
 
 ! get data
 !      start(1)=1
@@ -2826,7 +2827,7 @@
       start(1)=i_global(1)
       start(2)=j_global(1)
       start(3)=1
-      start(4)=1 !length
+      start(4)=n
       edge(1)=im
       edge(2)=jm
       edge(3)=k-1
@@ -2841,9 +2842,11 @@
 ! close file
       status=nfmpi_close(ncid)
       call handle_error_pnetcdf('nf_close',status,nf_noerr)
-
+      
       temp(1:im,1:jm,:) = ttmp
       salt(1:im,1:jm,:) = stmp
+
+      write(*,*) "T:",n,temp(30,30,1)
 
       return
       end
@@ -3218,7 +3221,7 @@
       if (my_task==master_task) then
         write(*,*) "[DBG] ulwrf@(50,50), W/m2: ", (tmp(50,50)*fac+off)
       end if
-      
+
 ! open downward longwave radiation flux file
       write(netcdf_heat_file,'(a,''in/NNRP2-SFC/dlwrf.'',i4,''.nc'')')
      $                                                   trim(wrk_pth),y
@@ -3284,7 +3287,7 @@
 
 ! unpack data and add to heat flux
       shf = shf + (real(tmp,8)*fac+off)
-      
+
 ! close file
       status=nfmpi_close(ncid)
       call handle_error_pnetcdf('nf_close',status,nf_noerr)
@@ -3323,7 +3326,7 @@
 ! close file
       status=nfmpi_close(ncid)
       call handle_error_pnetcdf('nf_close',status,nf_noerr)
-      
+
 ! open downward short wave radiation flux file
       write(netcdf_heat_file,'(a,''in/NNRP2-SFC/dswrf.'',i4,''.nc'')')
      $                                                   trim(wrk_pth),y
