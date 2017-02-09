@@ -397,7 +397,7 @@
 ! calculate w from u, v, dt (h+et), etf and etb
         call vertvl
 
-        call bcondorl(5)
+        call bcond(5)
 
         call exchange3d_mpi(w,im_local,jm_local,kb)
 
@@ -463,7 +463,7 @@
         call profu
         call profv
 
-        call bcondorl(3)
+        call bcond(3)
 
         call exchange3d_mpi(uf(:,:,1:kbm1),im_local,jm_local,kbm1)
         call exchange3d_mpi(vf(:,:,1:kbm1),im_local,jm_local,kbm1)

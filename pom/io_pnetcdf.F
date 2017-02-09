@@ -2916,25 +2916,67 @@
       end
 
 !_______________________________________________________________________
-      subroutine read_wind_pnetcdf(f,n,wu,wv)
+      subroutine read_wind_pnetcdf(y,n,wu,wv)
 ! read wind stress
       implicit none
 # include "mpif.h"
 # include "pnetcdf.inc"
       include 'pom.h'
-      integer f,n
-      double precision wu(im,jm),wv(im,jm)
+      integer y,n
+      real(kind=4) off,fac
+      integer(kind=2) tmp(im,jm)
+      double precision wu(im,jm),wv(im,jm),wunr(im,jm),wvnr(im,jm)
 !      integer i,j
       character*120 netcdf_file2
-      integer ncid,status
-      integer wu_varid,wv_varid
+      integer ncid,status,attid,varid
 !      integer vdims(2)
 !      integer(mpi_offset_kind) length
       integer(mpi_offset_kind) start(3),edge(3)
 
-! open netcdf file
-      write(netcdf_file2,'(a,''in/NNRP2-SFC/uflx.'',a,''.sfrc.nc'')')
-     $                                 trim(wrk_pth),trim(netcdf_file)
+      start(1)=i_global(1)
+      start(2)=j_global(1)
+      start(3)=n
+      edge(1)=im
+      edge(2)=jm
+      edge(3)=1
+
+      write(netcdf_file2,'(a,''in/NNRP2-SFC/uflx.'',i4,''.nc'')')
+     $                                                   trim(wrk_pth),y
+      if(my_task.eq.0) write(*,'(/''reading wind '',a," [",i3,"]")')
+     $                                             trim(netcdf_file2),n
+! open uflx file
+      status=nfmpi_open(pom_comm,netcdf_file2,nf_nowrite,
+     $                                               mpi_info_null,ncid)
+      call handle_error_pnetcdf('nfmpi_open: '//netcdf_file2,
+     $                                                 status,nf_noerr)
+
+! get variables
+      status=nfmpi_inq_varid(ncid,'uflx',varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: uflx',status,nf_noerr)
+
+! get attributes for unpacking
+      status=nfmpi_get_att_real(ncid, varid, "add_offset", off)
+      call handle_error_pnetcdf('nfmpi_get_att_real: add_offset@uflx'
+     $                          ,status,nf_noerr)
+      status=nfmpi_get_att_real(ncid, varid, "scale_factor", fac)
+      call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@uflx'
+     $                          ,status,nf_noerr)
+
+! get data (swf is used as temporary storage first, then it reads shortwave radiation)
+      status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
+      call handle_error_pnetcdf('nfmpi_get_vara_int2_all: uflx',
+     $                          status,nf_noerr)
+
+! unpack data
+      wunr = real(tmp,8)*fac+off
+
+! close file
+      status=nfmpi_close(ncid)
+      call handle_error_pnetcdf('nf_close',status,nf_noerr)
+
+! open vflx file
+      write(netcdf_file2,'(a,''in/NNRP2-SFC/vflx.'',i4,''.nc'')')
+     $                                                   trim(wrk_pth),y
       if(my_task.eq.0) write(*,'(/''reading wind '',a," [",i3,"]")')
      $                                             trim(netcdf_file2),n
       status=nfmpi_open(pom_comm,netcdf_file2,nf_nowrite,
@@ -2943,32 +2985,37 @@
      $                                                 status,nf_noerr)
 
 ! get variables
-      status=nfmpi_inq_varid(ncid,'sustr',wu_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: wu',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'svstr',wv_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: wv',status,nf_noerr)
+      status=nfmpi_inq_varid(ncid,'vflx',varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: vflx',status,nf_noerr)
 
-! get data
-      start(1)=i_global(1)
-      start(2)=j_global(1)
-      start(3)=n
-      edge(1)=im
-      edge(2)=jm
-      edge(3)=1
-      status=nfmpi_get_vara_double_all(ncid,wu_varid,start,edge,wu)
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all: wu',
-     $                                                  status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,wv_varid,start,edge,wv)
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all: wv',
-     $                                                  status,nf_noerr)
+! get attributes for unpacking
+      status=nfmpi_get_att_real(ncid, varid, "add_offset", off)
+      call handle_error_pnetcdf('nfmpi_get_att_real: add_offset@uflx'
+     $                          ,status,nf_noerr)
+      status=nfmpi_get_att_real(ncid, varid, "scale_factor", fac)
+      call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@uflx'
+     $                          ,status,nf_noerr)
+
+! get data (swf is used as temporary storage first, then it reads shortwave radiation)
+      status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
+      call handle_error_pnetcdf('nfmpi_get_vara_int2_all: vflx',
+     $                          status,nf_noerr)
+
+! unpack data
+      wvnr = real(tmp,8)*fac+off
+
+! rotate momenutm flux into the grid (it is not rotated in Reanalysis2BC.java)
+      write(*,*) shape(rot)
+      wu = wunr*cos(rot(1:im,1:jm))-wvnr*sin(rot(1:im,1:jm))
+      wv = wunr*sin(rot(1:im,1:jm))+wvnr*cos(rot(1:im,1:jm))
 
 ! close file
       status=nfmpi_close(ncid)
       call handle_error_pnetcdf('nf_close',status,nf_noerr)
 
 ! convert wind stress from N^2/m to m^2/s^2
-      wu = -wu/1025.
-      wv = -wv/1025.
+      wu = -wu/rhoref
+      wv = -wv/rhoref
 ! taper wind stress along the boundary
       wu(2:imm1,2:jmm1) = .25*wu(2:imm1,2:jmm1)
      $                   *(dum(2:imm1,3:jm)+dum(2:imm1,1:jmm2)
@@ -3114,25 +3161,33 @@
       end
 
 !_______________________________________________________________________
-      subroutine read_heat_pnetcdf(n,shf,swr)
+      subroutine read_heat_pnetcdf(y,n,shf,swr)
 ! read heat flux
       implicit none
 # include "mpif.h"
 # include "pnetcdf.inc"
       include 'pom.h'
-      double precision shf(im,jm),swr(im,jm)
+      integer(kind=2) tmp(im,jm)
+      real(kind=8) shf(im,jm),swr(im,jm)
 !      integer i,j
-      integer n
+      integer y,n
       character*120 netcdf_heat_file
-      integer ncid,status
-      integer shf_varid,swr_varid
+      integer ncid,status,varid,attid
 !      integer vdims(2)
 !      integer(mpi_offset_kind) length
       integer(mpi_offset_kind) start(3),edge(3)
+      real(kind=4) off, fac
 
-! open netcdf heat file
-      write(netcdf_heat_file,'(a,''in/'',a,''.sfrc.nc'')')
-     $                                 trim(wrk_pth),trim(netcdf_file)
+      start(1)=i_global(1)
+      start(2)=j_global(1)
+      start(3)=n
+      edge(1)=im
+      edge(2)=jm
+      edge(3)=1
+
+! open upward longwave radiation flux file
+      write(netcdf_heat_file,'(a,''in/NNRP2-SFC/ulwrf.'',i4,''.nc'')')
+     $                                                   trim(wrk_pth),y
       if(my_task.eq.master_task)
      $                     write(*,'(/''reading heat '',a," [",i3,"]")')
      $                                          trim(netcdf_heat_file),n
@@ -3141,33 +3196,206 @@
       call handle_error_pnetcdf('nfmpi_open: '//netcdf_heat_file,
      $                          status,nf_noerr)
 
-! get variables
-      status=nfmpi_inq_varid(ncid,'shflux',shf_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: shf'
+! get the variable
+      status=nfmpi_inq_varid(ncid,'ulwrf',varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: ulwrf'
      $                          ,status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'swrad',swr_varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: swr'
+! get attributes for unpacking
+      status=nfmpi_get_att_real(ncid, varid, "add_offset", off)
+      call handle_error_pnetcdf('nfmpi_get_att_real: add_offset@ulwrf'
+     $                          ,status,nf_noerr)
+      status=nfmpi_get_att_real(ncid, varid, "scale_factor", fac)
+      call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@ulwrf'
+     $                          ,status,nf_noerr)
+
+! get data (swf is used as temporary storage first, then it reads shortwave radiation)
+      status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
+      call handle_error_pnetcdf('nfmpi_get_vara_int2_all: ulwrf',
+     $                          status,nf_noerr)
+
+! unpack data
+      shf = real(tmp,8)*fac+off
+      if (my_task==master_task) then
+        write(*,*) "[DBG] ulwrf@(50,50), W/m2: ", (tmp(50,50)*fac+off)
+      end if
+      
+! open downward longwave radiation flux file
+      write(netcdf_heat_file,'(a,''in/NNRP2-SFC/dlwrf.'',i4,''.nc'')')
+     $                                                   trim(wrk_pth),y
+      if(my_task.eq.master_task)
+     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
+     $                                          trim(netcdf_heat_file),n
+      status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
+     $                  mpi_info_null,ncid)
+      call handle_error_pnetcdf('nfmpi_open: '//netcdf_heat_file,
+     $                          status,nf_noerr)
+
+! get the variable
+      status=nfmpi_inq_varid(ncid,'dlwrf',varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: dlwrf'
+     $                          ,status,nf_noerr)
+! get attributes for unpacking
+      status=nfmpi_get_att_real(ncid, varid, "add_offset", off)
+      call handle_error_pnetcdf('nfmpi_get_att_real: add_offset@dlwrf'
+     $                          ,status,nf_noerr)
+      status=nfmpi_get_att_real(ncid, varid, "scale_factor", fac)
+      call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@dlwrf'
+     $                          ,status,nf_noerr)
+
+! get data (swf is used as temporary storage first, then it reads shortwave radiation)
+      status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
+      call handle_error_pnetcdf('nfmpi_get_vara_int2_all: dlwrf',
+     $                          status,nf_noerr)
+
+! unpack data
+      shf = shf - (real(tmp,8)*fac+off)
+
+! close file
+      status=nfmpi_close(ncid)
+      call handle_error_pnetcdf('nf_close',status,nf_noerr)
+
+! open shtfl file
+      write(netcdf_heat_file,'(a,''in/NNRP2-SFC/shtfl.'',i4,''.nc'')')
+     $                                                   trim(wrk_pth),y
+      if(my_task.eq.master_task)
+     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
+     $                                          trim(netcdf_heat_file),n
+      status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
+     $                  mpi_info_null,ncid)
+      call handle_error_pnetcdf('nfmpi_open: '//netcdf_heat_file,
+     $                          status,nf_noerr)
+
+! get the variable
+      status=nfmpi_inq_varid(ncid,'shtfl',varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: shtfl'
+     $                          ,status,nf_noerr)
+! get attributes for unpacking
+      status=nfmpi_get_att_real(ncid, varid, "add_offset", off)
+      call handle_error_pnetcdf('nfmpi_get_att_real: add_offset@shtfl'
+     $                          ,status,nf_noerr)
+      status=nfmpi_get_att_real(ncid, varid, "scale_factor", fac)
+      call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@shtfl'
      $                          ,status,nf_noerr)
 
 ! get data
-      start(1)=i_global(1)
-      start(2)=j_global(1)
-      start(3)=n
-      edge(1)=im
-      edge(2)=jm
-      edge(3)=1
-      status=nfmpi_get_vara_double_all(ncid,shf_varid,start,edge,shf)
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all: shf',
+      status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
+      call handle_error_pnetcdf('nfmpi_get_vara_int2_all: shtfl',
      $                          status,nf_noerr)
-      status=nfmpi_get_vara_double_all(ncid,swr_varid,start,edge,swr)
-      call handle_error_pnetcdf('nfmpi_get_vara_double_all: swr',
+
+! unpack data and add to heat flux
+      shf = shf + (real(tmp,8)*fac+off)
+      
+! close file
+      status=nfmpi_close(ncid)
+      call handle_error_pnetcdf('nf_close',status,nf_noerr)
+
+! open lhtfl file
+      write(netcdf_heat_file,'(a,''in/NNRP2-SFC/lhtfl.'',i4,''.nc'')')
+     $                                                   trim(wrk_pth),y
+      if(my_task.eq.master_task)
+     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
+     $                                          trim(netcdf_heat_file),n
+      status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
+     $                  mpi_info_null,ncid)
+      call handle_error_pnetcdf('nfmpi_open: '//netcdf_heat_file,
      $                          status,nf_noerr)
+
+! get the variable
+      status=nfmpi_inq_varid(ncid,'lhtfl',varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: lhtfl'
+     $                          ,status,nf_noerr)
+! get attributes for unpacking
+      status=nfmpi_get_att_real(ncid, varid, "add_offset", off)
+      call handle_error_pnetcdf('nfmpi_get_att_real: add_offset@lhtfl'
+     $                          ,status,nf_noerr)
+      status=nfmpi_get_att_real(ncid, varid, "scale_factor", fac)
+      call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@lhtfl'
+     $                          ,status,nf_noerr)
+
+! get data
+      status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
+      call handle_error_pnetcdf('nfmpi_get_vara_int2_all: lhtfl',
+     $                          status,nf_noerr)
+
+! unpack data and add to heat flux
+      shf = shf + (real(tmp,8)*fac+off)
+
+! close file
+      status=nfmpi_close(ncid)
+      call handle_error_pnetcdf('nf_close',status,nf_noerr)
+      
+! open downward short wave radiation flux file
+      write(netcdf_heat_file,'(a,''in/NNRP2-SFC/dswrf.'',i4,''.nc'')')
+     $                                                   trim(wrk_pth),y
+      if(my_task.eq.master_task)
+     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
+     $                                          trim(netcdf_heat_file),n
+      status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
+     $                  mpi_info_null,ncid)
+      call handle_error_pnetcdf('nfmpi_open: '//netcdf_heat_file,
+     $                          status,nf_noerr)
+
+! get the variable
+      status=nfmpi_inq_varid(ncid,'dswrf',varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: dswrf'
+     $                          ,status,nf_noerr)
+! get attributes for unpacking
+      status=nfmpi_get_att_real(ncid, varid, "add_offset", off)
+      call handle_error_pnetcdf('nfmpi_get_att_real: add_offset@dswrf'
+     $                          ,status,nf_noerr)
+      status=nfmpi_get_att_real(ncid, varid, "scale_factor", fac)
+      call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@dswrf'
+     $                          ,status,nf_noerr)
+
+! get data
+      status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
+      call handle_error_pnetcdf('nfmpi_get_vara_int2_all: dswrf',
+     $                          status,nf_noerr)
+
+! unpack data and add to heat flux
+      swr = real(tmp,8)*fac+off
+
+! open upward short wave radiation flux file
+      write(netcdf_heat_file,'(a,''in/NNRP2-SFC/uswrf.'',i4,''.nc'')')
+     $                                                   trim(wrk_pth),y
+      if(my_task.eq.master_task)
+     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
+     $                                          trim(netcdf_heat_file),n
+      status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
+     $                  mpi_info_null,ncid)
+      call handle_error_pnetcdf('nfmpi_open: '//netcdf_heat_file,
+     $                          status,nf_noerr)
+
+! get the variable
+      status=nfmpi_inq_varid(ncid,'uswrf',varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: uswrf'
+     $                          ,status,nf_noerr)
+! get attributes for unpacking
+      status=nfmpi_get_att_real(ncid, varid, "add_offset", off)
+      call handle_error_pnetcdf('nfmpi_get_att_real: add_offset@uswrf'
+     $                          ,status,nf_noerr)
+      status=nfmpi_get_att_real(ncid, varid, "scale_factor", fac)
+      call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@uswrf'
+     $                          ,status,nf_noerr)
+
+! get data
+      status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
+      call handle_error_pnetcdf('nfmpi_get_vara_int2_all: uswrf',
+     $                          status,nf_noerr)
+
+! unpack data and add to heat flux
+      swr = swr - (real(tmp,8)*fac+off)
 
 ! close file
       status=nfmpi_close(ncid)
       call handle_error_pnetcdf('nf_close: heat',status,nf_noerr)
+
+      if (my_task==master_task) then
+        write(*,*) "[DBG] Heat flux@(50,50), W/m2: ", shf(50,50)
+        write(*,*) "[DBG] Shortwave@(50,50), W/m2: ", swr(50,50)
+      end if
 ! convert heat fluxes
-      shf = -shf/rhoref/3986. ! J/kg
+      shf =  shf/rhoref/3986. ! J/kg
       swr = -swr/rhoref/3986.
 
       return

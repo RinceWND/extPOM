@@ -898,14 +898,10 @@
       end if
       ! read wind file corresponding to next time
       if (iint.eq.1 .or. mod(iint+cont_bry,iwind).eq.0.) then
-        do i=1,im
-          do j=1,jm
-            wusurfb(i,j)=wusurff(i,j)
-            wvsurfb(i,j)=wvsurff(i,j)
-          end do
-        end do
+        wusurfb = wusurff
+        wvsurfb = wvsurff
         if (iint.ne.iend) then
-          call read_wind_pnetcdf((iint+cont_bry+iwind)/iwind+1,wu,wv)
+          call read_wind_pnetcdf(year,int(doy/twind)+1,wu,wv)
           wusurff(1:im,1:jm) = wu
           wvsurff(1:im,1:jm) = wv
         end if
@@ -946,7 +942,7 @@
 ! read heat stress data
       ! read initial heat file
       if (iint.eq.1) then
-        call read_heat_pnetcdf(year,(iint+cont_bry)/iheat+1,shf,swr)
+        call read_heat_pnetcdf(year,int(doy/theat),shf,swr)
         wtsurff(1:im,1:jm) = shf
         swradf(1:im,1:jm) = swr
       end if
@@ -959,7 +955,7 @@
           end do
         end do
         if (iint/=iend) then
-          call read_heat_pnetcdf((iint+cont_bry+iheat)/iheat+1,shf,swr)
+          call read_heat_pnetcdf(year,int(doy/theat)+1,shf,swr)
           wtsurff(1:im,1:jm) = shf
           swradf(1:im,1:jm) = swr
         end if
