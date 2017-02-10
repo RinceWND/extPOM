@@ -886,13 +886,13 @@
       timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
 
       read(timestamp, '(i4)') year
-      doy = Date_to_Day_of_Year(timestamp)
-      if (my_task==0) write(*,*) iint,"::",year,"::",int(doy/twind)
+      doy = Date_to_Day_of_Year(timestamp) - 1.
+      if (my_task==0) write(*,*) iint,"::",year,"::",int(doy/twind)+1
 
 ! read wind stress data
       ! read initial wind file
       if (iint.eq.1) then
-        call read_wind_pnetcdf(year,int(doy/twind),wu,wv)
+        call read_wind_pnetcdf(year,int(doy/twind)+1,wu,wv)
         wusurff(1:im,1:jm) = wu
         wvsurff(1:im,1:jm) = wv
       end if
@@ -901,7 +901,7 @@
         wusurfb = wusurff
         wvsurfb = wvsurff
         if (iint.ne.iend) then
-          call read_wind_pnetcdf(year,int(doy/twind)+1,wu,wv)
+          call read_wind_pnetcdf(year,int(doy/twind)+2,wu,wv)
           wusurff(1:im,1:jm) = wu
           wvsurff(1:im,1:jm) = wv
         end if
@@ -936,13 +936,13 @@
       timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
 
       read(timestamp, '(i4)') year
-      doy = Date_to_Day_of_Year(timestamp)
+      doy = Date_to_Day_of_Year(timestamp) - 1.
       write(*,*) doy/iheat
 
 ! read heat stress data
       ! read initial heat file
       if (iint.eq.1) then
-        call read_heat_pnetcdf(year,int(doy/theat),shf,swr)
+        call read_heat_pnetcdf(year,int(doy/theat)+1,shf,swr)
         wtsurff(1:im,1:jm) = shf
         swradf(1:im,1:jm) = swr
       end if
@@ -955,7 +955,7 @@
           end do
         end do
         if (iint/=iend) then
-          call read_heat_pnetcdf(year,int(doy/theat)+1,shf,swr)
+          call read_heat_pnetcdf(year,int(doy/theat)+2,shf,swr)
           wtsurff(1:im,1:jm) = shf
           swradf(1:im,1:jm) = swr
         end if
