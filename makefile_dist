@@ -33,7 +33,8 @@ SRCDIR = pom
 #-----------------------------------------------------------------------
 # Define objects
 #-----------------------------------------------------------------------
-OBJS = parallel_mpi.o   \
+OBJS = date_utility.mod.o \
+       parallel_mpi.o   \
        io_pnetcdf.o     \
        solver.o         \
        bounds_forcing.o \
@@ -55,6 +56,10 @@ VPATH = $(SRCDIR)
 %.f: %.F
 	@echo
 	$(CPP) $(FFLAGS) $< > $*.f
+
+%.mod.o: %.mod.f
+	@echo
+	$(FC) -c -ffree-form $(FFLAGS) $<
 
 #-----------------------------------------------------------------------
 # Create the executable

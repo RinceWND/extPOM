@@ -3008,7 +3008,6 @@
       wvnr = real(tmp,8)*fac+off
 
 ! rotate momenutm flux into the grid (it is not rotated in Reanalysis2BC.java)
-      write(*,*) shape(rot)
       wu = wunr*cos(rot(1:im,1:jm))-wvnr*sin(rot(1:im,1:jm))
       wv = wunr*sin(rot(1:im,1:jm))+wvnr*cos(rot(1:im,1:jm))
 
@@ -3398,7 +3397,7 @@
         write(*,*) "[DBG] Shortwave@(50,50), W/m2: ", swr(50,50)
       end if
 ! convert heat fluxes
-      shf =  shf/rhoref/3986. ! J/kg
+      shf = -shf/rhoref/3986. ! J/kg
       swr = -swr/rhoref/3986.
 
       return
