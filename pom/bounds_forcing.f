@@ -592,25 +592,41 @@
 ! _____________________________________________________________________
       subroutine lateral_bc
 ! create variable lateral boundary conditions
+      use date_utility, only : Date_since, Is_Leap_Year
       implicit none
       include 'pom.h'
       integer nz
       parameter(nz=40)
-      integer i,j,k,ntime,ibc
-      double precision tbc,fold,fnew
+      integer i,j,k
+      integer(kind=2) ntime,ntimeb
+      double precision fold,fnew
 !      double precision z0(nz),hs(im,jm)
 !      double precision t_w(jm,nz),s_w(jm,nz),t_e(jm,nz),s_e(jm,nz),q,
 !     $       t_n(im,nz),s_n(im,nz),t_s(im,nz),s_s(im,nz)
 !      double precision ts1(im,jm,nz),ss1(im,jm,nz)
 !      double precision ts2(im,jm,kb),ss2(im,jm,kb)
+      double precision mnth(12),doy
+      logical upd
+      character(len=26) timestamp
+      
+      data mnth
+     $ /31.,28.,31.,30.,31.,30.,31.,31.,30.,31.,30.,31./
+!     $ /0.,31.,59.,90.,120.,151.,181.,212.,243.,273.,304.,334.,365./
 
-      tbc=30. ! time between bc files (days)
-      ibc=int(tbc*86400.d0/dti)
-      ntime=int(time/tbc)
+!      ibc=int(tbc*86400.d0/dti)
+      
+      upd = .false.
+      timestamp = Date_since(time_start,real((iint-1)*dti/86400.,8),"s")
+      read(timestamp, '(i4,x,i2)') ntime, ntimeb
+      if (Is_Leap_Year(ntime)) mnth(2) = 29.
+      
+      timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
+      read(timestamp, '(5x,i2)') ntime
+      
 ! read bc data
       ! read initial bc file
       if (iint.eq.1) then
-        call read_boundary_conditions_pnetcdf((iint+cont_bry)/ibc+1,kb
+        call read_boundary_conditions_pnetcdf(ntime,kb
      $                         ,tbwf,sbwf,ubwf,vbwf,tbef,sbef,ubef,vbef
      $                         ,tbnf,sbnf,vbnf,ubnf,tbsf,sbsf,vbsf,ubsf
      $                         ,elw,ele,eln,els)
@@ -717,7 +733,7 @@
 
       end if
       ! read bc file corresponding to next time
-      if (iint.eq.1 .or. mod(iint+cont_bry,ibc).eq.0.) then
+      if (iint.eq.1 .or. ntime.ne.ntimeb) then
         tbwb = tbwf
         sbwb = sbwf
         tbeb = tbef
@@ -732,7 +748,7 @@
         vabsb = vabsf
         if (iint.ne.iend) then
           call read_boundary_conditions_pnetcdf(
-     $                                     (iint+cont_bry+ibc)/ibc+1,kb
+     $                                     mod(ntime+1,12),kb
      $     ,tbwf,sbwf,ubwf,vbwf,tbef,sbef,ubef,vbef,tbnf,sbnf,vbnf,ubnf
      $                             ,tbsf,sbsf,vbsf,ubsf,elw,ele,eln,els)
 ! integrate by depth
@@ -839,7 +855,7 @@
       end if
 
 ! linear interpolation in time
-      fnew=time/tbc-real(ntime, 8)
+      fnew=time/mnth(ntime) - int(time/mnth(ntime))
       fold=1.-fnew
       tbw(1:jm,1:kb) = fold*tbwb(1:jm,1:kb)+fnew*tbwf(1:jm,1:kb)
       sbw(1:jm,1:kb) = fold*sbwb(1:jm,1:kb)+fnew*sbwf(1:jm,1:kb)
@@ -937,7 +953,6 @@
 
       read(timestamp, '(i4)') year
       doy = Date_to_Day_of_Year(timestamp) - 1.
-      write(*,*) doy/iheat
 
 ! read heat stress data
       ! read initial heat file

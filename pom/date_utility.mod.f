@@ -4,7 +4,7 @@ module Date_Utility
   public :: Date_since, Days_in_between, get_Month, Number_of_Days
   public :: get_Month_Int, get_Month_IntDays, get_Month_IntFactor
   public :: Days_to_Stamp, Days_to_TimeStamp, Days_plus, Date_to_Day_of_Year
-  public :: day_of_year
+  public :: day_of_year, Is_Leap_Year
   public :: T_TimeStamp, T_Zone, T_Date, T_Time
   integer*1, parameter :: N_MONTHS = 13
   integer*2, parameter :: MONTH_DAYS(N_MONTHS) = (/ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 /)
