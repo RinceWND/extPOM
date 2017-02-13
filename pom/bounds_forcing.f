@@ -626,7 +626,7 @@
 ! read bc data
       ! read initial bc file
       if (iint.eq.1) then
-        call read_boundary_conditions_pnetcdf(ntime,kb
+        call read_boundary_conditions_pnetcdf(int(ntime),kb
      $                         ,tbwf,sbwf,ubwf,vbwf,tbef,sbef,ubef,vbef
      $                         ,tbnf,sbnf,vbnf,ubnf,tbsf,sbsf,vbsf,ubsf
      $                         ,elw,ele,eln,els)
