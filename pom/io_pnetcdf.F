@@ -3679,7 +3679,7 @@
       write(netcdf_file2,'(a,''in/'',a,''.lbry.nc'')')
      $                                   trim(wrk_pth),trim(netcdf_file)
       if(my_task.eq.0)
-     $               write(*,'(/''reading boundaries '',a," [",i3,"]")')
+     $               write(*,'(/''reading boundaries '',a," [",i4,"]")')
      $                                              trim(netcdf_file2),n
       status=nfmpi_open(pom_comm,netcdf_file2,nf_nowrite,
      $                                               mpi_info_null,ncid)
@@ -3837,15 +3837,22 @@
 !      call handle_error_pnetcdf('nfmpi_get_vara_double_all: s_s',
 !     $                                                  status,nf_noerr)
 
-      t_w(1:jm,:) = tclim( 1,1:jm,:)
-      t_e(1:jm,:) = tclim(im,1:jm,:)
-      t_s(1:im,:) = tclim(1:im, 1,:)
-      t_n(1:im,:) = tclim(1:im,jm,:)
-      
-      s_w(1:jm,:) = sclim( 1,1:jm,:)
-      s_e(1:jm,:) = sclim(im,1:jm,:)
-      s_s(1:im,:) = sclim(1:im, 1,:)
-      s_n(1:im,:) = sclim(1:im,jm,:)
+      if (n_west==-1) then
+        t_w(1:jm,:) = tclim( 1,1:jm,:)
+        s_w(1:jm,:) = sclim( 1,1:jm,:)
+      end if
+      if (n_east==-1) then
+        t_e(1:jm,:) = tclim(im,1:jm,:)
+        s_e(1:jm,:) = sclim(im,1:jm,:)
+      end if
+      if (n_south==-1) then
+        t_s(1:im,:) = tclim(1:im, 1,:)
+        s_s(1:im,:) = sclim(1:im, 1,:)
+      end if
+      if (n_north==-1) then
+        t_n(1:im,:) = tclim(1:im,jm,:)
+        s_n(1:im,:) = sclim(1:im,jm,:)
+      end if
 
 ! close file
       status=nfmpi_close(ncid)
