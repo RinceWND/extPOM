@@ -1070,91 +1070,103 @@
       start(2)=1
       edge(1)=im
       edge(2)=1
-      dat_lon(:,1) = eln(1:im)
-      status=nfmpi_put_vara_double_all(ncid,eln_varid,start,edge
+! exclude processors that do not have boundary values by n_* flags
+      if (n_north==-1) then
+        dat_lon(:,1) = eln(1:im)
+        status=nfmpi_put_vara_double_all(ncid,eln_varid,start,edge
      $                                                    ,dat_lon(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: eln',
+        call handle_error_pnetcdf('nf_put_vara_double: eln',
      $                                                  status,nf_noerr)
-      dat_lon(:,1) = els(1:im)
-      status=nfmpi_put_vara_double_all(ncid,els_varid,start,edge
+        dat_lon(:,1) = vabn(1:im)
+        status=nfmpi_put_vara_double_all(ncid,vabn_varid,start,edge
      $                                                    ,dat_lon(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: els',
+        call handle_error_pnetcdf('nf_put_vara_double: vabn',
      $                                                  status,nf_noerr)
-      dat_lon(:,1) = vabn(1:im)
-      status=nfmpi_put_vara_double_all(ncid,vabn_varid,start,edge
+        dat_lon(:,1) = vabnb(1:im)
+        status=nfmpi_put_vara_double_all(ncid,vabnb_varid,start,edge
      $                                                    ,dat_lon(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: vabn',
+        call handle_error_pnetcdf('nf_put_vara_double: vabnb',
      $                                                  status,nf_noerr)
-      dat_lon(:,1) = vabnb(1:im)
-      status=nfmpi_put_vara_double_all(ncid,vabnb_varid,start,edge
+        dat_lon(:,1) = vabnf(1:im)
+        status=nfmpi_put_vara_double_all(ncid,vabnf_varid,start,edge
      $                                                    ,dat_lon(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: vabnb',
+        call handle_error_pnetcdf('nf_put_vara_double: vabnf',
      $                                                  status,nf_noerr)
-      dat_lon(:,1) = vabnf(1:im)
-      status=nfmpi_put_vara_double_all(ncid,vabnf_varid,start,edge
+      end if
+
+      if (n_south==-1) then
+        dat_lon(:,1) = els(1:im)
+        status=nfmpi_put_vara_double_all(ncid,els_varid,start,edge
      $                                                    ,dat_lon(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: vabnf',
+        call handle_error_pnetcdf('nf_put_vara_double: els',
      $                                                  status,nf_noerr)
-      dat_lon(:,1) = vabs(1:im)
-      status=nfmpi_put_vara_double_all(ncid,vabs_varid,start,edge
+        dat_lon(:,1) = vabs(1:im)
+        status=nfmpi_put_vara_double_all(ncid,vabs_varid,start,edge
      $                                                    ,dat_lon(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: vabs',
+        call handle_error_pnetcdf('nf_put_vara_double: vabs',
      $                                                  status,nf_noerr)
-      dat_lon(:,1) = vabsb(1:im)
-      status=nfmpi_put_vara_double_all(ncid,vabsb_varid,start,edge
+        dat_lon(:,1) = vabsb(1:im)
+        status=nfmpi_put_vara_double_all(ncid,vabsb_varid,start,edge
      $                                                    ,dat_lon(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: vabsb',
+        call handle_error_pnetcdf('nf_put_vara_double: vabsb',
      $                                                  status,nf_noerr)
-      dat_lon(:,1) = vabsf(1:im)
-      status=nfmpi_put_vara_double_all(ncid,vabsf_varid,start,edge
+        dat_lon(:,1) = vabsf(1:im)
+        status=nfmpi_put_vara_double_all(ncid,vabsf_varid,start,edge
      $                                                    ,dat_lon(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: vabsf',
+        call handle_error_pnetcdf('nf_put_vara_double: vabsf',
      $                                                  status,nf_noerr)
+      end if
 
       start(1)=j_global(1)
       start(2)=1
       edge(1)=jm
       edge(2)=1
-      dat_lat(:,1) = ele(1:jm)
-      status=nfmpi_put_vara_double_all(ncid,ele_varid,start,edge
+
+      if (n_east==-1) then
+        dat_lat(:,1) = ele(1:jm)
+        status=nfmpi_put_vara_double_all(ncid,ele_varid,start,edge
      $                                                    ,dat_lat(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: ele',
+        call handle_error_pnetcdf('nf_put_vara_double: ele',
      $                                                  status,nf_noerr)
-      dat_lat(:,1) = elw(1:jm)
-      status=nfmpi_put_vara_double_all(ncid,elw_varid,start,edge
+        dat_lat(:,1) = uabe(1:jm)
+        status=nfmpi_put_vara_double_all(ncid,uabe_varid,start,edge
      $                                                    ,dat_lat(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: elw',
+        call handle_error_pnetcdf('nf_put_vara_double: uabe',
      $                                                  status,nf_noerr)
-      dat_lat(:,1) = uabe(1:jm)
-      status=nfmpi_put_vara_double_all(ncid,uabe_varid,start,edge
+        dat_lat(:,1) = uabeb(1:jm)
+        status=nfmpi_put_vara_double_all(ncid,uabeb_varid,start,edge
      $                                                    ,dat_lat(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: uabe',
+        call handle_error_pnetcdf('nf_put_vara_double: uabeb',
      $                                                  status,nf_noerr)
-      dat_lat(:,1) = uabeb(1:jm)
-      status=nfmpi_put_vara_double_all(ncid,uabeb_varid,start,edge
+        dat_lat(:,1) = uabef(1:jm)
+        status=nfmpi_put_vara_double_all(ncid,uabef_varid,start,edge
      $                                                    ,dat_lat(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: uabeb',
+        call handle_error_pnetcdf('nf_put_vara_double: uabef',
      $                                                  status,nf_noerr)
-      dat_lat(:,1) = uabef(1:jm)
-      status=nfmpi_put_vara_double_all(ncid,uabef_varid,start,edge
+      end if
+
+      if (n_west==-1) then
+        dat_lat(:,1) = elw(1:jm)
+        status=nfmpi_put_vara_double_all(ncid,elw_varid,start,edge
      $                                                    ,dat_lat(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: uabef',
+        call handle_error_pnetcdf('nf_put_vara_double: elw',
      $                                                  status,nf_noerr)
-      dat_lat(:,1) = uabw(1:jm)
-      status=nfmpi_put_vara_double_all(ncid,uabw_varid,start,edge
+        dat_lat(:,1) = uabw(1:jm)
+        status=nfmpi_put_vara_double_all(ncid,uabw_varid,start,edge
      $                                                    ,dat_lat(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: uabw',
+        call handle_error_pnetcdf('nf_put_vara_double: uabw',
      $                                                  status,nf_noerr)
-      dat_lat(:,1) = uabwb(1:jm)
-      status=nfmpi_put_vara_double_all(ncid,uabwb_varid,start,edge
+        dat_lat(:,1) = uabwb(1:jm)
+        status=nfmpi_put_vara_double_all(ncid,uabwb_varid,start,edge
      $                                                    ,dat_lat(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: uabwb',
+        call handle_error_pnetcdf('nf_put_vara_double: uabwb',
      $                                                  status,nf_noerr)
-      dat_lat(:,1) = uabwf(1:jm)
-      status=nfmpi_put_vara_double_all(ncid,uabwf_varid,start,edge
+        dat_lat(:,1) = uabwf(1:jm)
+        status=nfmpi_put_vara_double_all(ncid,uabwf_varid,start,edge
      $                                                    ,dat_lat(:,1))
-      call handle_error_pnetcdf('nf_put_vara_double: uabwf',
+        call handle_error_pnetcdf('nf_put_vara_double: uabwf',
      $                                                  status,nf_noerr)
+      end if
 
       start(1)=i_global(1)
       start(2)=1
@@ -1162,36 +1174,42 @@
       edge(1)=im
       edge(2)=kb
       edge(3)=1
-      dat_lon = vbn(1:im,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,vbn_varid,start,edge
+
+      if (n_north==-1) then
+        dat_lon = vbn(1:im,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,vbn_varid,start,edge
      $                                                         ,dat_lon)
-      call handle_error_pnetcdf('nf_put_vara_double: vbn',
+        call handle_error_pnetcdf('nf_put_vara_double: vbn',
      $                                                  status,nf_noerr)
-      dat_lon = vbs(1:im,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,vbs_varid,start,edge
+        dat_lon = tbn(1:im,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,tbn_varid,start,edge
      $                                                         ,dat_lon)
-      call handle_error_pnetcdf('nf_put_vara_double: vbs',
+        call handle_error_pnetcdf('nf_put_vara_double: tbn',
      $                                                  status,nf_noerr)
-      dat_lon = tbn(1:im,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,tbn_varid,start,edge
+        dat_lon = sbn(1:im,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,sbn_varid,start,edge
      $                                                         ,dat_lon)
-      call handle_error_pnetcdf('nf_put_vara_double: tbn',
+        call handle_error_pnetcdf('nf_put_vara_double: sbn',
      $                                                  status,nf_noerr)
-      dat_lon = tbs(1:im,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,tbs_varid,start,edge
+      end if
+
+      if (n_south==-1) then
+        dat_lon = vbs(1:im,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,vbs_varid,start,edge
      $                                                         ,dat_lon)
-      call handle_error_pnetcdf('nf_put_vara_double: tbs',
+        call handle_error_pnetcdf('nf_put_vara_double: vbs',
      $                                                  status,nf_noerr)
-      dat_lon = sbn(1:im,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,sbn_varid,start,edge
+        dat_lon = tbs(1:im,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,tbs_varid,start,edge
      $                                                         ,dat_lon)
-      call handle_error_pnetcdf('nf_put_vara_double: sbn',
+        call handle_error_pnetcdf('nf_put_vara_double: tbs',
      $                                                  status,nf_noerr)
-      dat_lon = sbs(1:im,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,sbs_varid,start,edge
+        dat_lon = sbs(1:im,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,sbs_varid,start,edge
      $                                                         ,dat_lon)
-      call handle_error_pnetcdf('nf_put_vara_double: sbs',
+        call handle_error_pnetcdf('nf_put_vara_double: sbs',
      $                                                  status,nf_noerr)
+      end if
 
       start(1)=j_global(1)
       start(2)=1
@@ -1199,36 +1217,42 @@
       edge(1)=jm
       edge(2)=kb
       edge(3)=1
-      dat_lat = ube(1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,ube_varid,start,edge
+      
+      if (n_east==-1) then
+        dat_lat = ube(1:jm,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,ube_varid,start,edge
      $                                                         ,dat_lat)
-      call handle_error_pnetcdf('nf_put_vara_double: ube',
+        call handle_error_pnetcdf('nf_put_vara_double: ube',
      $                                                  status,nf_noerr)
-      dat_lat = ubw(1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,ubw_varid,start,edge
+        dat_lat = tbe(1:jm,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,tbe_varid,start,edge
      $                                                         ,dat_lat)
-      call handle_error_pnetcdf('nf_put_vara_double: ubw',
+        call handle_error_pnetcdf('nf_put_vara_double: tbe',
      $                                                  status,nf_noerr)
-      dat_lat = tbe(1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,tbe_varid,start,edge
+        dat_lat = sbe(1:jm,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,sbe_varid,start,edge
      $                                                         ,dat_lat)
-      call handle_error_pnetcdf('nf_put_vara_double: tbe',
+        call handle_error_pnetcdf('nf_put_vara_double: sbe',
      $                                                  status,nf_noerr)
-      dat_lat = tbw(1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,tbw_varid,start,edge
+      end if
+
+      if (n_west==-1) then
+        dat_lat = ubw(1:jm,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,ubw_varid,start,edge
      $                                                         ,dat_lat)
-      call handle_error_pnetcdf('nf_put_vara_double: tbw',
+        call handle_error_pnetcdf('nf_put_vara_double: ubw',
      $                                                  status,nf_noerr)
-      dat_lat = sbe(1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,sbe_varid,start,edge
+        dat_lat = tbw(1:jm,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,tbw_varid,start,edge
      $                                                         ,dat_lat)
-      call handle_error_pnetcdf('nf_put_vara_double: sbe',
+        call handle_error_pnetcdf('nf_put_vara_double: tbw',
      $                                                  status,nf_noerr)
-      dat_lat = sbw(1:jm,1:kb)
-      status=nfmpi_put_vara_double_all(ncid,sbw_varid,start,edge
+        dat_lat = sbw(1:jm,1:kb)
+        status=nfmpi_put_vara_double_all(ncid,sbw_varid,start,edge
      $                                                         ,dat_lat)
-      call handle_error_pnetcdf('nf_put_vara_double: sbw',
+        call handle_error_pnetcdf('nf_put_vara_double: sbw',
      $                                                  status,nf_noerr)
+      end if
 
       start(1)=i_global(1)
       start(2)=j_global(1)
@@ -2942,7 +2966,7 @@
 
       write(netcdf_file2,'(a,''in/NNRP2-SFC/uflx.'',i4,''.nc'')')
      $                                                   trim(wrk_pth),y
-      if(my_task.eq.0) write(*,'(/''reading wind '',a," [",i3,"]")')
+      if(my_task.eq.0) write(*,'(/''reading wind '',a," [",i4,"]")')
      $                                             trim(netcdf_file2),n
 ! open uflx file
       status=nfmpi_open(pom_comm,netcdf_file2,nf_nowrite,
@@ -2977,7 +3001,7 @@
 ! open vflx file
       write(netcdf_file2,'(a,''in/NNRP2-SFC/vflx.'',i4,''.nc'')')
      $                                                   trim(wrk_pth),y
-      if(my_task.eq.0) write(*,'(/''reading wind '',a," [",i3,"]")')
+      if(my_task.eq.0) write(*,'(/''reading wind '',a," [",i4,"]")')
      $                                             trim(netcdf_file2),n
       status=nfmpi_open(pom_comm,netcdf_file2,nf_nowrite,
      $                                               mpi_info_null,ncid)
@@ -3188,7 +3212,7 @@
       write(netcdf_heat_file,'(a,''in/NNRP2-SFC/ulwrf.'',i4,''.nc'')')
      $                                                   trim(wrk_pth),y
       if(my_task.eq.master_task)
-     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
+     $                     write(*,'(/''reading heat '',a," [",i4,"]")')
      $                                          trim(netcdf_heat_file),n
       status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
      $                  mpi_info_null,ncid)
@@ -3222,7 +3246,7 @@
       write(netcdf_heat_file,'(a,''in/NNRP2-SFC/dlwrf.'',i4,''.nc'')')
      $                                                   trim(wrk_pth),y
       if(my_task.eq.master_task)
-     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
+     $                     write(*,'(/''reading heat '',a," [",i4,"]")')
      $                                          trim(netcdf_heat_file),n
       status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
      $                  mpi_info_null,ncid)
@@ -3257,7 +3281,7 @@
       write(netcdf_heat_file,'(a,''in/NNRP2-SFC/shtfl.'',i4,''.nc'')')
      $                                                   trim(wrk_pth),y
       if(my_task.eq.master_task)
-     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
+     $                     write(*,'(/''reading heat '',a," [",i4,"]")')
      $                                          trim(netcdf_heat_file),n
       status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
      $                  mpi_info_null,ncid)
@@ -3292,7 +3316,7 @@
       write(netcdf_heat_file,'(a,''in/NNRP2-SFC/lhtfl.'',i4,''.nc'')')
      $                                                   trim(wrk_pth),y
       if(my_task.eq.master_task)
-     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
+     $                     write(*,'(/''reading heat '',a," [",i4,"]")')
      $                                          trim(netcdf_heat_file),n
       status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
      $                  mpi_info_null,ncid)
@@ -3327,7 +3351,7 @@
       write(netcdf_heat_file,'(a,''in/NNRP2-SFC/dswrf.'',i4,''.nc'')')
      $                                                   trim(wrk_pth),y
       if(my_task.eq.master_task)
-     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
+     $                     write(*,'(/''reading heat '',a," [",i4,"]")')
      $                                          trim(netcdf_heat_file),n
       status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
      $                  mpi_info_null,ncid)
@@ -3358,7 +3382,7 @@
       write(netcdf_heat_file,'(a,''in/NNRP2-SFC/uswrf.'',i4,''.nc'')')
      $                                                   trim(wrk_pth),y
       if(my_task.eq.master_task)
-     $                     write(*,'(/''reading heat '',a," [",i3,"]")')
+     $                     write(*,'(/''reading heat '',a," [",i4,"]")')
      $                                          trim(netcdf_heat_file),n
       status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
      $                  mpi_info_null,ncid)
@@ -3421,7 +3445,7 @@
       write(netcdf_heat_file,'(a,''in/'',a,''.sfrc.nc'')')
      $                                 trim(wrk_pth),trim(netcdf_file)
       if(my_task.eq.master_task)
-     $                  write(*,'(/''reading surface '',a," [",i3,"]")')
+     $                  write(*,'(/''reading surface '',a," [",i4,"]")')
      $                                          trim(netcdf_heat_file),n
       status=nfmpi_open(pom_comm,netcdf_heat_file,nf_nowrite,
      $                  mpi_info_null,ncid)

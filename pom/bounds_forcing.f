@@ -592,7 +592,7 @@
 ! _____________________________________________________________________
       subroutine lateral_bc
 ! create variable lateral boundary conditions
-      use date_utility, only : Date_since, Is_Leap_Year
+      use date_utility, only:Date_since,Is_Leap_Year,Date_to_Day_of_Year
       implicit none
       include 'pom.h'
       integer nz
@@ -605,13 +605,13 @@
 !     $       t_n(im,nz),s_n(im,nz),t_s(im,nz),s_s(im,nz)
 !      double precision ts1(im,jm,nz),ss1(im,jm,nz)
 !      double precision ts2(im,jm,kb),ss2(im,jm,kb)
-      double precision mnth(12),doy
+      double precision mnth(13),doy
       logical upd
       character(len=26) timestamp
       
       data mnth
-     $ /31.,28.,31.,30.,31.,30.,31.,31.,30.,31.,30.,31./
-!     $ /0.,31.,59.,90.,120.,151.,181.,212.,243.,273.,304.,334.,365./
+     $ /0.,31.,59.,90.,120.,151.,181.,212.,243.,273.,304.,334.,365./
+!     $ /31.,28.,31.,30.,31.,30.,31.,31.,30.,31.,30.,31./
 
 !      ibc=int(tbc*86400.d0/dti)
       
@@ -623,6 +623,8 @@
       timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
       read(timestamp, '(5x,i2)') ntime
       
+      doy = Date_to_Day_of_Year(timestamp) - 1.
+
 ! read bc data
       ! read initial bc file
       if (iint.eq.1) then
@@ -742,6 +744,10 @@
         sbnb = sbnf
         tbsb = tbsf
         sbsb = sbsf
+        ubwb = ubwf
+        ubeb = ubef
+        vbnb = vbnf
+        vbsb = vbsf
         uabwb = uabwf
         uabeb = uabef
         vabnb = vabnf
@@ -855,7 +861,9 @@
       end if
 
 ! linear interpolation in time
-      fnew=time/mnth(ntime) - int(time/mnth(ntime))
+      fnew = (doy-mnth(ntime))/(mnth(ntime+1)-mnth(ntime))
+     $      -int((doy-mnth(ntime))/(mnth(ntime+1)-mnth(ntime)))
+      if (my_task==master_task) write(*,*) "DoY::",doy,fnew,ntime
       fold=1.-fnew
       tbw(1:jm,1:kb) = fold*tbwb(1:jm,1:kb)+fnew*tbwf(1:jm,1:kb)
       sbw(1:jm,1:kb) = fold*sbwb(1:jm,1:kb)+fnew*sbwf(1:jm,1:kb)
@@ -889,35 +897,40 @@
       use date_utility
       implicit none
       include 'pom.h'
-      integer i,j,ntime,iwind
+      integer i,j,ntime,iwind,year
       double precision twind,fold,fnew
       double precision, dimension(im,jm) :: wu, wv
-      integer year
-      double precision doy
       character(len=26) timestamp
 
       twind=.25 ! time between wind files (days)
       iwind=int(twind*86400./dti)
 
-      timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
-
-      read(timestamp, '(i4)') year
-      doy = Date_to_Day_of_Year(timestamp) - 1.
-      if (my_task==0) write(*,*) iint,"::",year,"::",int(doy/twind)+1
-
 ! read wind stress data
       ! read initial wind file
       if (iint.eq.1) then
-        call read_wind_pnetcdf(year,int(doy/twind)+1,wu,wv)
+
+        timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
+        read(timestamp, '(i4)') year
+        ntime = int((Date_to_Day_of_Year(timestamp)-1.)/twind)+1
+
+        call read_wind_pnetcdf(year,ntime,wu,wv)
         wusurff(1:im,1:jm) = wu
         wvsurff(1:im,1:jm) = wv
+
       end if
       ! read wind file corresponding to next time
       if (iint.eq.1 .or. mod(iint+cont_bry,iwind).eq.0.) then
+
+        timestamp = Date_since(time_start,
+     $                             real((iint+iwind)*dti/86400.,8), "s")
+        read(timestamp, '(i4)') year
+        ntime = int((Date_to_Day_of_Year(timestamp)-1.)/twind)+1
+        if (my_task==0) write(*,*) iint,":ff:",timestamp
+
         wusurfb = wusurff
         wvsurfb = wvsurff
         if (iint.ne.iend) then
-          call read_wind_pnetcdf(year,int(doy/twind)+2,wu,wv)
+          call read_wind_pnetcdf(year,ntime,wu,wv)
           wusurff(1:im,1:jm) = wu
           wvsurff(1:im,1:jm) = wv
         end if
@@ -939,38 +952,39 @@
       use date_utility
       implicit none
       include 'pom.h'
-      integer i,j,ntime,iheat
+      integer i,j,ntime,iheat,year
       double precision theat,fold,fnew
       double precision, dimension(im,jm) :: shf, swr
-      integer year
-      double precision doy
       character(len=26) timestamp
 
       theat=.25 ! time between heat forcing (days)
       iheat=int(theat*86400./dti)
-      
-      timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
-
-      read(timestamp, '(i4)') year
-      doy = Date_to_Day_of_Year(timestamp) - 1.
 
 ! read heat stress data
       ! read initial heat file
       if (iint.eq.1) then
-        call read_heat_pnetcdf(year,int(doy/theat)+1,shf,swr)
+
+        timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
+        read(timestamp, '(i4)') year
+        ntime = int((Date_to_Day_of_Year(timestamp)-1.)/theat)+1
+        if (my_task==0) write(*,*) iint,":ff:",timestamp
+
+        call read_heat_pnetcdf(year,ntime,shf,swr)
         wtsurff(1:im,1:jm) = shf
         swradf(1:im,1:jm) = swr
       end if
       ! read heat forcing corresponding to next theat
       if (iint.eq.1 .or. mod(iint+cont_bry,iheat).eq.0.) then
-        do i=1,im
-          do j=1,jm
-            wtsurfb(i,j)=wtsurff(i,j)
-            swradb(i,j)=swradf(i,j)
-          end do
-        end do
+
+        timestamp = Date_since(time_start,
+     $                             real((iint+iheat)*dti/86400.,8), "s")
+        read(timestamp, '(i4)') year
+        ntime = int((Date_to_Day_of_Year(timestamp)-1.)/theat)+1
+
+        wtsurfb = wtsurff
+        swradb  = swradf
         if (iint/=iend) then
-          call read_heat_pnetcdf(year,int(doy/theat)+2,shf,swr)
+          call read_heat_pnetcdf(year,ntime,shf,swr)
           wtsurff(1:im,1:jm) = shf
           swradf(1:im,1:jm) = swr
         end if
@@ -980,12 +994,8 @@
       ntime=int(time/theat)
       fnew=time/theat-ntime
       fold=1.-fnew
-      do i=1,im
-        do j=1,jm
-          wtsurf(i,j)=fold*wtsurfb(i,j)+fnew*wtsurff(i,j)
-          swrad(i,j)=fold*swradb(i,j)+fnew*swradf(i,j)
-        end do
-      end do
+      wtsurf(1:im,1:jm)=fold*wtsurfb(1:im,1:jm)+fnew*wtsurff(1:im,1:jm)
+      swrad(1:im,1:jm) =fold*swradb(1:im,1:jm) +fnew*swradf(1:im,1:jm)
 
       return
       end
