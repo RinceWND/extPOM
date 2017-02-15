@@ -608,21 +608,21 @@
       double precision mnth(13),doy
       logical upd
       character(len=26) timestamp
-      
+
       data mnth
      $ /0.,31.,59.,90.,120.,151.,181.,212.,243.,273.,304.,334.,365./
 !     $ /31.,28.,31.,30.,31.,30.,31.,31.,30.,31.,30.,31./
 
 !      ibc=int(tbc*86400.d0/dti)
-      
+
       upd = .false.
       timestamp = Date_since(time_start,real((iint-1)*dti/86400.,8),"s")
       read(timestamp, '(i4,x,i2)') ntime, ntimeb
       if (Is_Leap_Year(ntime)) mnth(2) = 29.
-      
+
       timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
       read(timestamp, '(5x,i2)') ntime
-      
+
       doy = Date_to_Day_of_Year(timestamp) - 1.
 
 ! read bc data
@@ -863,7 +863,6 @@
 ! linear interpolation in time
       fnew = (doy-mnth(ntime))/(mnth(ntime+1)-mnth(ntime))
      $      -int((doy-mnth(ntime))/(mnth(ntime+1)-mnth(ntime)))
-      if (my_task==master_task) write(*,*) "DoY::",doy,fnew,ntime
       fold=1.-fnew
       tbw(1:jm,1:kb) = fold*tbwb(1:jm,1:kb)+fnew*tbwf(1:jm,1:kb)
       sbw(1:jm,1:kb) = fold*sbwb(1:jm,1:kb)+fnew*sbwf(1:jm,1:kb)

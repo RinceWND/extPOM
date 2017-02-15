@@ -37,7 +37,7 @@
 ! write output
       if(netcdf_file.ne.'nonetcdf' .and. mod(iint,iprint).eq.0) then
         call write_output_pnetcdf
-        call write_aux_pnetcdf
+!        call write_aux_pnetcdf
       end if
       
 ! write auxillary debug

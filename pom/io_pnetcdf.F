@@ -3418,7 +3418,7 @@
         write(*,*) "[DBG] Shortwave@(50,50), W/m2: ", swr(50,50)
       end if
 ! convert heat fluxes
-      shf = -shf/rhoref/3986. ! J/kg
+      shf =  shf/rhoref/3986. ! J/kg
       swr = -swr/rhoref/3986.
 
       return
