@@ -3168,7 +3168,7 @@
       call handle_error_pnetcdf('nf_close: heat',status,nf_noerr)
 ! convert heat fluxes
       write(*,*) "B: ", my_task, "::", shf(40,40)
-      shf = -shf/rhoref/3986. ! J/kg
+      shf =  shf/rhoref/3986. ! J/kg
       swr = -swr/rhoref/3986.
       write(*,*) "A: ", my_task, "::", shf(40,40)
 
