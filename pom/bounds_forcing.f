@@ -1002,21 +1002,27 @@
 !_______________________________________________________________________
       subroutine surface
 ! read and interpolate heat flux in time
+      use date_utility, only:Date_since
       implicit none
       include 'pom.h'
-      integer i,j,ntime,isrf
+      integer i,j
+      integer(kind=2) ntime, ntimeb
       double precision tsrf!,fold,fnew
       double precision, dimension(im,jm) :: sst, sss
+      character(len=26) timestamp
 
-      tsrf=30. ! time between heat forcing (days)
-      isrf=int(tsrf*86400.d0/dti)
+      timestamp = Date_since(time_start,real((iint-1)*dti/86400.,8),"s")
+      read(timestamp, '(i4,x,i2)') ntime, ntimeb
+
+      timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
+      read(timestamp, '(5x,i2)') ntime
 
 ! read heat stress data
       ! read surface fields (no interpolation)
-      if (iint.eq.1 .or. mod(iint+cont_bry,isrf).eq.0.) then
-        call read_surface_pnetcdf((iint+cont_bry)/isrf+1,sst,sss)
+      if (iint.eq.1 .or. ntime.ne.ntimeb) then
+        call read_surface_pnetcdf(int(ntime),sst,sss)
         tsurf(1:im,1:jm) = sst
-!        ssurf(1:im,1:jm) = sss ! Do not overwrite SSS yet.
+        ssurf(1:im,1:jm) = sss
       end if
 
       return
@@ -1062,22 +1068,27 @@
 ! _____________________________________________________________________
       subroutine restore_interior
 ! read, interpolate (in time) and apply restore interior data
+      use date_utility, only:Date_since
       implicit none
       include 'pom.h'
       integer nz
       parameter(nz=40)
       double precision z0(nz),tr(im,jm,kb),sr(im,jm,kb)
-      integer i,j,k,ntime,irst
+      integer i,j,k
+      integer(kind=2) ntime,ntimeb
       double precision trst,fold,fnew
+      character(len=26) timestamp
 
-      trst=30. ! time between restore files (days)
-      irst=int(trst*86400.d0/dti)
-      ntime=int(time/trst)
+      timestamp = Date_since(time_start,real((iint-1)*dti/86400.,8),"s")
+      read(timestamp, '(i4,x,i2)') ntime, ntimeb
+
+      timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
+      read(timestamp, '(5x,i2)') ntime
 
 ! read restore data
       ! read initial restore file
-      if (iint.eq.2) then
-        call read_restore_ts_interior_pnetcdf((iint/irst)+1,kb,tr,sr)
+      if (iint.eq.1) then
+        call read_restore_ts_interior_pnetcdf(int(ntime),kb,tr,sr)
         trstrf(1:im,1:jm,:) = tr
         srstrf(1:im,1:jm,:) = sr
         taurstrf = 1./trst
@@ -1091,7 +1102,7 @@
 !     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
       end if
       ! read restore file corresponding to next time
-      if (iint.eq.2 .or. mod(iint,irst).eq.0.) then
+      if (iint.eq.1 .or. ntime/=ntimeb) then
         do k=1,kbm1
           do i=1,im
             do j=1,jm
@@ -1102,7 +1113,7 @@
           end do
         end do
         if (iint.ne.iend) then
-          call read_restore_ts_interior_pnetcdf((iint+irst)/irst+1,kb,
+          call read_restore_ts_interior_pnetcdf(int(ntime)+1,kb,
      $                                                            tr,sr)
           trstrf(1:im,1:jm,:) = tr
           srstrf(1:im,1:jm,:) = sr
