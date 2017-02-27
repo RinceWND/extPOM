@@ -2986,7 +2986,7 @@
       call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@uflx'
      $                          ,status,nf_noerr)
 
-! get data (swf is used as temporary storage first, then it reads shortwave radiation)
+! get data
       status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
       call handle_error_pnetcdf('nfmpi_get_vara_int2_all: uflx',
      $                          status,nf_noerr)
@@ -3006,7 +3006,7 @@
       call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@uflx'
      $                          ,status,nf_noerr)
 
-! get data (swf is used as temporary storage first, then it reads shortwave radiation)
+! get data
       status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
       call handle_error_pnetcdf('nfmpi_get_vara_int2_all: vflx',
      $                          status,nf_noerr)

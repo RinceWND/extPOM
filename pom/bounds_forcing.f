@@ -754,7 +754,7 @@
         vabsb = vabsf
         if (iint.ne.iend) then
           call read_boundary_conditions_pnetcdf(
-     $                                     mod(ntime+1,12),kb
+     $                                     mod(ntime,12)+1,kb
      $     ,tbwf,sbwf,ubwf,vbwf,tbef,sbef,ubef,vbef,tbnf,sbnf,vbnf,ubnf
      $                             ,tbsf,sbsf,vbsf,ubsf,elw,ele,eln,els)
 ! integrate by depth
@@ -1068,7 +1068,7 @@
 ! _____________________________________________________________________
       subroutine restore_interior
 ! read, interpolate (in time) and apply restore interior data
-      use date_utility, only:Date_since
+      use date_utility, only:Date_since,Is_Leap_Year
       implicit none
       include 'pom.h'
       integer nz
@@ -1076,8 +1076,9 @@
       double precision z0(nz),tr(im,jm,kb),sr(im,jm,kb)
       integer i,j,k
       integer(kind=2) ntime,ntimeb
-      double precision trst,fold,fnew
+      double precision trst(12),fold,fnew
       character(len=26) timestamp
+      data trst/31.,28.,31.,30.,31.,30.,31.,31.,30.,31.,30.,31./
 
       timestamp = Date_since(time_start,real((iint-1)*dti/86400.,8),"s")
       read(timestamp, '(i4,x,i2)') ntime, ntimeb
@@ -1091,7 +1092,7 @@
         call read_restore_ts_interior_pnetcdf(int(ntime),kb,tr,sr)
         trstrf(1:im,1:jm,:) = tr
         srstrf(1:im,1:jm,:) = sr
-        taurstrf = 1./trst
+        taurstrf = 1./trst(ntime)
 !        call ztosig(z0,f0,zz,h,trstrf,im,jm,nz,kb,
 !     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !        call read_restore_s_interior_pnetcdf(iint/irst,nz,z0,f0)
@@ -1117,7 +1118,7 @@
      $                                                            tr,sr)
           trstrf(1:im,1:jm,:) = tr
           srstrf(1:im,1:jm,:) = sr
-          taurstrf = 1./trst
+          taurstrf = 1./trst(ntime)
 !          call ztosig(z0,f0,zz,h,trstrf,im,jm,nz,kb,
 !     $                  im_local,jm_local,n_west,n_east,n_south,n_north)
 !          call read_restore_s_interior_pnetcdf((iint+irst)/irst,nz,z0,
@@ -1132,7 +1133,7 @@
       end if
 
 ! linear interpolation in time
-      fnew=time/trst-ntime
+      fnew=time/trst(ntime)-ntime
       fold=1.-fnew
       do k=1,kbm1
         do i=1,im
