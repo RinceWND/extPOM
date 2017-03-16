@@ -1781,7 +1781,7 @@
 
 !_______________________________________________________________________
       subroutine profv
-! solves for vertical diffusion of x-momentum using method described by
+! solves for vertical diffusion of y-momentum using method described by
 ! Richmeyer and Morton (1967)
 ! note: wvsurf has the opposite sign to the wind speed
       implicit none

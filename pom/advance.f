@@ -10,6 +10,9 @@
       
 ! get time
       call get_time
+
+! update background clim fields
+      call bg_fields
       
 ! set time dependent surface boundary conditions
       call surface_forcing

@@ -2820,8 +2820,8 @@
 ! open netcdf ic file (read initial conditions from climatology)
       write(netcdf_ic_file,'(a,''in/'',a,''.clim.nc'')')
      $                                   trim(wrk_pth),trim(netcdf_file)
-      if(my_task.eq.0) write(*,'(/''reading file '',a)')
-     $                                              trim(netcdf_ic_file)
+      if(my_task.eq.0) write(*,'(/''reading file '',a," [",i4,"]")')
+     $                                            trim(netcdf_ic_file),n
       status=nfmpi_open(pom_comm,netcdf_ic_file,nf_nowrite,
      $                                               mpi_info_null,ncid)
       call handle_error_pnetcdf('nfmpi_open: '//netcdf_ic_file,
@@ -2873,13 +2873,13 @@
       end
 
 !_______________________________________________________________________
-      subroutine read_clim_ts_pnetcdf(k,ti,temp,salt)
+      subroutine read_clim_ts_pnetcdf(k,n,temp,salt)
 ! read initial temperature and salinity
       implicit none
 # include "mpif.h"
 # include "pnetcdf.inc"
       include 'pom.h'
-      integer k,ti
+      integer k,n
 !      double precision zlev(k)
       double precision, dimension(im_local,jm_local,k), intent(out) ::
      $                                                        temp, salt
@@ -2895,8 +2895,8 @@
 ! open netcdf file
       write(netcdf_ic_file,'(a,''in/'',a,''.clim.nc'')')
      $                                   trim(wrk_pth),trim(netcdf_file)
-      if(my_task.eq.0) write(*,'(/''reading file '',a)')
-     $                                              trim(netcdf_ic_file)
+      if(my_task.eq.0) write(*,'(/''reading file '',a," [",i4,"]")')
+     $                                            trim(netcdf_ic_file),n
       status=nfmpi_open(pom_comm,netcdf_ic_file,nf_nowrite,
      $                                               mpi_info_null,ncid)
       call handle_error_pnetcdf('nfmpi_open: '//netcdf_ic_file,
@@ -2918,7 +2918,7 @@
       start(1)=i_global(1)
       start(2)=j_global(1)
       start(3)=1
-      start(4)=ti
+      start(4)=n
       edge(1)=im
       edge(2)=jm
       edge(3)=k

@@ -102,22 +102,22 @@
       cbcmin=.0025d0
 
 ! Maximum bottom friction coeff.
-      cbcmax=1.d0
+      cbcmax=5. !1.
 
 ! Smagorinsky diffusivity coeff.
       horcon=0.1d0
 
 ! Inverse horizontal turbulent Prandtl number (ah/am; dimensionless):
 ! NOTE that tprni=0.d0 yields zero horizontal diffusivity!
-      tprni=.1d0
+      tprni=.5 !.1
 
 ! Background viscosity used in subroutines profq, proft, profu and
 ! profv (S.I. units):
-      umol=1.d-6
+      umol=1.d-5 !1.d-6
 
 ! Maximum magnitude of vaf (used in check that essentially tests
 ! for CFL violation):
-      vmaxl=100.d0
+      vmaxl=5. !100.
 
 ! Maximum allowable value of:
 !   <difference of depths>/<sum of depths>
@@ -165,7 +165,7 @@
       alpha=0.d0
 
 ! Initial value of aam:
-      aam_init=0.d0
+      aam_init=500. !0.
 
 ! End of input of constants
 
@@ -175,7 +175,7 @@
       close(73)
 
 ! calculate some constants
-      small=1.d-9           ! Small value
+      small=1.d-10          ! Small value
       pi=atan(1.d0)*4.d0    ! PI
 
       dti=dte*float(isplit)

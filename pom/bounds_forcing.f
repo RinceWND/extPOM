@@ -889,6 +889,32 @@
 
       return
       end
+! _____________________________________________________________________
+      subroutine bg_fields
+! create variable lateral boundary conditions
+      use date_utility, only:Date_since,Is_Leap_Year,Date_to_Day_of_Year
+      implicit none
+      include 'pom.h'
+      integer(kind=2) ntime,ntimeb
+      double precision mnth(13),doy
+      character(len=26) timestamp
+
+      timestamp = Date_since(time_start,real((iint-1)*dti/86400.,8),"s")
+      read(timestamp, '(i4,x,i2)') ntime, ntimeb
+!      if (Is_Leap_Year(ntime)) mnth(2) = 29.
+
+      timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
+      read(timestamp, '(5x,i2)') ntime
+
+      doy = Date_to_Day_of_Year(timestamp) - 1.
+
+! read clim data
+      if (ntime.ne.ntimeb) then
+        call read_clim_ts_pnetcdf(kb,int(ntime),tclim,sclim)
+      end if
+
+      return
+      end
 
 !_______________________________________________________________________
       subroutine wind
