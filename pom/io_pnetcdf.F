@@ -3166,14 +3166,14 @@
       end
 
 !_______________________________________________________________________
-      subroutine read_heat_pnetcdf(y,n,shf,swr)
+      subroutine read_heat_pnetcdf(y,n,shf,swr,air,emp)
 ! read heat flux
       implicit none
 # include "mpif.h"
 # include "pnetcdf.inc"
       include 'pom.h'
       integer(kind=2) tmp(im,jm)
-      real(kind=8) shf(im,jm),swr(im,jm)
+      real(kind=8), dimension(im,jm) :: shf,swr,air,emp
 !      integer i,j
       integer y,n
       character*120 netcdf_heat_file
@@ -3203,7 +3203,7 @@
 
 ! get the variable
       status=nfmpi_inq_varid(ncid,'uhtfl',varid)
-      call handle_error_pnetcdf('nfmpi_inq_varid: wtsurf'
+      call handle_error_pnetcdf('nfmpi_inq_varid: uhtfl'
      $                          ,status,nf_noerr)
 ! get attributes for unpacking
       status=nfmpi_get_att_real(ncid, varid, "add_offset", off)
@@ -3220,6 +3220,49 @@
 
 ! unpack data
       shf = real(tmp,8)*fac+off
+
+
+! get the variable
+      status=nfmpi_inq_varid(ncid,'evmpr',varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: evmpr'
+     $                          ,status,nf_noerr)
+! get attributes for unpacking
+      status=nfmpi_get_att_real(ncid, varid, "add_offset", off)
+      call handle_error_pnetcdf('nfmpi_get_att_real: add_offset@evmpr'
+     $                          ,status,nf_noerr)
+      status=nfmpi_get_att_real(ncid, varid, "scale_factor", fac)
+      call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@evmpr'
+     $                          ,status,nf_noerr)
+
+! get data
+      status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
+      call handle_error_pnetcdf('nfmpi_get_vara_int2_all: evmpr',
+     $                          status,nf_noerr)
+
+! unpack data
+      emp = real(tmp,8)*fac+off
+
+
+      ! get the variable
+      status=nfmpi_inq_varid(ncid,'tempa',varid)
+      call handle_error_pnetcdf('nfmpi_inq_varid: tempa'
+     $                          ,status,nf_noerr)
+! get attributes for unpacking
+      status=nfmpi_get_att_real(ncid, varid, "add_offset", off)
+      call handle_error_pnetcdf('nfmpi_get_att_real: add_offset@tempa'
+     $                          ,status,nf_noerr)
+      status=nfmpi_get_att_real(ncid, varid, "scale_factor", fac)
+      call handle_error_pnetcdf('nfmpi_get_att_real: scale_factor@tempa'
+     $                          ,status,nf_noerr)
+
+! get data
+      status=nfmpi_get_vara_int2_all(ncid,varid,start,edge,tmp)
+      call handle_error_pnetcdf('nfmpi_get_vara_int2_all: tempa',
+     $                          status,nf_noerr)
+
+! unpack data
+      air = real(tmp,8)*fac+off
+
 
 ! get the variable
       status=nfmpi_inq_varid(ncid,'swrad',varid)

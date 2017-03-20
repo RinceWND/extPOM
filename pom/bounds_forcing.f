@@ -979,7 +979,7 @@
       include 'pom.h'
       integer i,j,ntime,iheat,year
       double precision theat,fold,fnew
-      double precision, dimension(im,jm) :: shf, swr
+      double precision, dimension(im,jm) :: shf, swr, air, emp
       character(len=26) timestamp
 
       theat=.25 ! time between heat forcing (days)
@@ -994,8 +994,8 @@
         ntime = int((Date_to_Day_of_Year(timestamp)-1.)/theat)+1
         if (my_task==0) write(*,*) iint,":ff:",timestamp
 
-        call read_heat_pnetcdf(year,ntime,shf,swr)
-        wtsurff(1:im,1:jm) = shf
+        call read_heat_pnetcdf(year,ntime,shf,swr,air,emp)
+        wtsurff(1:im,1:jm) = shf+emp*(air-t(1:im,1:jm,1))/rhoref
         swradf(1:im,1:jm) = swr
       end if
       ! read heat forcing corresponding to next theat
@@ -1009,8 +1009,8 @@
         wtsurfb = wtsurff
         swradb  = swradf
         if (iint/=iend) then
-          call read_heat_pnetcdf(year,ntime,shf,swr)
-          wtsurff(1:im,1:jm) = shf
+          call read_heat_pnetcdf(year,ntime,shf,swr,air,emp)
+          wtsurff(1:im,1:jm) = shf+emp*(air-t(1:im,1:jm,1))/rhoref
           swradf(1:im,1:jm) = swr
         end if
       end if
