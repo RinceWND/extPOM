@@ -3022,36 +3022,36 @@
       wu = -wu/rhoref
       wv = -wv/rhoref
 ! taper wind stress along the boundary
-      wu(2:imm1,2:jmm1) = .25*wu(2:imm1,2:jmm1)
-     $                   *(dum(2:imm1,3:jm)+dum(2:imm1,1:jmm2)
-     $                    +dum(3:im,2:jmm1)+dum(1:imm2,2:jmm1))
-      wu(2:imm1,1) = wu(2:imm1,1)/3.
-     $              *(dum(2:imm1,2)+dum(1:imm2,1)+dum(3:im,1))
-      wu(2:imm1,jm) = wu(2:imm1,jm)/3.
-     $               *(dum(2:imm1,jmm1)+dum(1:imm2,jm)+dum(3:im,jm))
-      wu(1,2:jmm1) = wu(1,2:jmm1)/3.
-     $              *(dum(2,2:jmm1)+dum(1,1:jmm2)+dum(1,3:jm))
-      wu(im,2:jmm1) = wu(im,2:jmm1)/3.
-     $               *(dum(imm1,2:jmm1)+dum(im,1:jmm2)+dum(im,3:jm))
-      wu( 1, 1) = .5*wu( 1, 1)*(dum( 1,   2)+dum(   2, 1))
-      wu(im, 1) = .5*wu(im, 1)*(dum(im,   2)+dum(imm1, 1))
-      wu(im,jm) = .5*wu(im,jm)*(dum(im,jmm1)+dum(imm1,jm))
-      wu( 1,jm) = .5*wu( 1,jm)*(dum( 1,jmm1)+dum(   2,jm))
-      wv(2:imm1,2:jmm1) = .25*wv(2:imm1,2:jmm1)
-     $                   *(dvm(2:imm1,3:jm)+dvm(2:imm1,1:jmm2)
-     $                    +dvm(3:im,2:jmm1)+dvm(1:imm2,2:jmm1))
-      wv(2:imm1,1) = wv(2:imm1,1)/3.
-     $              *(dvm(2:imm1,2)+dvm(1:imm2,1)+dvm(3:im,1))
-      wv(2:imm1,jm) = wv(2:imm1,jm)/3.
-     $               *(dvm(2:imm1,jmm1)+dvm(1:imm2,jm)+dvm(3:im,jm))
-      wv(1,2:jmm1) = wv(1,2:jmm1)/3.
-     $              *(dvm(2,2:jmm1)+dvm(1,1:jmm2)+dvm(1,3:jm))
-      wv(im,2:jmm1) = wv(im,2:jmm1)/3.
-     $               *(dvm(imm1,2:jmm1)+dvm(im,1:jmm2)+dvm(im,3:jm))
-      wv( 1, 1) = .5*wv( 1, 1)*(dvm( 1,   2)+dvm(   2, 1))
-      wv(im, 1) = .5*wv(im, 1)*(dvm(im,   2)+dvm(imm1, 1))
-      wv(im,jm) = .5*wv(im,jm)*(dvm(im,jmm1)+dvm(imm1,jm))
-      wv( 1,jm) = .5*wv( 1,jm)*(dvm( 1,jmm1)+dvm(   2,jm))
+!      wu(2:imm1,2:jmm1) = .25*wu(2:imm1,2:jmm1)
+!     $                   *(dum(2:imm1,3:jm)+dum(2:imm1,1:jmm2)
+!     $                    +dum(3:im,2:jmm1)+dum(1:imm2,2:jmm1))
+!      wu(2:imm1,1) = wu(2:imm1,1)/3.
+!     $              *(dum(2:imm1,2)+dum(1:imm2,1)+dum(3:im,1))
+!      wu(2:imm1,jm) = wu(2:imm1,jm)/3.
+!     $               *(dum(2:imm1,jmm1)+dum(1:imm2,jm)+dum(3:im,jm))
+!      wu(1,2:jmm1) = wu(1,2:jmm1)/3.
+!     $              *(dum(2,2:jmm1)+dum(1,1:jmm2)+dum(1,3:jm))
+!      wu(im,2:jmm1) = wu(im,2:jmm1)/3.
+!     $               *(dum(imm1,2:jmm1)+dum(im,1:jmm2)+dum(im,3:jm))
+!      wu( 1, 1) = .5*wu( 1, 1)*(dum( 1,   2)+dum(   2, 1))
+!      wu(im, 1) = .5*wu(im, 1)*(dum(im,   2)+dum(imm1, 1))
+!      wu(im,jm) = .5*wu(im,jm)*(dum(im,jmm1)+dum(imm1,jm))
+!      wu( 1,jm) = .5*wu( 1,jm)*(dum( 1,jmm1)+dum(   2,jm))
+!      wv(2:imm1,2:jmm1) = .25*wv(2:imm1,2:jmm1)
+!     $                   *(dvm(2:imm1,3:jm)+dvm(2:imm1,1:jmm2)
+!     $                    +dvm(3:im,2:jmm1)+dvm(1:imm2,2:jmm1))
+!      wv(2:imm1,1) = wv(2:imm1,1)/3.
+!     $              *(dvm(2:imm1,2)+dvm(1:imm2,1)+dvm(3:im,1))
+!      wv(2:imm1,jm) = wv(2:imm1,jm)/3.
+!     $               *(dvm(2:imm1,jmm1)+dvm(1:imm2,jm)+dvm(3:im,jm))
+!      wv(1,2:jmm1) = wv(1,2:jmm1)/3.
+!     $              *(dvm(2,2:jmm1)+dvm(1,1:jmm2)+dvm(1,3:jm))
+!      wv(im,2:jmm1) = wv(im,2:jmm1)/3.
+!     $               *(dvm(imm1,2:jmm1)+dvm(im,1:jmm2)+dvm(im,3:jm))
+!      wv( 1, 1) = .5*wv( 1, 1)*(dvm( 1,   2)+dvm(   2, 1))
+!      wv(im, 1) = .5*wv(im, 1)*(dvm(im,   2)+dvm(imm1, 1))
+!      wv(im,jm) = .5*wv(im,jm)*(dvm(im,jmm1)+dvm(imm1,jm))
+!      wv( 1,jm) = .5*wv( 1,jm)*(dvm( 1,jmm1)+dvm(   2,jm))
 
       return
       end
