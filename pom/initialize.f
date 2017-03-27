@@ -71,7 +71,7 @@
       namelist/pom_nml/ title,wrk_pth,netcdf_file,mode,nadv,nitera,
      $                  sw,npg,dte,isplit,time_start,nread_rst,
      $                  read_rst_file,cont_bry,write_rst,write_rst_file,
-     $                  days,prtd1,prtd2,swtch,ntp,nbct,nbcs
+     $                  days,prtd1,prtd2,swtch,ntp,nbct,nbcs,umol,tprni
 
 ! Input of filenames and constants
 
