@@ -67,7 +67,7 @@
       integer z_varid,zz_varid,dx_varid,dy_varid,east_c_varid,
      $        east_e_varid,east_u_varid,east_v_varid,north_c_varid,
      $        north_e_varid,north_u_varid,north_v_varid,rot_varid,
-     $        h_varid,fsm_varid,dum_varid,dvm_varid
+     $        h_varid,fsm_varid,dum_varid,dvm_varid,uhtfl_varid
       integer time_varid,uab_varid,vab_varid,elb_varid,u_varid,v_varid,
      $        w_varid,t_varid,s_varid,rho_varid
       integer ncid,status
@@ -216,6 +216,8 @@
      $           'depth-averaged v','metre/sec','east_v north_v',.true.)
       call def_var_pnetcdf(ncid,'elb',3,vdims,elb_varid,
      $              'surface elevation','metre','east_e north_e',.true.)
+      call def_var_pnetcdf(ncid,'uhtfl',3,vdims,uhtfl_varid,
+     $               'upward heat flux','K m/s','east_e north_e',.true.)
 
       vdims(1)=x_dimid
       vdims(2)=y_dimid
@@ -371,6 +373,11 @@
       status=nfmpi_put_vara_double_all(ncid,elb_varid,start,edge
      $                                                      ,dat(:,:,1))
       call handle_error_pnetcdf('nf_put_vara_double: elb',
+     $                                                  status,nf_noerr)
+      dat(:,:,1) = wtsurf(1:im,1:jm)+swrad(1:im,1:jm)
+      status=nfmpi_put_vara_double_all(ncid,uhtfl_varid,start,edge
+     $                                                      ,dat(:,:,1))
+      call handle_error_pnetcdf('nf_put_vara_double: uhtfl',
      $                                                  status,nf_noerr)
 
       start(1)=i_global(1)

@@ -327,6 +327,10 @@
 ! read grid
       call read_grid_pnetcdf
 
+! do not allow distances less than 1 meter for now
+      where(dx<=1.) dx = 1.
+      where(dy<=1.) dy = 1.
+
 ! derived vertical grid variables
       do k=1,kb-1
         dz(k)=z(k)-z(k+1)
@@ -406,6 +410,13 @@
 ! read initial temperature and salinity from ic file
       call read_initial_ts_pnetcdf(kb,mnth,tb,sb)
       call read_clim_ts_pnetcdf(kb,mnth,tclim,sclim)
+      
+      do k=1,kbm1
+        tb(1:im,1:jm,k) = 5.+15.*exp(zz(k)*h(1:im,1:jm)/1000.)
+      end do
+      sb = 34.
+      tclim = tb
+      sclim = sb
 
 ! map onto sigma coordinate
 !      call ztosig(z2,tb0,zz,h,tclim,im,jm,nz,kb,
@@ -504,6 +515,8 @@
         call baropg
       else if (npg.eq.2) then
         call baropg_mcc
+      else if (npg.eq.3) then
+        call baropg_lin
       else
         error_status=1
         write(6,'(/''Error: invalid value for npg'')')

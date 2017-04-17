@@ -15,10 +15,10 @@
       call bg_fields
       
 ! set time dependent surface boundary conditions
-      call surface_forcing
+!      call surface_forcing
       
 ! set time dependent lateral boundary conditions
-      call lateral_bc
+!      call lateral_bc
       
 ! set lateral viscosity
       call lateral_viscosity
@@ -40,7 +40,7 @@
 ! write output
       if(netcdf_file.ne.'nonetcdf' .and. mod(iint,iprint).eq.0) then
         call write_output_pnetcdf
-        call write_aux_pnetcdf
+!        call write_aux_pnetcdf
       end if
       
 ! write auxillary debug
@@ -118,6 +118,8 @@
           call baropg
         else if (npg.eq.2) then
           call baropg_mcc
+        else if (npg.eq.3) then
+          call baropg_lin
         else
           error_status=1
           write(6,'(/''Error: invalid value for npg'')')

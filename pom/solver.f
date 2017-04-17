@@ -1157,6 +1157,77 @@
 
       return
       end
+      
+!_______________________________________________________________________
+      subroutine baropg_lin()
+
+      implicit none
+      include 'pom.h'
+      integer i,j,k
+      double precision p(im,jm,kb),fx(im,jm,kb),fc(im,kb)
+      double precision dh,cff,cff1
+
+      rho = rho-rmean
+        
+      p(:,:,1) = 0.
+      do k = 2,kb
+        p(:,:,k)  = p(:,:,k-1)+zz(k)*h(1:im,1:jm)*rho(1:im,1:jm,k)
+        fx(:,:,k) = .5*zz(k)*h(1:im,1:jm)*(p(:,:,k-1)+p(:,:,k))
+      end do
+
+      do j = 1,jm
+!
+!  Calculate pressure gradient in the XI-direction (m4/s2).
+!
+          fc(:,1) = 0.
+          cff = .5*grav
+          cff1= grav/rhoref
+          do k = 1,kbm1
+            do i = 2,im
+              if (dum(i,j)/=0.) then
+              dh = zz(k+1)*h(i,j)-zz(k+1)*h(i-1,j)
+              fc(i,k+1) = .5*dh*(p(i,j,k+1)+p(i-1,j,k+1))
+              drhox(i,j,k) = (cff*(dz(k)*h(i-1,j)+
+     &                             dz(k)*h(i,j))*                        &
+     &                            (-z(2)*h(i-1,j)+
+     &                              z(2)*h(i,j))+
+     &                        cff1*(fx(i-1,j,k)-                        &
+     &                              fx(i  ,j,k)+                        &
+     &                              fc(i,k+1)-                          &
+     &                              fc(i,k)))/dy(i,j)
+              end if
+            end do
+          end do
+!
+!  Calculate pressure gradient in the ETA-direction (m4/s2).
+!
+          if (j>=2) then
+          fc(:,1) = 0.
+          cff = .5*grav
+          cff1= grav/rhoref
+          do k = 1,kbm1
+            do i = 2,im
+              if (dvm(i,j)/=0.) then
+              dh = z(k+1)*h(i,j)-z(k+1)*h(i,j-1)
+              fc(i,k+1) = .5*dh*(p(i,j,k+1)+p(i,j-1,k+1))
+              drhoy(i,j,k) = (cff*(dz(k)*h(i,j-1)+                         &
+     &                             dz(k)*h(i,j))*                        &
+     &                            (z(2)*h(i,j-1)-
+     &                             z(2)*h(i,j))+
+     &                        cff1*(fx(i,j-1,k)-                        &
+     &                              fx(i,j  ,k)+                        &
+     &                              fc(i,k+1)-                          &
+     &                              fc(i,k)))/dx(i,j)
+              end if
+            end do
+          end do
+          end if
+      end do
+      
+      rho = rho+rmean
+      
+        
+      end subroutine
 
 !_______________________________________________________________________
       subroutine dens(si,ti,rhoo)
@@ -1171,6 +1242,7 @@
       integer i,j,k
       double precision cr,p,rhor,sr,tr,tr2,tr3,tr4
 
+      write(*,*) iint, minval(ti, ti>0.), maxval(abs(ti))
       do k=1,kbm1
         do j=1,jm
           do i=1,im
@@ -1493,6 +1565,9 @@
 ! layer data. The choice is whether or not it should be subject to the
 ! stability factor, sh. Generally, there is not a great difference in
 ! output
+      where (abs(kq)<1.d-306) kq = 0.
+      where (abs(km)<1.d-306) km = 0.
+      where (abs(kh)<1.d-306) kh = 0.
       do k=1,kb
         do j=1,jm
           do i=1,im
@@ -1709,10 +1784,15 @@
       ee = 0.
       gg = 0.
 
+!      rewind(40+my_task)
+!      write(40+my_task,'(180(91(e17.7,";"),/))') km
+      
+      where (abs(km)<1.d-306) km = 0.
+      
       do k=1,kb
         do j=2,jm
           do i=2,im
-            c(i,j,k)=(km(i,j,k)+km(i-1,j,k))*.5d0
+            c(i,j,k)=(km(i,j,k)+km(i-1,j,k))*.5
           end do
         end do
       end do

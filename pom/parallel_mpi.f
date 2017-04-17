@@ -486,15 +486,15 @@
       include 'mpif.h'
       include 'pom.h'
 
-      double precision, dimension(im_local,jm_local) :: cfl
+      double precision, dimension(im,jm) :: cfl
       double precision cflmin, tmp
       integer ierr
 
       cfl = 0.
       cflmin = 1.d10
 
-      cfl(:,:) = .5d0/sqrt(1.d0/dx(:,:)**2+1.d0/dy(:,:)**2)
-     $               /sqrt(grav*(h(:,:)+small))*fsm(:,:)
+      cfl = .5d0/sqrt(1.d0/dx(1:im,1:jm)**2+1.d0/dy(1:im,1:jm)**2)
+     $          /sqrt(grav*(h(1:im,1:jm)+small))*fsm(1:im,1:jm)
 
       cflmin = minval(cfl, cfl>0.)
 

@@ -935,7 +935,8 @@
       if (iint.eq.1) then
 
         timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
-        read(timestamp, '(i4)') year
+!        read(timestamp, '(i4)') year
+        year = 1980
         ntime = int((Date_to_Day_of_Year(timestamp)-1.)/twind)+1
 
         call read_wind_pnetcdf(year,ntime,wu,wv)
@@ -948,7 +949,8 @@
 
         timestamp = Date_since(time_start,
      $                             real((iint+iwind)*dti/86400.,8), "s")
-        read(timestamp, '(i4)') year
+!        read(timestamp, '(i4)') year
+        year = 1980
         ntime = int((Date_to_Day_of_Year(timestamp)-1.)/twind)+1
         if (my_task==0) write(*,*) iint,":ff:",timestamp
 
@@ -990,12 +992,13 @@
       if (iint.eq.1) then
 
         timestamp = Date_since(time_start, real(iint*dti/86400.,8), "s")
-        read(timestamp, '(i4)') year
+!        read(timestamp, '(i4)') year
+        year = 1980
         ntime = int((Date_to_Day_of_Year(timestamp)-1.)/theat)+1
         if (my_task==0) write(*,*) iint,":ff:",timestamp
 
         call read_heat_pnetcdf(year,ntime,shf,swr,air,emp)
-        wtsurff(1:im,1:jm) = shf+emp*(air-t(1:im,1:jm,1))/rhoref
+        wtsurff(1:im,1:jm) = shf!+emp*(air-t(1:im,1:jm,1))/rhoref
         swradf(1:im,1:jm) = swr
       end if
       ! read heat forcing corresponding to next theat
@@ -1003,14 +1006,15 @@
 
         timestamp = Date_since(time_start,
      $                             real((iint+iheat)*dti/86400.,8), "s")
-        read(timestamp, '(i4)') year
+!        read(timestamp, '(i4)') year
+        year = 1980
         ntime = int((Date_to_Day_of_Year(timestamp)-1.)/theat)+1
 
         wtsurfb = wtsurff
         swradb  = swradf
         if (iint/=iend) then
           call read_heat_pnetcdf(year,ntime,shf,swr,air,emp)
-          wtsurff(1:im,1:jm) = shf+emp*(air-t(1:im,1:jm,1))/rhoref
+          wtsurff(1:im,1:jm) = shf!+emp*(air-t(1:im,1:jm,1))/rhoref
           swradf(1:im,1:jm) = swr
         end if
       end if
