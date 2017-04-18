@@ -1185,16 +1185,16 @@
           do k = 1,kbm1
             do i = 2,im
               if (dum(i,j)/=0.) then
-              dh = zz(k+1)*h(i,j)-zz(k+1)*h(i-1,j)
+              dh = z(k+1)*h(i,j)-z(k+1)*h(i-1,j)
               fc(i,k+1) = .5*dh*(p(i,j,k+1)+p(i-1,j,k+1))
               drhox(i,j,k) = (cff*(dz(k)*h(i-1,j)+
      &                             dz(k)*h(i,j))*                        &
-     &                            (-z(2)*h(i-1,j)+
-     &                              z(2)*h(i,j))+
+     &                            (-z(1)*h(i-1,j)+
+     &                              z(1)*h(i,j))+
      &                        cff1*(fx(i-1,j,k)-                        &
      &                              fx(i  ,j,k)+                        &
-     &                              fc(i,k+1)-                          &
-     &                              fc(i,k)))/dy(i,j)
+     &                              fc(i,k)-
+     &                              fc(i,k+1)))/dy(i,j)
               end if
             end do
           end do
@@ -1212,12 +1212,12 @@
               fc(i,k+1) = .5*dh*(p(i,j,k+1)+p(i,j-1,k+1))
               drhoy(i,j,k) = (cff*(dz(k)*h(i,j-1)+                         &
      &                             dz(k)*h(i,j))*                        &
-     &                            (z(2)*h(i,j-1)-
-     &                             z(2)*h(i,j))+
+     &                            (z(1)*h(i,j-1)-
+     &                             z(1)*h(i,j))+
      &                        cff1*(fx(i,j-1,k)-                        &
      &                              fx(i,j  ,k)+                        &
-     &                              fc(i,k+1)-                          &
-     &                              fc(i,k)))/dx(i,j)
+     &                              fc(i,k)-
+     &                              fc(i,k+1)))/dx(i,j)
               end if
             end do
           end do
