@@ -1170,9 +1170,10 @@
       rho = rho-rmean
         
       p(:,:,1) = 0.
-      do k = 2,kb
-        p(:,:,k)  = p(:,:,k-1)+zz(k)*h(1:im,1:jm)*rho(1:im,1:jm,k)
-        fx(:,:,k) = .5*zz(k)*h(1:im,1:jm)*(p(:,:,k-1)+p(:,:,k))
+      do k = 1,kbm1
+        p(:,:,k+1) = p(:,:,k)
+     &            +dz(k)*d(1:im,1:jm)*rho(1:im,1:jm,k)
+        fx(:,:,k) = .5*dz(k)*d(1:im,1:jm)*(p(:,:,k)+p(:,:,k+1))
       end do
 
       do j = 1,jm
@@ -1185,15 +1186,15 @@
           do k = 1,kbm1
             do i = 2,im
               if (dum(i,j)/=0.) then
-              dh = z(k+1)*h(i,j)-z(k+1)*h(i-1,j)
+              dh = z(k+1)*d(i,j)-z(k+1)*d(i-1,j)
               fc(i,k+1) = .5*dh*(p(i,j,k+1)+p(i-1,j,k+1))
-              drhox(i,j,k) = (cff*(dz(k)*h(i-1,j)+
-     &                             dz(k)*h(i,j))*                        &
-     &                            (-z(1)*h(i-1,j)+
-     &                              z(1)*h(i,j))+
-     &                        cff1*(fx(i-1,j,k)-                        &
-     &                              fx(i  ,j,k)+                        &
-     &                              fc(i,k)-
+              drhox(i,j,k) = (cff*(dz(k)*d(i-1,j)+
+     &                             dz(k)*d(i  ,j))*
+     &                            ( z(1)*d(i-1,j)-
+     &                              z(1)*d(i  ,j))+
+     &                        cff1*(fx(i-1,j,k)-
+     &                              fx(i  ,j,k)+
+     &                              fc(i,k  )-
      &                              fc(i,k+1)))/dy(i,j)
               end if
             end do
@@ -1208,15 +1209,15 @@
           do k = 1,kbm1
             do i = 2,im
               if (dvm(i,j)/=0.) then
-              dh = z(k+1)*h(i,j)-z(k+1)*h(i,j-1)
+              dh = z(k+1)*d(i,j)-z(k+1)*d(i,j-1)
               fc(i,k+1) = .5*dh*(p(i,j,k+1)+p(i,j-1,k+1))
-              drhoy(i,j,k) = (cff*(dz(k)*h(i,j-1)+                         &
-     &                             dz(k)*h(i,j))*                        &
-     &                            (z(1)*h(i,j-1)-
-     &                             z(1)*h(i,j))+
-     &                        cff1*(fx(i,j-1,k)-                        &
-     &                              fx(i,j  ,k)+                        &
-     &                              fc(i,k)-
+              drhoy(i,j,k) = (cff*(dz(k)*d(i,j-1)+
+     &                             dz(k)*d(i,j  ))*
+     &                            ( z(1)*d(i,j-1)-
+     &                              z(1)*d(i,j  ))+
+     &                        cff1*(fx(i,j-1,k)-
+     &                              fx(i,j  ,k)+
+     &                              fc(i,k  )-
      &                              fc(i,k+1)))/dx(i,j)
               end if
             end do
