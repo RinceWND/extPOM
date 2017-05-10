@@ -88,7 +88,7 @@
 ! wind forcing is suplied in subroutine wind
       call wind
 ! heat fluxes are suplied in subroutine heat
-      call heat
+!      call heat
 ! water fluxes are suplied in subroutine water
 !      call water
 ! surface fields (SST,SSS) are suplied in subroutine surface

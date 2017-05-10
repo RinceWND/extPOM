@@ -411,12 +411,12 @@
       call read_initial_ts_pnetcdf(kb,mnth,tb,sb)
       call read_clim_ts_pnetcdf(kb,mnth,tclim,sclim)
       
-      do k=1,kbm1
-        tb(1:im,1:jm,k) = 5.+15.*exp(zz(k)*h(1:im,1:jm)/1000.)
-      end do
-      sb = 34.
-      tclim = tb
-      sclim = sb
+!      do k=1,kbm1
+!        tb(1:im,1:jm,k) = 5.+15.*exp(zz(k)*h(1:im,1:jm)/1000.)
+!      end do
+!      sb = 34.
+!      tclim = tb
+!      sclim = sb
 
 ! map onto sigma coordinate
 !      call ztosig(z2,tb0,zz,h,tclim,im,jm,nz,kb,
