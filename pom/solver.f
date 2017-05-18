@@ -1159,7 +1159,7 @@
       end
       
 !_______________________________________________________________________
-      subroutine baropg_lin()
+      subroutine baropg_lin
 
       implicit none
       include 'pom.h'
@@ -1226,9 +1226,247 @@
       end do
       
       rho = rho+rmean
-      
         
       end subroutine
+!_______________________________________________________________________
+      subroutine baropg_sch2
+
+      implicit none
+      include 'pom.h'
+      integer i,j,k
+      double precision p(im,jm,kb),fx(im,jm,0:kb)
+      double precision :: fc(im,0:kb)
+      double precision r(im,jm,0:kb)
+      double precision, dimension(im,kb) :: aR,aL,dR,dL
+      double precision dh,cff,cff1,cff2,cffL,cffR,rr,dP
+      double precision deltaR,deltaL
+
+      real(kind=8), parameter :: eps = 1.0e-8
+
+      rho = rho-rmean
+
+      cff2 = 1./6.
+
+      do j = 1,jm
+
+        do k = 2,kbm1
+          do i = 1,im
+            fc(i,k) = (rho(i,j,k-1)-rho(i,j,k))/d(i,j)/(dz(k-1)+dz(k))
+          end do
+        end do
+
+!
+!  Parabolic WENO reconstruction of density field. Compute left and
+!  right side limits aL and aR for the density assuming monotonized
+!  parabolic distributions within each grid box.  Also compute dL and
+!  dR which are used as a measure of quadratic variation during
+!  subsquent WENO reconciliation of side limits.
+!
+        do k = 2,kbm1-1
+          do i = 1,im
+            deltaR = dz(k)*d(i,j)*fc(i,k)
+            deltaL = dz(k)*d(i,j)*fc(i,k+1)
+            if ((deltaR*deltaL)<0.) then
+              deltaR = 0.
+              deltaL = 0.
+            end if
+            cff  = dz(k+1)*d(i,j)+2.*dz(k)*d(i,j)+dz(k-1)*d(i,j)
+            cffR = cff*fc(i,k)
+            cffL = cff*fc(i,k+1)
+            if (abs(deltaR)>abs(cffL)) deltaR = cffL
+            if (abs(deltaL)>abs(cffR)) deltaL = cffR
+            cff = (deltaR-deltaL)
+     &           /(dz(k+1)*d(i,j)+dz(k)*d(i,j)+dz(k-1)*d(i,j))
+            deltaR = deltaR-cff*dz(k-1)*d(i,j)
+            deltaL = deltaL+cff*dz(k+1)*d(i,j)
+            aR(i,k) = rho(i,j,k)+deltaR
+            aL(i,k) = rho(i,j,k)-deltaL
+            dR(i,k) = (2.*deltaR-deltaL)**2
+            dL(i,k) = (2.*deltaL-deltaR)**2
+          end do
+        end do
+
+        do i = 1,im
+          aL(i,1) = aR(i,2)
+          aR(i,1) = 2.*rho(i,j,1)-aL(i,1)
+          dR(i,1) = (2.*aR(i,1)+aL(i,1)-3.*rho(i,j,1))**2
+          dL(i,1) = (3.*rho(i,j,1)-2.*aL(i,1)-aR(i,1))**2
+          aR(i,kbm1) = aL(i,kbm1-1)
+          aL(i,kbm1) = 2.*rho(i,j,kbm1-1)-aR(i,kbm1-1)
+          dR(i,kbm1) = (2.*aR(i,kbm1-1)+aL(i,kbm1-1)
+     &                 -3.*rho(i,j,kbm1-1))**2
+          dL(i,kbm1) = (3.*rho(i,j,kbm1-1)-2.*aL(i,kbm1-1)
+     &                 -aR(i,kbm1-1))**2
+        end do
+!
+        do k = 2,kbm1
+          do i = 1,im
+             deltaL = max(dL(i,k  ),eps)
+             deltaR = max(dR(i,k-1),eps)
+             r(i,j,k) = (deltaR*aR(i,k)+deltaL*aL(i,k-1))/
+     $                  (deltaR+deltaL)
+          end do
+        end do
+
+        do i = 1,im
+          r(i,j,1) = 2.*rho(i,j,1)-r(i,j,2)
+          r(i,j,kb) = 2.*rho(i,j,kbm1)-r(i,j,kbm1)
+        end do
+
+!
+!  Compute pressure (P) and lateral pressure force (FX). Initialize
+!  pressure at the free-surface as zero
+!
+        do i = 1,im
+          p(i,j,1) = 0.
+        end do
+        do k = 1,kbm1
+          do i = 1,im
+            p(i,j,k+1) = p(i,j,k)+dz(k)*d(i,j)*rho(i,j,k)
+            deltaR = r(i,j,k)-rho(i,j,k)
+            deltaL = rho(i,j,k)-r(i,j,k+1)
+            if ((deltaR*deltaL)<0.) then
+              rr = 0.
+            else if (abs(deltaR)>(2.*abs(deltaL))) then
+              rr = 3.*deltaL
+            else if (abs(deltaL)>(2.*abs(deltaR))) then
+              rr = 3.*deltaR
+            else
+              rr = deltaR+deltaL
+            end if
+            fx(i,j,k) = .5*dz(k)*d(i,j)*                                 &
+     &                (p(i,j,k)+p(i,j,k+1)+cff2*rr*dz(k)*d(i,j))
+          end do
+        end do
+
+!
+!  Compute net pressure gradient forces in the XI-directions.
+!  Set pressure at free-surface as zero.
+!
+        if ((j>=2).and.(j<=jmm1)) then
+          fc(:,1) = 0.
+          do k = 1,kbm1
+            do i = 2,im
+              dP = p(i-1,j,k+1)-p(i,j,k+1)
+              dh = z(k+1)*d(i,j)-z(k+1)*d(i-1,j)
+              deltaR = dh*r(i,j,k+1)-dP
+              deltaL = dP-dh*r(i-1,j,k+1)
+              if ((deltaR*deltaL)<0.) then
+                rr = 0.
+              else if (abs(deltaR)>(2.*abs(deltaL))) then
+                rr = 3.*deltaL
+              else if (abs(deltaL)>(2.*abs(deltaR))) then
+                rr = 3.*deltaR
+              else
+                rr = deltaR+deltaL
+              end if
+              fc(i,k+1) = .5*dh*(p(i,j,k+1)+p(i-1,j,k+1)+cff2*rr)
+              drhox(i,j,k) = dum(i,j)*2.*(fx(i-1,j,k)-fx(i,j,k)+
+     &                               fc(i,k)-fc(i,k+1))/                &
+     &                       (dz(k)*d(i-1,j)+dz(k)*d(i,j))
+            end do
+          end do
+        end if
+
+!
+!  Compute net pressure gradient forces in the ETA-directions.
+!  Set pressure at free-surface as zero.
+!
+        if (j>=2) then
+          fc(:,1) = 0.
+          do k= 1,kbm1
+            do i = 1,im
+              dP = p(i,j-1,k+1)-p(i,j,k+1)
+              dh = z(k+1)*d(i,j)-z(k+1)*d(i,j-1)
+              deltaR = dh*r(i,j,k+1)-dP
+              deltaL = dP-dh*r(i,j-1,k+1)
+              if ((deltaR*deltaL)<0.) then
+                rr = 0.
+              else if (abs(deltaR)>(2.*abs(deltaL))) then
+                rr = 3.*deltaL
+              else if (abs(deltaL)>(2.*abs(deltaR))) then
+                rr = 3.*deltaR
+              else
+                rr = deltaR+deltaL
+              end if
+              fc(i,k+1) = .5*dh*(p(i,j,k+1)+p(i,j-1,k+1)+cff2*rr)
+              drhoy(i,j,k) = dvm(i,j)*2.*(fx(i,j-1,k)-fx(i,j,k)+
+     &                               fc(i,k)-fc(i,k+1))/                &
+     &                       (dz(k)*d(i,j-1)+dz(k)*d(i,j))
+            end do
+          end do
+        end if
+
+      end do
+
+      rr = grav/(24.*rhoref)
+      cff = .5*grav
+      cff1 = .5*grav/rhoref
+      do j = 1,jm
+        do k = 2,kbm1
+          do i = 2,imm1
+            dh = rr*(z(k)*d(i,j)-z(k)*d(i-1,j))
+            fc(i,k) = max(dh,0.)*
+     &                   (drhox(i,j,k-1)+drhox(i+1,j,k  )-
+     &                    drhox(i,j,k  )-drhox(i-1,j,k-1))+
+     &                min(dh,0.)*
+     &                   (drhox(i,j,k  )+drhox(i+1,j,k-1)-
+     &                    drhox(i,j,k-1)-drhox(i-1,j,k  ))
+          end do
+        end do
+        do i = 2,imm1
+          fc(i,1) = 0.
+          dh = rr*(z(1)*d(i,j)-z(1)*d(i-1,j))
+          fc(i,0) = max(dh,0.)*
+     &                 (drhox(i  ,j,1)-drhox(i-1,j,1))+
+     &              min(dh,0.)*
+     &                 (drhox(i+1,j,1)-drhox(i  ,j,1))
+        end do
+        do k = 1,kbm1
+          do i = 2,imm1
+            drhox(i,j,k) = (cff*(z(1)*d(i-1,j)-z(1)*d(i,j))+
+     &                      cff1*drhox(i,j,k))*
+     &                     (dz(k)*d(i-1,j)+dz(k)*d(i,j))/dy(i,j)+           &
+     &                     (fc(i,k)-fc(i,k+1))/dy(i,j)
+          end do
+        end do
+      end do
+
+      do j = 2,jmm1
+        do k = 2,kbm1
+          do i = 1,imm1
+            dh = rr*(z(k)*d(i,j)-z(k)*d(i,j-1))
+            fx(i,j,k) = max(dh,0.)*
+     &                     (drhoy(i,j,k-1)+drhoy(i+1,j  ,k  )-
+     &                      drhoy(i,j,k  )-drhoy(i  ,j-1,k-1))+
+     &                  min(dh,0.)*
+     &                     (drhoy(i,j,k  )+drhoy(i+1,j  ,k-1)-
+     &                      drhoy(i,j,k-1)-drhoy(i  ,j-1,k  ))
+          end do
+        end do
+        do i = 1,imm1
+          fx(i,j,1) = 0.
+          dh = rr*(z(1)*d(i,j)-z(1)*d(i,j-1))
+          fx(i,j,kb) = max(dh,0.)*
+     &                   (drhoy(i  ,j,1)-drhoy(i,j-1,1))+
+     &                min(dh,0.)*
+     &                   (drhoy(i+1,j,1)-drhoy(i,j  ,1))
+        end do
+      end do
+      do j = 2,jmm1
+        do k = 1,kbm1
+          do i = 2,imm1
+            drhoy(i,j,k) = (cff*(z(1)*d(i,j-1)-z(1)*d(i,j))+
+     &                      cff1*drhoy(i,j,k))*
+     &                     (dz(k)*d(i,j-1)+dz(k)*d(i,j))/dx(i,j)+           &
+     &                     (fx(i,j,k)-fx(i,j,k+1))/dx(i,j)
+          end do
+        end do
+      end do
+
+      rho = rho+rmean
+
+      end subroutine baropg_sch2
 
 !_______________________________________________________________________
       subroutine dens(si,ti,rhoo)

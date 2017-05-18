@@ -15,7 +15,7 @@
       call bg_fields
       
 ! set time dependent surface boundary conditions
-!      call surface_forcing
+      call surface_forcing
       
 ! set time dependent lateral boundary conditions
 !      call lateral_bc
@@ -120,6 +120,8 @@
           call baropg_mcc
         else if (npg.eq.3) then
           call baropg_lin
+        else if (npg.eq.4) then
+          call baropg_sch2
         else
           error_status=1
           write(6,'(/''Error: invalid value for npg'')')
