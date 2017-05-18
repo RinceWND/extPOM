@@ -1167,14 +1167,15 @@
       double precision p(im,jm,kb),fx(im,jm,kb),fc(im,kb)
       double precision dh,cff,cff1
 
-      rho = rho-rmean
-        
       p(:,:,1) = 0.
       do k = 1,kbm1
         p(:,:,k+1) = p(:,:,k)
-     &            +dz(k)*d(1:im,1:jm)*rho(1:im,1:jm,k)
-        fx(:,:,k) = .5*dz(k)*d(1:im,1:jm)*(p(:,:,k)+p(:,:,k+1))
+     &             +(dz(k)*dt(1:im,1:jm)+et(1:im,1:jm))*rho(1:im,1:jm,k)
+        fx(:,:,k) = .5*(dz(k)*dt(1:im,1:jm)+et(1:im,1:jm))
+     &                *(p(:,:,k)+p(:,:,k+1))
       end do
+
+      rho = rho-rmean
 
       do j = 1,jm
 !
@@ -1186,16 +1187,16 @@
           do k = 1,kbm1
             do i = 2,im
               if (dum(i,j)/=0.) then
-              dh = z(k+1)*d(i,j)-z(k+1)*d(i-1,j)
+              dh = z(k+1)*(dt(i,j)-dt(i-1,j))+et(i,j)-et(i-1,j)
               fc(i,k+1) = .5*dh*(p(i,j,k+1)+p(i-1,j,k+1))
-              drhox(i,j,k) = (cff*(dz(k)*d(i-1,j)+
-     &                             dz(k)*d(i  ,j))*
-     &                            ( z(1)*d(i-1,j)-
-     &                              z(1)*d(i  ,j))+
-     &                        cff1*(fx(i-1,j,k)-
-     &                              fx(i  ,j,k)+
-     &                              fc(i,k  )-
-     &                              fc(i,k+1)))/dy(i,j)
+              drhox(i,j,k) = .5*(cff*(dz(k)*dt(i-1,j)+et(i-1,j)+
+     &                                dz(k)*dt(i  ,j)+et(i  ,j))*
+     &                               ( z(1)*dt(i-1,j)+et(i-1,j)-
+     &                                 z(1)*dt(i  ,j)-et(i  ,j))+
+     &                           cff1*(fx(i-1,j,k)-
+     &                                 fx(i  ,j,k)+
+     &                                 fc(i,k  )-
+     &                                 fc(i,k+1)))*(dy(i,j)+dy(i-1,j))
               end if
             end do
           end do
@@ -1209,24 +1210,24 @@
           do k = 1,kbm1
             do i = 2,im
               if (dvm(i,j)/=0.) then
-              dh = z(k+1)*d(i,j)-z(k+1)*d(i,j-1)
+              dh = z(k+1)*(dt(i,j)-dt(i,j-1))+et(i,j)-et(i,j-1)
               fc(i,k+1) = .5*dh*(p(i,j,k+1)+p(i,j-1,k+1))
-              drhoy(i,j,k) = (cff*(dz(k)*d(i,j-1)+
-     &                             dz(k)*d(i,j  ))*
-     &                            ( z(1)*d(i,j-1)-
-     &                              z(1)*d(i,j  ))+
-     &                        cff1*(fx(i,j-1,k)-
-     &                              fx(i,j  ,k)+
-     &                              fc(i,k  )-
-     &                              fc(i,k+1)))/dx(i,j)
+              drhoy(i,j,k) = .5*(cff*(dz(k)*dt(i,j-1)+et(i,j-1)+
+     &                                dz(k)*dt(i,j  )+et(i,j  ))*
+     &                               ( z(1)*dt(i,j-1)+et(i,j-1)-
+     &                                 z(1)*dt(i,j  )-et(i,j  ))+
+     &                           cff1*(fx(i,j-1,k)-
+     &                                 fx(i,j  ,k)+
+     &                                 fc(i,k  )-
+     &                                 fc(i,k+1)))*(dx(i,j)+dx(i,j-1))
               end if
             end do
           end do
           end if
       end do
-      
+
       rho = rho+rmean
-        
+
       end subroutine
 !_______________________________________________________________________
       subroutine baropg_sch2
@@ -1481,7 +1482,6 @@
       integer i,j,k
       double precision cr,p,rhor,sr,tr,tr2,tr3,tr4
 
-      write(*,*) iint, minval(ti, ti>0.), maxval(abs(ti))
       do k=1,kbm1
         do j=1,jm
           do i=1,im

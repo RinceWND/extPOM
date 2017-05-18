@@ -897,6 +897,7 @@
       include 'pom.h'
       integer(kind=2) ntime,ntimeb
       double precision mnth(13),doy
+      double precision, dimension(im,jm) :: wu, wv
       character(len=26) timestamp
 
       timestamp = Date_since(time_start,real((iint-1)*dti/86400.,8),"s")
@@ -909,8 +910,24 @@
       doy = Date_to_Day_of_Year(timestamp) - 1.
 
 ! read clim data
-      if (ntime.ne.ntimeb) then
+      if (ntime.ne.ntimeb .or. iint==1) then
         call read_clim_ts_pnetcdf(kb,int(ntime),tclim,sclim)
+
+        call read_wind_pnetcdf_obs(int(ntime),wu,wv)
+        wusurf(1:im,1:jm) = wu
+        wvsurf(1:im,1:jm) = wv
+! read wind file corresponding to next time
+!        ntime = ntime+1
+!        if (ntime>12) ntime = 1
+!        call read_wind_pnetcdf_obs(ntime,wu,wv)
+!        wusurff(1:im,1:jm) = wu
+!        wvsurff(1:im,1:jm) = wv
+!
+!        wusurf(1:im,1:jm) =
+!     $                   fold*wusurfb(1:im,1:jm)+fnew*wusurff(1:im,1:jm)
+!        wvsurf(1:im,1:jm) =
+!     $                   fold*wvsurfb(1:im,1:jm)+fnew*wvsurff(1:im,1:jm)
+
       end if
 
       return

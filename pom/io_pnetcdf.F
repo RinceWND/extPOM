@@ -3079,29 +3079,31 @@
       integer wu_varid,wv_varid
 !      integer vdims(2)
 !      integer(mpi_offset_kind) length
-      integer(mpi_offset_kind) start(2),edge(2)
+      integer(mpi_offset_kind) start(3),edge(3)
 
 ! open netcdf file
-      write(netcdf_file2,'(a,''in/'',a,''.wind.'',i4.4,''.nc'')')
-     $                                 trim(wrk_pth),trim(netcdf_file),n
-      if(my_task.eq.0) write(*,'(/''reading file '',a)')
-     $                                                trim(netcdf_file2)
+      write(netcdf_file2,'(a,''in/'',a,''.sfrc.nc'')')
+     $                                   trim(wrk_pth),trim(netcdf_file)
+      if(my_task.eq.0) write(*,'(/''reading wind '',a,'' ['',i4,'']'')')
+     $                                              trim(netcdf_file2),n
       status=nfmpi_open(pom_comm,netcdf_file2,nf_nowrite,
      $                                               mpi_info_null,ncid)
       call handle_error_pnetcdf('nfmpi_open: '//netcdf_file2,
      $                                                 status,nf_noerr)
 
 ! get variables
-      status=nfmpi_inq_varid(ncid,'wu',wu_varid)
+      status=nfmpi_inq_varid(ncid,'wU',wu_varid)
       call handle_error_pnetcdf('nfmpi_inq_varid: wu',status,nf_noerr)
-      status=nfmpi_inq_varid(ncid,'wv',wv_varid)
+      status=nfmpi_inq_varid(ncid,'wV',wv_varid)
       call handle_error_pnetcdf('nfmpi_inq_varid: wv',status,nf_noerr)
 
 ! get data
       start(1)=i_global(1)
       start(2)=j_global(1)
+      start(3)=n
       edge(1)=im
       edge(2)=jm
+      edge(3)=1
       status=nfmpi_get_vara_double_all(ncid,wu_varid,start,edge,wu)
       call handle_error_pnetcdf('nfmpi_get_vara_double_all',
      $                                                  status,nf_noerr)
